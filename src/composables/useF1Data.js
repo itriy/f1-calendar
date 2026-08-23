@@ -1,5 +1,5 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { getLastRaceResults, getSeasonData } from '../services/jolpica'
+import { getLastRaceResults, getSeasons, getSeasonData, getSeasonRaceWinners } from '../services/jolpica'
 
 const flags = {
   Australia: '🇦🇺', Austria: '🇦🇹', Azerbaijan: '🇦🇿', Bahrain: '🇧🇭', Belgium: '🇧🇪', Brazil: '🇧🇷', Canada: '🇨🇦', China: '🇨🇳',
@@ -34,6 +34,12 @@ export function useF1Data() {
   const lastRace = ref(null)
   const resultsLoading = ref(true)
   const resultsError = ref('')
+  const raceHistory = ref([])
+  const historyLoading = ref(true)
+  const historyError = ref('')
+  const historySeason = ref('')
+  const historySeasons = ref([])
+  let historyRequestId = 0
   const futureRaces = computed(() => schedule.value.filter((race) => {
       const start = getRaceStart(race)
       if (start) return start.getTime() > now.value
@@ -56,15 +62,39 @@ export function useF1Data() {
       date: race.date,
       place: race.Circuit?.Location?.locality || '—',
       flag: flags[race.Circuit?.Location?.country] || '🏁',
-      results: (race.Results || []).filter((result) => Number(result.points) > 0).map((result) => ({
-        position: result.position,
-        name: `${result.Driver.givenName} ${result.Driver.familyName}`,
-        url: result.Driver.url || '',
-        team: result.Constructor?.name || '—',
-        teamUrl: result.Constructor?.url || '',
-        points: result.points,
-        status: result.status
-      }))
+      results: (race.Results || []).filter((result) => Number(result.points) > 0).map((result) => {
+        const resultTime = result.Time?.time || ''
+        const isWinner = result.position === '1'
+        const gap = isWinner ? '' : result.status === 'Lapped' ? 'На коло позаду' : resultTime.startsWith('+') ? resultTime : result.status === 'Finished' ? 'Розрив не вказано' : `Статус: ${result.status || 'не класифікований'}`
+        return {
+          position: result.position,
+          name: `${result.Driver.givenName} ${result.Driver.familyName}`,
+          url: result.Driver.url || '',
+          team: result.Constructor?.name || '—',
+          teamUrl: result.Constructor?.url || '',
+          points: result.points,
+          status: result.status,
+          raceTime: isWinner ? resultTime || 'Час не вказано' : '',
+          gap
+        }
+      })
+    }
+  }
+  function normalizeRaceWinner(race) {
+    const winner = race.Results?.[0]
+    return {
+      round: race.round,
+      name: race.raceName,
+      date: race.date,
+      circuit: race.Circuit?.circuitName || 'Траса уточнюється',
+      place: race.Circuit?.Location?.locality || '—',
+      flag: flags[race.Circuit?.Location?.country] || '🏁',
+      winner: winner ? {
+        name: `${winner.Driver.givenName} ${winner.Driver.familyName}`,
+        url: winner.Driver.url || '',
+        team: winner.Constructor?.name || '—',
+        teamUrl: winner.Constructor?.url || ''
+      } : null
     }
   }
   async function loadLastResults() {
@@ -82,6 +112,25 @@ export function useF1Data() {
       resultsLoading.value = false
     }
   }
+  async function loadRaceHistory(selectedSeason = historySeason.value || season.value) {
+    const requestId = ++historyRequestId
+    historySeason.value = String(selectedSeason)
+    historyLoading.value = true
+    historyError.value = ''
+    try {
+      const data = await getSeasonRaceWinners(historySeason.value)
+      const races = data.MRData?.RaceTable?.Races
+      if (!Array.isArray(races)) throw new Error('Jolpica не повернув історію етапів')
+      if (requestId !== historyRequestId) return
+      raceHistory.value = races.map(normalizeRaceWinner).sort((a, b) => Number(b.round) - Number(a.round))
+    } catch (cause) {
+      if (requestId !== historyRequestId) return
+      console.error('Не вдалося завантажити історію етапів', cause)
+      historyError.value = 'Не вдалося завантажити історію завершених етапів.'
+    } finally {
+      historyLoading.value = false
+    }
+  }
   async function load() {
     loading.value = true
     error.value = ''
@@ -92,6 +141,7 @@ export function useF1Data() {
       const constructorList = data.constructors.MRData?.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings
       if (!raceTable?.Races?.length || !driverList || !constructorList) throw new Error('Jolpica повернув неповні дані сезону')
       season.value = raceTable.season
+      historySeason.value = raceTable.season
       schedule.value = raceTable.Races.map((race) => ({ ...race, flag: flags[race.Circuit.Location.country] || '🏁' }))
       driverStandings.value = driverList.map(driver)
       drivers.value = driverStandings.value.slice(0, 5)
@@ -104,6 +154,10 @@ export function useF1Data() {
       loading.value = false
     }
     loadLastResults()
+    getSeasons().then((data) => {
+      historySeasons.value = (data.MRData?.SeasonTable?.Seasons || []).map((item) => item.season).filter((year) => Number(year) >= 1986 && Number(year) <= Number(season.value)).sort((a, b) => Number(b) - Number(a))
+    }).catch((cause) => console.error('Не вдалося завантажити список сезонів', cause))
+    loadRaceHistory(season.value)
   }
 
   let clock
@@ -112,5 +166,5 @@ export function useF1Data() {
     clock = window.setInterval(() => { now.value = Date.now() }, 60_000)
   })
   onUnmounted(() => window.clearInterval(clock))
-  return { season, schedule, drivers, driverStandings, constructors, loading, error, updatedAt, now, upcomingRaces, nextRace, remainingRounds, lastRace, resultsLoading, resultsError, load, loadLastResults }
+  return { season, schedule, drivers, driverStandings, constructors, loading, error, updatedAt, now, upcomingRaces, nextRace, remainingRounds, lastRace, resultsLoading, resultsError, raceHistory, historyLoading, historyError, historySeason, historySeasons, load, loadLastResults, loadRaceHistory }
 }

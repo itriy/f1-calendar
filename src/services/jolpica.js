@@ -1,4 +1,4 @@
-const API_ROOT = 'https://api.jolpi.ca/ergast/f1/current'
+const API_ROOT = 'https://api.jolpi.ca/ergast/f1'
 
 async function getJson(path) {
   const response = await fetch(`${API_ROOT}${path}`, { headers: { Accept: 'application/json' } })
@@ -7,11 +7,19 @@ async function getJson(path) {
 }
 
 export async function getSeasonData() {
-  const [schedule, drivers, constructors] = await Promise.all([getJson('.json'), getJson('/driverstandings.json'), getJson('/constructorstandings.json')])
+  const [schedule, drivers, constructors] = await Promise.all([getJson('/current.json'), getJson('/current/driverstandings.json'), getJson('/current/constructorstandings.json')])
 
   return { schedule, drivers, constructors }
 }
 
 export function getLastRaceResults() {
-  return getJson('/last/results.json')
+  return getJson('/current/last/results.json')
+}
+
+export function getSeasonRaceWinners(season) {
+  return getJson(`/${encodeURIComponent(season)}/results/1.json?limit=100`)
+}
+
+export function getSeasons() {
+  return getJson('/seasons.json?limit=100')
 }
