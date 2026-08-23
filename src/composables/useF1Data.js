@@ -45,10 +45,10 @@ export function useF1Data() {
 
   function driver(item) {
     const constructor = item.Constructors?.[0]
-    return { pos: item.position, name: `${item.Driver.givenName} ${item.Driver.familyName}`, team: constructor?.name || '—', points: item.points, code: item.Driver.driverId, color: teamColors[constructor?.constructorId] || '#9ba1aa' }
+    return { pos: item.position, name: `${item.Driver.givenName} ${item.Driver.familyName}`, url: item.Driver.url || '', team: constructor?.name || '—', teamUrl: constructor?.url || '', points: item.points, code: item.Driver.driverId, color: teamColors[constructor?.constructorId] || '#9ba1aa' }
   }
   function constructor(item) {
-    return { pos: item.position, name: item.Constructor.name, team: item.Constructor.nationality, points: item.points, code: item.Constructor.constructorId, color: teamColors[item.Constructor.constructorId] || '#9ba1aa' }
+    return { pos: item.position, name: item.Constructor.name, url: item.Constructor.url || '', team: item.Constructor.nationality, points: item.points, code: item.Constructor.constructorId, color: teamColors[item.Constructor.constructorId] || '#9ba1aa' }
   }
   function normalizeLastRace(race) {
     return {
@@ -59,7 +59,9 @@ export function useF1Data() {
       results: (race.Results || []).filter((result) => Number(result.points) > 0).map((result) => ({
         position: result.position,
         name: `${result.Driver.givenName} ${result.Driver.familyName}`,
+        url: result.Driver.url || '',
         team: result.Constructor?.name || '—',
+        teamUrl: result.Constructor?.url || '',
         points: result.points,
         status: result.status
       }))
