@@ -79,7 +79,7 @@ export function useF1Data() {
           points: result.points,
           status: result.status,
           raceTime: isWinner ? resultTime || 'Час не вказано' : '',
-          gap
+          gap: isWinner ? 'Переможець' : gap
         }
       })
     }
