@@ -14,6 +14,6 @@ const safeUrl = computed(() => {
 </script>
 
 <template>
-  <a v-if="safeUrl" :href="safeUrl" target="_blank" rel="noopener noreferrer" :class="className" :aria-label="`${label}: відкрити сторінку Вікіпедії в новій вкладці`">{{ label }}</a>
+  <a v-if="safeUrl" :href="safeUrl" target="_blank" rel="noopener noreferrer" :class="['cursor-pointer decoration-f1-red/70 underline-offset-2 transition-colors hover:underline focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-f1-red', className]" :aria-label="`${label}: відкрити сторінку Вікіпедії в новій вкладці`" :title="`Відкрити сторінку Вікіпедії: ${label}`">{{ label }}</a>
   <span v-else :class="className">{{ label }}</span>
 </template>
