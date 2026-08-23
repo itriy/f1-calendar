@@ -1,7 +1,8 @@
-<script setup>
+<script setup lang="ts">
 import WikiLink from './WikiLink.vue'
+import type { TitleContender } from '../utils/championship'
 
-defineProps({ contenders: { type: Array, required: true }, remainingRounds: { type: Number, required: true }, maxPointsPerRace: { type: Number, required: true } })
+defineProps<{ contenders: TitleContender[]; remainingRounds: number; maxPointsPerRace: number }>()
 </script>
 
 <template>

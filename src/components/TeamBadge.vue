@@ -1,26 +1,31 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
-import alpine from '../assets/team-badges/alpine.svg'
-import astonMartin from '../assets/team-badges/aston-martin.svg'
-import audi from '../assets/team-badges/audi.svg'
-import cadillac from '../assets/team-badges/cadillac.svg'
-import ferrari from '../assets/team-badges/ferrari.svg'
-import haas from '../assets/team-badges/haas.svg'
-import mclaren from '../assets/team-badges/mclaren.svg'
-import mercedes from '../assets/team-badges/mercedes.svg'
-import racingBulls from '../assets/team-badges/racing-bulls.svg'
-import redBull from '../assets/team-badges/red-bull.svg'
+import alpine from '../assets/team-badges/alpine.avif'
+import astonMartin from '../assets/team-badges/astonmartin.avif'
+import audi from '../assets/team-badges/audi.avif'
+import cadillac from '../assets/team-badges/cadillac.avif'
+import ferrari from '../assets/team-badges/ferrari.avif'
+import haas from '../assets/team-badges/haasf1team.avif'
+import mclaren from '../assets/team-badges/mclaren.avif'
+import mercedes from '../assets/team-badges/mercedes.avif'
+import racingBulls from '../assets/team-badges/racingbulls.avif'
+import redBull from '../assets/team-badges/redbullracing.avif'
 import unknown from '../assets/team-badges/unknown.svg'
-import williams from '../assets/team-badges/williams.svg'
+import williams from '../assets/team-badges/williams.avif'
 
 const props = defineProps({ team: { type: String, default: '' } })
 const identities = [
-  ['mercedes', mercedes], ['ferrari', ferrari], ['mclaren', mclaren], ['red bull', redBull], ['racing bulls', racingBulls], ['rb f1', racingBulls],
-  ['williams', williams], ['aston martin', astonMartin], ['alpine', alpine], ['haas', haas], ['audi', audi], ['cadillac', cadillac]
+  ['mercedes', mercedes, '#27f4d2'], ['ferrari', ferrari, '#e8002d'], ['mclaren', mclaren, '#ff8700'], ['red bull', redBull, '#3671c6'], ['racing bulls', racingBulls, '#6692ff'], ['rb f1', racingBulls, '#6692ff'],
+  ['williams', williams, '#64c4ff'], ['aston martin', astonMartin, '#229971'], ['alpine', alpine, '#ff87bc'], ['haas', haas, '#b6babd'], ['audi', audi, '#ff2d00'], ['cadillac', cadillac, '#d6aa61']
 ]
-const asset = computed(() => identities.find(([name]) => props.team.toLowerCase().includes(name))?.[1] || unknown)
+const identity = computed(() => identities.find(([name]) => props.team.toLowerCase().includes(name)))
+const asset = computed(() => identity.value?.[1] || unknown)
+const brandColor = computed(() => identity.value?.[2] || '#71717a')
+const invertIcon = computed(() => identity.value?.[0] === 'mercedes')
 </script>
 
 <template>
-  <img class="size-5 shrink-0" :src="asset" :alt="`Команда: ${team || 'невідома'}`" :title="team || 'Невідома команда'" width="20" height="20">
+  <span class="flex size-5 shrink-0 items-center justify-center rounded-full p-0.5" :style="{ backgroundColor: brandColor }">
+    <img class="size-full object-contain" :class="{ invert: invertIcon }" :src="asset" :alt="`Команда: ${team || 'невідома'}`" :title="team || 'Невідома команда'" width="16" height="16">
+  </span>
 </template>

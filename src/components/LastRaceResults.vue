@@ -1,10 +1,10 @@
-<script setup>
+<script setup lang="ts">
 defineProps({ race: { type: Object, default: null }, loading: Boolean, error: { type: String, default: '' } })
 defineEmits(['retry'])
 import TeamBadge from './TeamBadge.vue'
 import WikiLink from './WikiLink.vue'
 
-const formatDate = (date) => date ? new Intl.DateTimeFormat('uk-UA', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${date}T12:00:00Z`)) : 'Дата уточнюється'
+const formatDate = (date?: string) => date ? new Intl.DateTimeFormat('uk-UA', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${date}T12:00:00Z`)) : 'Дата уточнюється'
 </script>
 
 <template>

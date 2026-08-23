@@ -1,8 +1,11 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref } from 'vue'
 import TeamBadge from './TeamBadge.vue'
 import WikiLink from './WikiLink.vue'
-const props = defineProps({ drivers: { type: Array, required: true }, constructors: { type: Array, required: true } })
+import type { StandingDriver } from '../types/f1'
+
+type ConstructorStanding = StandingDriver
+const props = defineProps<{ drivers: StandingDriver[]; constructors: ConstructorStanding[] }>()
 const activeTable = ref('drivers')
 const standings = computed(() => activeTable.value === 'drivers' ? props.drivers : props.constructors)
 </script>

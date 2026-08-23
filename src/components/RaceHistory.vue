@@ -1,24 +1,28 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref } from 'vue'
 import TeamBadge from './TeamBadge.vue'
 import WikiLink from './WikiLink.vue'
 
-const props = defineProps({ races: { type: Array, required: true }, season: { type: String, required: true }, seasons: { type: Array, required: true }, currentSeason: { type: [String, Number], required: true }, selectedRace: { type: Object, default: null }, detailsLoading: Boolean, detailsError: { type: String, default: '' }, loading: Boolean, error: { type: String, default: '' } })
-const emit = defineEmits(['retry', 'select-season', 'select-race', 'close-race'])
+type ResultLink = { name: string; url: string; team: string; teamUrl: string }
+type HistoryRace = { round: string; name: string; date: string; circuit: string; flag: string; winner: ResultLink | null }
+type RaceDetail = { round: string; results: Array<ResultLink & { position: string; gap: string }> }
+type SeasonSummary = { driver: ResultLink & { points: string }; constructor: { name: string; url: string; points: string } }
+const props = defineProps<{ races: HistoryRace[]; season: string; seasons: string[]; currentSeason: string | number; summary: SeasonSummary | null; summaryLoading: boolean; summaryError: string; selectedRace: RaceDetail | null; detailsLoading: boolean; detailsError: string; loading: boolean; error: string }>()
+const emit = defineEmits(['retry', 'retry-summary', 'select-season', 'select-race', 'close-race'])
 
 const initialCount = 5
 const expanded = ref(false)
 const visibleRaces = computed(() => expanded.value ? props.races : props.races.slice(0, initialCount))
-const formatDate = (date) => date ? new Intl.DateTimeFormat('uk-UA', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${date}T12:00:00Z`)) : 'Дата уточнюється'
+const formatDate = (date?: string) => date ? new Intl.DateTimeFormat('uk-UA', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${date}T12:00:00Z`)) : 'Дата уточнюється'
 const isCurrentSeason = computed(() => String(props.season) === String(props.currentSeason))
-function selectSeason(event) {
+function selectSeason(event: Event) {
   expanded.value = false
-  emit('select-season', event.target.value)
+  emit('select-season', (event.target as HTMLSelectElement).value)
 }
-function isSelected(race) {
+function isSelected(race: HistoryRace) {
   return String(props.selectedRace?.round) === String(race.round)
 }
-function toggleRace(race) {
+function toggleRace(race: HistoryRace) {
   if (isSelected(race)) emit('close-race')
   else emit('select-race', race.round)
 }
@@ -28,6 +32,7 @@ function toggleRace(race) {
   <section class="border border-white/10 bg-f1-panel">
     <div class="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-end sm:justify-between sm:px-7"><div><p class="mb-2 text-[10px] font-extrabold tracking-[.16em] text-zinc-400">АРХІВ · JOLPICA-F1</p><h2 class="font-display text-3xl leading-none font-extrabold uppercase">Історія етапів</h2></div><label class="text-[9px] font-extrabold tracking-[.12em] text-zinc-500">СЕЗОН<select class="mt-1 block w-full cursor-pointer border border-white/15 bg-f1-panel px-3 py-2 text-xs font-bold text-white outline-none focus:border-f1-red sm:w-36" :value="season" :disabled="loading" @change="selectSeason"><option v-for="year in seasons" :key="year" :value="year">{{ year }}</option></select></label></div>
     <p class="border-t border-white/10 px-5 py-3 text-[10px] leading-5 text-zinc-400 sm:px-7">{{ isCurrentSeason ? 'Усі вже завершені гонки сезону. Останній етап деталізовано окремою карткою вище.' : `Усі завершені гонки сезону ${season} та їхні переможці.` }}</p>
+    <div class="grid gap-px border-t border-white/10 bg-white/10 sm:grid-cols-2"><div class="bg-f1-panel px-5 py-4 sm:px-7"><p class="mb-3 text-[8px] font-extrabold tracking-[.14em] text-zinc-500">{{ isCurrentSeason ? 'ЛІДЕР ПІЛОТІВ' : 'ЧЕМПІОН ПІЛОТІВ' }}</p><p v-if="summaryLoading" class="text-xs text-zinc-400">Завантажуємо підсумок…</p><div v-else-if="summary?.driver" class="flex items-center gap-3"><TeamBadge :team="summary.driver.team" /><div class="min-w-0"><WikiLink :url="summary.driver.url" :label="summary.driver.name" class-name="block truncate text-sm font-bold hover:text-f1-red" /><WikiLink :url="summary.driver.teamUrl" :label="summary.driver.team" class-name="block truncate text-[9px] text-zinc-500 hover:text-white" /><strong class="mt-1 block font-display text-xl">{{ summary.driver.points }} <small class="font-sans text-[8px] text-zinc-500">очок</small></strong></div></div><div v-else class="flex items-center justify-between gap-3 text-xs text-red-100"><span>{{ summaryError || 'Підсумок недоступний.' }}</span><button v-if="summaryError" class="cursor-pointer border border-white/30 px-3 py-2 font-bold" type="button" @click="emit('retry-summary')">Повторити</button></div></div><div class="bg-f1-panel px-5 py-4 sm:px-7"><p class="mb-3 text-[8px] font-extrabold tracking-[.14em] text-zinc-500">{{ isCurrentSeason ? 'ЛІДЕР КОМАНД' : 'ЧЕМПІОН КОМАНД' }}</p><p v-if="summaryLoading" class="text-xs text-zinc-400">Завантажуємо підсумок…</p><div v-else-if="summary?.constructor" class="flex items-center gap-3"><TeamBadge :team="summary.constructor.name" /><div class="min-w-0"><WikiLink :url="summary.constructor.url" :label="summary.constructor.name" class-name="block truncate text-sm font-bold hover:text-f1-red" /><strong class="mt-1 block font-display text-xl">{{ summary.constructor.points }} <small class="font-sans text-[8px] text-zinc-500">очок</small></strong></div></div><div v-else class="flex items-center justify-between gap-3 text-xs text-red-100"><span>{{ summaryError || 'Підсумок недоступний.' }}</span><button v-if="summaryError" class="cursor-pointer border border-white/30 px-3 py-2 font-bold" type="button" @click="emit('retry-summary')">Повторити</button></div></div></div>
     <div v-if="loading" class="border-t border-white/10 px-5 py-7 text-sm text-zinc-400 sm:px-7">Завантажуємо історію завершених етапів…</div>
     <div v-else-if="error" class="flex items-center justify-between gap-4 border-t border-red-500/30 bg-red-950/20 px-5 py-5 text-xs text-red-100 sm:px-7"><span>{{ error }}</span><button class="shrink-0 border border-white/30 px-3 py-2 font-bold" @click="$emit('retry')">Повторити</button></div>
     <template v-else-if="races.length">

@@ -1,7 +1,10 @@
-<script setup>
-defineProps({ races: { type: Array, required: true }, updatedAt: { type: String, default: '' } })
-const format = (date) => new Intl.DateTimeFormat('uk-UA', { day: 'numeric', month: 'long' }).format(new Date(`${date}T12:00:00Z`))
-const raceDate = (race) => { const end = race.FirstPractice?.date || race.date; return format(race.date) === format(end) ? format(race.date) : `${format(race.date)} — ${format(end)}` }
+<script setup lang="ts">
+import type { JolpicaRace } from '../types/f1'
+
+type CalendarRace = JolpicaRace & { flag: string; FirstPractice?: { date?: string } }
+defineProps<{ races: CalendarRace[]; updatedAt?: string }>()
+const format = (date?: string) => date ? new Intl.DateTimeFormat('uk-UA', { day: 'numeric', month: 'long' }).format(new Date(`${date}T12:00:00Z`)) : 'Дата уточнюється'
+const raceDate = (race: CalendarRace) => { const end = race.FirstPractice?.date || race.date; return format(race.date) === format(end) ? format(race.date) : `${format(race.date)} — ${format(end)}` }
 </script>
 
 <template>
