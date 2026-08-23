@@ -1,5 +1,5 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { getLastRaceResults, getSeasons, getSeasonData, getSeasonRaceWinners } from '../services/jolpica'
+import { getLastRaceResults, getRaceResults, getSeasons, getSeasonData, getSeasonRaceWinners } from '../services/jolpica'
 
 const flags = {
   Australia: '🇦🇺', Austria: '🇦🇹', Azerbaijan: '🇦🇿', Bahrain: '🇧🇭', Belgium: '🇧🇪', Brazil: '🇧🇷', Canada: '🇨🇦', China: '🇨🇳',
@@ -39,7 +39,11 @@ export function useF1Data() {
   const historyError = ref('')
   const historySeason = ref('')
   const historySeasons = ref([])
+  const selectedHistoryRace = ref(null)
+  const historyDetailsLoading = ref(false)
+  const historyDetailsError = ref('')
   let historyRequestId = 0
+  let historyDetailsRequestId = 0
   const futureRaces = computed(() => schedule.value.filter((race) => {
       const start = getRaceStart(race)
       if (start) return start.getTime() > now.value
@@ -97,6 +101,29 @@ export function useF1Data() {
       } : null
     }
   }
+  function formatResultGap(result) {
+    const resultTime = result.Time?.time || ''
+    if (result.position === '1') return 'Переможець'
+    if (result.status === 'Lapped') return 'На коло позаду'
+    if (resultTime.startsWith('+')) return resultTime
+    if (result.status === 'Finished') return 'Розрив не вказано'
+    return `Статус: ${result.status || 'не класифікований'}`
+  }
+  function normalizeRaceDetails(race) {
+    return {
+      round: race.round,
+      name: race.raceName,
+      results: (race.Results || []).filter((result) => result.position).slice(0, 3).map((result) => ({
+        position: result.position,
+        name: `${result.Driver.givenName} ${result.Driver.familyName}`,
+        url: result.Driver.url || '',
+        team: result.Constructor?.name || '—',
+        teamUrl: result.Constructor?.url || '',
+        points: result.points,
+        gap: formatResultGap(result)
+      }))
+    }
+  }
   async function loadLastResults() {
     resultsLoading.value = true
     resultsError.value = ''
@@ -114,7 +141,11 @@ export function useF1Data() {
   }
   async function loadRaceHistory(selectedSeason = historySeason.value || season.value) {
     const requestId = ++historyRequestId
+    ++historyDetailsRequestId
     historySeason.value = String(selectedSeason)
+    selectedHistoryRace.value = null
+    historyDetailsLoading.value = false
+    historyDetailsError.value = ''
     historyLoading.value = true
     historyError.value = ''
     try {
@@ -130,6 +161,32 @@ export function useF1Data() {
     } finally {
       historyLoading.value = false
     }
+  }
+  async function loadHistoryRaceDetails(round) {
+    if (!round || !historySeason.value) return
+    const requestId = ++historyDetailsRequestId
+    const detailSeason = historySeason.value
+    historyDetailsLoading.value = true
+    historyDetailsError.value = ''
+    selectedHistoryRace.value = { round: String(round), results: [] }
+    try {
+      const data = await getRaceResults(detailSeason, round)
+      const race = data.MRData?.RaceTable?.Races?.[0]
+      if (!race?.Results?.length) throw new Error('Jolpica не повернув результати етапу')
+      if (requestId !== historyDetailsRequestId) return
+      selectedHistoryRace.value = normalizeRaceDetails(race)
+    } catch (cause) {
+      if (requestId !== historyDetailsRequestId) return
+      console.error('Не вдалося завантажити деталі етапу', cause)
+      historyDetailsError.value = 'Не вдалося завантажити деталі цього етапу.'
+    } finally {
+      if (requestId === historyDetailsRequestId) historyDetailsLoading.value = false
+    }
+  }
+  function closeHistoryRaceDetails() {
+    ++historyDetailsRequestId
+    selectedHistoryRace.value = null
+    historyDetailsError.value = ''
   }
   async function load() {
     loading.value = true
@@ -166,5 +223,5 @@ export function useF1Data() {
     clock = window.setInterval(() => { now.value = Date.now() }, 60_000)
   })
   onUnmounted(() => window.clearInterval(clock))
-  return { season, schedule, drivers, driverStandings, constructors, loading, error, updatedAt, now, upcomingRaces, nextRace, remainingRounds, lastRace, resultsLoading, resultsError, raceHistory, historyLoading, historyError, historySeason, historySeasons, load, loadLastResults, loadRaceHistory }
+  return { season, schedule, drivers, driverStandings, constructors, loading, error, updatedAt, now, upcomingRaces, nextRace, remainingRounds, lastRace, resultsLoading, resultsError, raceHistory, historyLoading, historyError, historySeason, historySeasons, selectedHistoryRace, historyDetailsLoading, historyDetailsError, load, loadLastResults, loadRaceHistory, loadHistoryRaceDetails, closeHistoryRaceDetails }
 }
