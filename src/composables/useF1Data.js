@@ -1,4 +1,4 @@
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { getLastRaceResults, getSeasonData } from '../services/jolpica'
 
 const flags = {
@@ -25,22 +25,23 @@ export function useF1Data() {
   const season = ref(new Date().getUTCFullYear())
   const schedule = ref([])
   const drivers = ref([])
+  const driverStandings = ref([])
   const constructors = ref([])
   const loading = ref(true)
   const error = ref('')
   const updatedAt = ref('')
+  const now = ref(Date.now())
   const lastRace = ref(null)
   const resultsLoading = ref(true)
   const resultsError = ref('')
-  const upcomingRaces = computed(() => {
-    const now = Date.now()
-    return schedule.value.filter((race) => {
+  const futureRaces = computed(() => schedule.value.filter((race) => {
       const start = getRaceStart(race)
-      if (start) return start.getTime() > now
-      return race.date ? new Date(`${race.date}T23:59:59Z`).getTime() > now : false
-    }).slice(0, 4)
-  })
+      if (start) return start.getTime() > now.value
+      return race.date ? new Date(`${race.date}T23:59:59Z`).getTime() > now.value : false
+    }))
+  const upcomingRaces = computed(() => futureRaces.value.slice(0, 10))
   const nextRace = computed(() => upcomingRaces.value[0] ?? null)
+  const remainingRounds = computed(() => futureRaces.value.length)
 
   function driver(item) {
     const constructor = item.Constructors?.[0]
@@ -55,7 +56,7 @@ export function useF1Data() {
       date: race.date,
       place: race.Circuit?.Location?.locality || '—',
       flag: flags[race.Circuit?.Location?.country] || '🏁',
-      results: (race.Results || []).slice(0, 3).map((result) => ({
+      results: (race.Results || []).filter((result) => Number(result.points) > 0).map((result) => ({
         position: result.position,
         name: `${result.Driver.givenName} ${result.Driver.familyName}`,
         team: result.Constructor?.name || '—',
@@ -90,7 +91,8 @@ export function useF1Data() {
       if (!raceTable?.Races?.length || !driverList || !constructorList) throw new Error('Jolpica повернув неповні дані сезону')
       season.value = raceTable.season
       schedule.value = raceTable.Races.map((race) => ({ ...race, flag: flags[race.Circuit.Location.country] || '🏁' }))
-      drivers.value = driverList.slice(0, 5).map(driver)
+      driverStandings.value = driverList.map(driver)
+      drivers.value = driverStandings.value.slice(0, 5)
       constructors.value = constructorList.slice(0, 5).map(constructor)
       updatedAt.value = new Intl.DateTimeFormat('uk-UA', { hour: '2-digit', minute: '2-digit' }).format(new Date())
     } catch (cause) {
@@ -102,6 +104,11 @@ export function useF1Data() {
     loadLastResults()
   }
 
-  onMounted(load)
-  return { season, schedule, drivers, constructors, loading, error, updatedAt, upcomingRaces, nextRace, lastRace, resultsLoading, resultsError, load, loadLastResults }
+  let clock
+  onMounted(() => {
+    load()
+    clock = window.setInterval(() => { now.value = Date.now() }, 60_000)
+  })
+  onUnmounted(() => window.clearInterval(clock))
+  return { season, schedule, drivers, driverStandings, constructors, loading, error, updatedAt, now, upcomingRaces, nextRace, remainingRounds, lastRace, resultsLoading, resultsError, load, loadLastResults }
 }
