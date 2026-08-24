@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">F1 Calendar</title>
+  <desc id="desc">Стилізований червоний гоночний болід на темному тлі.</desc>
+  <rect width="512" height="512" rx="112" fill="#0b0d12"/>
+  <path fill="#e10600" d="M92 302h42l28-88h62l20-34h104l23 34h55l42 88h43v48h-74l-19-49H163l-15 49H92z"/>
+  <path fill="#f4f7fb" d="M206 213h107l16 25H190zm52 93h92l-12-37h-68z"/>
+  <circle cx="173" cy="355" r="48" fill="#151922" stroke="#f4f7fb" stroke-width="12"/>
+  <circle cx="386" cy="355" r="48" fill="#151922" stroke="#f4f7fb" stroke-width="12"/>
+  <path fill="#ffb800" d="M257 250h58l10 20h-68z"/>
+</svg>
