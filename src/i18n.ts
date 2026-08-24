@@ -8,7 +8,11 @@ const messages = {
       points: 'очок',
       season: 'СЕЗОН',
       winner: 'ПЕРЕМОЖЕЦЬ',
-      loading: 'Завантажуємо…'
+      loading: 'Завантажуємо…',
+      live: 'LIVE',
+      of: 'з',
+      unknownLocation: 'Місце уточнюється',
+      gap: 'ВІДСТАВАННЯ'
     },
     app: {
       calendar: 'Календар',
@@ -16,7 +20,7 @@ const messages = {
       headlineStart: 'Тримай руку',
       headlineMiddle: 'на',
       headlineEmphasis: 'пульсі',
-      headlineEnd: 'гонки.',
+      headlineEnd: 'гонки',
       intro: 'Актуальний розклад і лідери чемпіонату Формули 1 — в одному місці.',
       nextRound: 'НАСТУПНИЙ ЕТАП',
       nextRace: 'НАСТУПНА ГОНКА',
@@ -42,6 +46,8 @@ const messages = {
     lastRace: { eyebrow: 'РЕЗУЛЬТАТИ · JOLPICA-F1', title: 'Останній етап', loading: 'Завантажуємо результати останньої гонки…', time: 'Час: {time}', allScorers: 'УСІ ПІЛОТИ З ОЧКАМИ', gap: 'ВІДСТАВАННЯ', empty: 'У Jolpica немає пілотів з нарахованими очками для цього етапу.' },
     history: { eyebrow: 'АРХІВ · JOLPICA-F1', title: 'Історія етапів', currentDescription: 'Усі вже завершені гонки сезону. Останній етап деталізовано окремою карткою вище.', description: 'Усі завершені гонки сезону {season} та їхні переможці.', driverLeader: 'ЛІДЕР ПІЛОТІВ', driverChampion: 'ЧЕМПІОН ПІЛОТІВ', constructorLeader: 'ЛІДЕР КОМАНД', constructorChampion: 'ЧЕМПІОН КОМАНД', summaryLoading: 'Завантажуємо підсумок…', summaryUnavailable: 'Підсумок недоступний.', loading: 'Завантажуємо історію завершених етапів…', winnerMissing: 'Переможця не вказано', podium: 'ПОДІУМ · ВІДСТАВАННЯ ВІД ПЕРЕМОЖЦЯ', detailsLoading: 'Завантажуємо класифікацію етапу…', detailsUnavailable: 'Класифікація етапу недоступна.', collapse: 'ЗГОРНУТИ АРХІВ', showMore: 'ПОКАЗАТИ ЩЕ {count}', currentEmpty: 'Завершених етапів у поточному сезоні поки немає.', empty: 'Для сезону {season} завершених етапів не знайдено.' },
     aiSearch: { eyebrow: 'AI-ПОШУК · GEMINI', title: 'Запитай про автоспорт', description: 'Короткі відповіді про F1, F2, F3, WEC та автоспорт із веб-джерелами й Wikipedia.', label: 'Запит про автоспорт', placeholder: 'Наприклад: хто виграв Гран-прі Монако 2025?', submit: 'Шукати', loading: 'Шукаємо…', validation: 'Введіть щонайменше 3 символи.', error: 'Не вдалося виконати AI-пошук.', answer: 'ВІДПОВІДЬ', sources: 'ДЖЕРЕЛА З ІНТЕРНЕТУ', wikipedia: 'WIKIPEDIA' },
+    reminders: { eyebrow: 'PUSH', title: 'Нагадування про гонку', description: 'Сповіщення надсилаються за запланованим UTC-часом календаря: за 1 день, за 1 годину або в момент запланованого старту. На сайті час етапу показано у вашому часовому поясі. Це не підтвердження фактичного старту гонки.', legend: 'Коли нагадувати', day: 'За 1 день', hour: 'За 1 годину', start: 'У момент старту', unsupported: 'Web Push недоступний у цьому браузері. На iPhone/iPad спершу встановіть застосунок на екран «Початок».', permissionDenied: 'Браузер заблокував сповіщення. Дозвольте їх у налаштуваннях сайту.', wait: 'Зачекайте…', enable: 'Увімкнути нагадування', save: 'Зберегти вибір', disable: 'Вимкнути', enableDenied: 'Дозвіл на сповіщення відхилено в браузері.', enableUnsupported: 'Цей браузер не підтримує Web Push.', enabled: 'Нагадування увімкнено.', enableError: 'Не вдалося увімкнути нагадування.', saved: 'Налаштування збережено.', saveError: 'Не вдалося зберегти налаштування.', disabled: 'Нагадування вимкнено.', disableError: 'Не вдалося вимкнути нагадування.' },
+    circuit: { about: 'Про трасу', unknownCircuit: 'Траса уточнюється', unknownCity: 'Місто уточнюється', coordinates: 'Координати: {lat}, {long}', sessions: 'СЕСІЇ ВІКЕНДУ', timeUnknown: 'Час уточнюється', loading: 'Завантаження…', imageUnavailable: 'Зображення траси недоступне', imageAlt: 'Вигляд {circuit}', previewImageAlt: 'Збільшений вигляд {circuit}', previewTrigger: 'Збільшити зображення: {circuit}', previewHint: 'Наведіть курсор або натисніть зображення ще раз, щоб закрити.', sourceMedia: 'Джерело: Wikipedia / Commons', sourceWikipedia: 'Джерело: Wikipedia', sessionFp1: 'Вільна практика 1', sessionFp2: 'Вільна практика 2', sessionFp3: 'Вільна практика 3', sessionQualifying: 'Кваліфікація', sessionSprintQualifying: 'Спринт-кваліфікація', sessionSprint: 'Спринт' },
     teamBadge: { unknown: 'невідома', unknownTitle: 'Невідома команда', label: 'Команда: {team}' },
     wikiLink: { ariaLabel: '{label}: відкрити сторінку Вікіпедії в новій вкладці', title: 'Відкрити сторінку Вікіпедії: {label}' }
   }

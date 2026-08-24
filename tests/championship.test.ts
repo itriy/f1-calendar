@@ -1,5 +1,4 @@
-import test from 'node:test'
-import assert from 'node:assert/strict'
+import { expect, test } from 'vitest'
 import { estimateChampionshipChances } from '../src/utils/championship'
 
 const standings = [
@@ -10,10 +9,10 @@ const standings = [
 
 test('keeps only mathematical contenders and distributes a deterministic model index', () => {
   const result = estimateChampionshipChances(standings, 2)
-  assert.deepEqual(result.map((item) => item.name), ['Leader', 'Contender'])
-  assert.equal(result.reduce((total, item) => total + item.estimate, 0), 100)
+  expect(result.map((item) => item.name)).toEqual(['Leader', 'Contender'])
+  expect(result.reduce((total, item) => total + item.estimate, 0)).toBe(100)
 })
 
 test('returns no title model once the season is complete', () => {
-  assert.deepEqual(estimateChampionshipChances(standings, 0), [])
+  expect(estimateChampionshipChances(standings, 0)).toEqual([])
 })

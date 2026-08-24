@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import type { JolpicaRace } from '../types/f1'
+import NextRaceCircuit from './NextRaceCircuit.vue'
 
 type CalendarRace = JolpicaRace & { flag: string; FirstPractice?: { date?: string } }
 defineProps<{ races: CalendarRace[]; updatedAt?: string }>()
@@ -16,6 +17,7 @@ const raceDate = (race: CalendarRace) => { const end = race.FirstPractice?.date 
       <div class="text-center font-display text-2xl font-extrabold">{{ race.round }}<small class="block font-sans text-[8px] font-semibold tracking-wide text-zinc-500">{{ t('calendar.round') }}</small></div><div class="text-xl">{{ race.flag }}</div>
       <div><b class="block text-[10px] sm:text-xs">{{ race.raceName }}</b><span class="block text-[8px] font-semibold tracking-wide text-zinc-500">{{ race.Circuit.Location.locality }}</span></div>
       <div class="text-right text-[9px] font-bold sm:text-[11px]">{{ raceDate(race) }}<small v-if="index === 0" class="block pt-1 text-[7px] font-bold tracking-wide text-f1-red">{{ t('calendar.nextRace') }}</small></div><span class="text-right text-zinc-400">→</span>
+      <div class="col-span-full"><NextRaceCircuit :race="race" /></div>
     </article>
     <p v-if="!races.length" class="p-6 text-center text-xs text-zinc-400">{{ t('calendar.empty') }}</p>
   </section>

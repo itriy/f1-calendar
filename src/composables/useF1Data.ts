@@ -26,6 +26,14 @@ export function formatRaceStartLocal(race: Pick<JolpicaRace, 'date' | 'time'> | 
   return new Intl.DateTimeFormat('uk-UA', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }).format(start)
 }
 
+export function getUpcomingRaces<T extends Pick<JolpicaRace, 'date' | 'time'>>(races: T[], currentTime = Date.now()): T[] {
+  return races.filter((race) => {
+    const start = getRaceStart(race)
+    if (start) return start.getTime() > currentTime
+    return race.date ? new Date(`${race.date}T23:59:59Z`).getTime() > currentTime : false
+  })
+}
+
 export function useF1Data() {
   const season = ref(String(new Date().getUTCFullYear()))
   const schedule = ref<RaceView[]>([])
@@ -52,12 +60,8 @@ export function useF1Data() {
   const historyDetailsError = ref('')
   let historyRequestId = 0
   let historyDetailsRequestId = 0
-  const futureRaces = computed(() => schedule.value.filter((race) => {
-    const start = getRaceStart(race)
-    if (start) return start.getTime() > now.value
-    return race.date ? new Date(`${race.date}T23:59:59Z`).getTime() > now.value : false
-  }))
-  const upcomingRaces = computed(() => futureRaces.value.slice(0, 10))
+  const futureRaces = computed(() => getUpcomingRaces(schedule.value, now.value))
+  const upcomingRaces = computed(() => futureRaces.value)
   const nextRace = computed(() => upcomingRaces.value[0] ?? null)
   const remainingRounds = computed(() => futureRaces.value.length)
 

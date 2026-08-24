@@ -3,6 +3,7 @@ dist/
 .wrangler/
 docs/
 .idea/
+migrations/
 .env
 .env.local
 .dev.vars

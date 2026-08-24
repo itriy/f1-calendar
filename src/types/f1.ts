@@ -27,11 +27,21 @@ export interface JolpicaRace {
   date?: string
   time?: string
   Circuit?: {
+    circuitId?: string
     circuitName?: string
-    Location?: { country?: string; locality?: string }
+    url?: string
+    Location?: { country?: string; locality?: string; lat?: string; long?: string }
   }
+  FirstPractice?: RaceSession
+  SecondPractice?: RaceSession
+  ThirdPractice?: RaceSession
+  Qualifying?: RaceSession
+  SprintQualifying?: RaceSession
+  Sprint?: RaceSession
   Results?: JolpicaResult[]
 }
+
+export interface RaceSession { date?: string; time?: string }
 
 export interface JolpicaDriverStanding {
   position: string

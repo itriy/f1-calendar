@@ -1,4 +1,4 @@
-const CACHE_NAME = 'f1-calendar-shell-v1'
+const CACHE_NAME = 'f1-calendar-shell-v2'
 const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icons/f1-calendar.svg', '/icons/f1-calendar-180.png', '/icons/f1-calendar-192.png', '/icons/f1-calendar-512.png']
 
 self.addEventListener('install', (event) => {
