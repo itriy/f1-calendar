@@ -4,3 +4,8 @@ GEMINI_API_KEY=
 
 # Optional non-secret local override. The Worker defaults to gemini-3.6-flash.
 GEMINI_MODEL=gemini-3.6-flash
+
+# Web Push: copy values locally only. VAPID_PRIVATE_KEY must never be committed.
+VAPID_PUBLIC_KEY=
+VAPID_PRIVATE_KEY=
+VAPID_SUBJECT=mailto:you@example.com

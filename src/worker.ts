@@ -1,8 +1,16 @@
+import { handlePushApi, sendDueRaceReminders, type D1Database } from './push'
+
 type Env = {
   ASSETS: { fetch(request: Request): Promise<Response> }
+  PUSH_DB?: D1Database
+  VAPID_PUBLIC_KEY?: string
+  VAPID_PRIVATE_KEY?: string
+  VAPID_SUBJECT?: string
   GEMINI_API_KEY?: string
   GEMINI_MODEL?: string
 }
+type ScheduledController = { scheduledTime: number; cron: string; noRetry(): void }
+type ExecutionContext = { waitUntil(promise: Promise<unknown>): void }
 
 type GeminiResponse = {
   candidates?: Array<{
@@ -135,9 +143,14 @@ async function handleSearch(request: Request, env: Env): Promise<Response> {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url)
+    if (url.pathname === '/api/push/subscription') return handlePushApi(request, env)
+    if (url.pathname === '/api/push/config') return handlePushApi(request, env)
     if (url.pathname === '/api/f1-search') return handleSearch(request, env)
     if (url.pathname.startsWith('/api/')) return error('not_found', 'Маршрут API не знайдено.', 404)
     return env.ASSETS.fetch(request)
+  },
+  async scheduled(_controller: ScheduledController, env: Env, ctx: ExecutionContext) {
+    ctx.waitUntil(sendDueRaceReminders(env))
   }
 }
 
