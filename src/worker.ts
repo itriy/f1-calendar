@@ -105,7 +105,7 @@ async function handleSearch(request: Request, env: Env): Promise<Response> {
   if (!env.GEMINI_API_KEY) return error('not_configured', 'AI-пошук ще не налаштований.', 503)
 
   const prompt = `Ти — пошук для F1 Calendar. Відповідай українською, стисло й лише на теми Формули 1, F2, F3, WEC, команд, пілотів, трас, перегонів та автоспорту. Якщо запит не про автоспорт, поясни, що пошук підтримує лише F1 та суміжний автоспорт. Не вигадуй фактів; спирайся на результати веб-пошуку. Запит користувача: ${normalizedQuery}`
-  const model = env.GEMINI_MODEL || 'gemini-2.5-flash-lite'
+  const model = env.GEMINI_MODEL || 'gemini-3.6-flash'
 
   try {
     const [geminiResponse, wikipedia] = await Promise.all([
