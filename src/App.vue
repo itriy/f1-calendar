@@ -6,7 +6,6 @@ import RaceCalendar from './components/RaceCalendar.vue'
 import StandingsTable from './components/StandingsTable.vue'
 import LastRaceResults from './components/LastRaceResults.vue'
 import RaceHistory from './components/RaceHistory.vue'
-import AiSearch from './components/AiSearch.vue'
 import RaceReminders from './components/RaceReminders.vue'
 import { formatRaceStartLocal, getRaceStart, useF1Data } from './composables/useF1Data'
 import { estimateChampionshipChances, MAX_POINTS_PER_RACE } from './utils/championship'
@@ -39,7 +38,10 @@ const countdown = (race: { date?: string; time?: string } | null, currentTime = 
       <section v-else class="mx-auto w-[min(1180px,calc(100%-28px))] border border-white/10 bg-f1-panel p-5 text-center text-sm text-zinc-400 sm:w-[min(1180px,calc(100%-48px))]">{{ t('app.seasonFinished', { season }) }}</section>
       <section class="mx-auto grid w-[min(1180px,calc(100%-28px))] grid-cols-1 gap-4 py-10 lg:w-[min(1180px,calc(100%-48px))] lg:grid-cols-[1.42fr_.9fr] lg:gap-6 lg:py-17"><RaceCalendar :races="upcomingRaces" :updated-at="updatedAt" /><div class="space-y-4"><ChampionshipChances :contenders="contenders" :remaining-rounds="remainingRounds" :max-points-per-race="MAX_POINTS_PER_RACE" /><LastRaceResults :race="lastRace" :loading="resultsLoading" :error="resultsError" @retry="loadLastResults" /><StandingsTable :drivers="drivers" :constructors="constructors" /></div></section>
       <section class="mx-auto w-[min(1180px,calc(100%-28px))] pb-10 lg:w-[min(1180px,calc(100%-48px))]"><RaceHistory :races="raceHistory" :season="historySeason" :seasons="historySeasons" :current-season="season" :summary="seasonSummary" :summary-loading="seasonSummaryLoading" :summary-error="seasonSummaryError" :loading="historyLoading" :error="historyError" :selected-race="selectedHistoryRace" :details-loading="historyDetailsLoading" :details-error="historyDetailsError" @retry="loadRaceHistory" @retry-summary="loadSeasonSummary" @select-season="selectHistorySeason" @select-race="loadHistoryRaceDetails" @close-race="closeHistoryRaceDetails" /></section>
-      <section class="mx-auto grid w-[min(1180px,calc(100%-28px))] grid-cols-1 gap-4 pb-10 lg:w-[min(1180px,calc(100%-48px))] lg:grid-cols-2"><RaceReminders /><AiSearch /></section>
+      <section class="mx-auto grid w-[min(1180px,calc(100%-28px))] grid-cols-1 gap-4 pb-10 lg:w-[min(1180px,calc(100%-48px))] lg:grid-cols-2">
+        <RaceReminders />
+        <!-- <AiSearch /> -->
+      </section>
     </template>
     <section class="mx-auto flex w-[min(1180px,calc(100%-28px))] gap-3 border border-white/10 bg-white/3 p-4 text-[10px] leading-5 text-zinc-400 sm:w-[min(1180px,calc(100%-48px))]"><span class="flex size-4 shrink-0 items-center justify-center rounded-full border border-f1-red font-bold text-f1-red">i</span><p class="m-0"><b class="text-zinc-100">{{ t('app.liveDataTitle') }}</b> {{ t('app.liveDataDescription') }}</p></section>
     <footer class="mx-auto mt-8 flex w-[min(1180px,calc(100%-28px))] flex-wrap gap-3 border-t border-white/10 py-6 text-[9px] text-zinc-500 sm:mt-10 sm:w-[min(1180px,calc(100%-48px))]"><span class="w-full font-display text-sm font-extrabold text-white sm:mr-auto sm:w-auto"><b class="mr-1 bg-f1-red px-1">F1</b> CALENDAR</span><small>{{ t('app.footer') }}</small><small>© {{ season }}</small></footer>

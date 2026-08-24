@@ -1,5 +1,5 @@
-const CACHE_NAME = 'f1-calendar-shell-v2'
-const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icons/f1-calendar.svg', '/icons/f1-calendar-180.png', '/icons/f1-calendar-192.png', '/icons/f1-calendar-512.png']
+const CACHE_NAME = 'f1-calendar-shell-v3'
+const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icons/favicon.svg', '/icons/favicon-32.png', '/icons/f1-calendar.svg', '/icons/f1-calendar-180.png', '/icons/f1-calendar-192.png', '/icons/f1-calendar-512.png']
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)))

@@ -1,10 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
   <title id="title">F1 Calendar</title>
-  <desc id="desc">Стилізований червоний гоночний болід на темному тлі.</desc>
-  <rect width="512" height="512" rx="112" fill="#0b0d12"/>
-  <path fill="#e10600" d="M92 302h42l28-88h62l20-34h104l23 34h55l42 88h43v48h-74l-19-49H163l-15 49H92z"/>
-  <path fill="#f4f7fb" d="M206 213h107l16 25H190zm52 93h92l-12-37h-68z"/>
-  <circle cx="173" cy="355" r="48" fill="#151922" stroke="#f4f7fb" stroke-width="12"/>
-  <circle cx="386" cy="355" r="48" fill="#151922" stroke="#f4f7fb" stroke-width="12"/>
-  <path fill="#ffb800" d="M257 250h58l10 20h-68z"/>
+  <desc id="desc">Червона іконка F1 Calendar з геометричним знаком F1 та написом Calendar.</desc>
+  <rect width="512" height="512" fill="#e10600"/>
+  <path d="M0 74 512 0v61L0 135Z" fill="#f13a35" opacity=".45"/>
+  <g transform="translate(0 10) skewX(-9)">
+    <path fill="#fff" d="M92 128h218v55H154v49h140v55H154v92H92V128Z"/>
+    <path fill="#fff" d="M335 128h59v251h-62V201l-43 26v-64l46-35Z"/>
+  </g>
+  <path d="M86 402h340" stroke="#fff" stroke-width="2" opacity=".55"/>
+  <text x="256" y="443" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" letter-spacing="4" text-anchor="middle">CALENDAR</text>
 </svg>
