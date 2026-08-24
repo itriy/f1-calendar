@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "npm run dev:worker",
+    "dev:vite": "vite",
     "dev:worker": "npm run build && wrangler dev --local",
     "lint": "eslint .",
     "test": "tsx --test",
