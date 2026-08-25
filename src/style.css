@@ -14,3 +14,22 @@
   body { @apply m-0 bg-f1-bg font-sans text-stone-100 antialiased; background-image: radial-gradient(circle at 90% 5%, #1b1f2b 0, transparent 28rem); }
   button, a { -webkit-tap-highlight-color: transparent; }
 }
+
+@media (max-width: 1023px) {
+  .text-xs { font-size: 0.8125rem; }
+  .text-sm { font-size: 0.9375rem; }
+}
+
+@media (min-width: 1024px) {
+  .text-xs { font-size: 0.8125rem; }
+  .text-sm { font-size: 0.9375rem; }
+  .text-lg { font-size: 1.1875rem; }
+  .text-xl { font-size: 1.3125rem; }
+}
+
+@media (min-width: 1440px) {
+  .text-xs { font-size: 0.875rem; }
+  .text-sm { font-size: 1rem; }
+  .text-lg { font-size: 1.25rem; }
+  .text-xl { font-size: 1.375rem; }
+}
