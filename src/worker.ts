@@ -8,6 +8,7 @@ type Env = {
   VAPID_SUBJECT?: string
   GEMINI_API_KEY?: string
   GEMINI_MODEL?: string
+  YOUTUBE_API_KEY?: string
 }
 type ScheduledController = { scheduledTime: number; cron: string; noRetry(): void }
 type ExecutionContext = { waitUntil(promise: Promise<unknown>): void }
@@ -21,12 +22,17 @@ type GeminiResponse = {
 
 type WikipediaSearch = { pages?: Array<{ title?: string; key?: string; excerpt?: string; description?: string }> }
 type SearchSource = { title: string; url: string; domain: string }
+type Formula1Video = { id: string; title: string; kind: 'race-highlights' | 'qualifying-highlights' | 'sprint-highlights' | 'race-moment' }
+type YoutubeSearchResponse = { nextPageToken?: string; items?: Array<{ id?: { videoId?: string }; snippet?: { channelId?: string; title?: string } }> }
 
 const MAX_BODY_BYTES = 1_024
 const MAX_QUERY_LENGTH = 400
 const RATE_LIMIT = 8
 const RATE_WINDOW_MS = 5 * 60 * 1_000
 const requestLog = new Map<string, number[]>()
+const videoRequestLog = new Map<string, number[]>()
+const OFFICIAL_FORMULA1_CHANNEL_ID = 'UCB_qr75-ydFVKSF9Dmo6izg'
+const YOUTUBE_ID = /^[A-Za-z0-9_-]{11}$/
 
 function json(body: unknown, status = 200): Response {
   return Response.json(body, { status, headers: { 'Cache-Control': 'no-store', 'Content-Type': 'application/json; charset=utf-8' } })
@@ -70,6 +76,87 @@ function isRateLimited(client: string): boolean {
   recent.push(now)
   requestLog.set(client, recent)
   return false
+}
+
+function isVideoRateLimited(client: string): boolean {
+  const now = Date.now()
+  const recent = (videoRequestLog.get(client) || []).filter((time) => now - time < RATE_WINDOW_MS)
+  if (recent.length >= 30) return true
+  recent.push(now)
+  videoRequestLog.set(client, recent)
+  return false
+}
+
+function normalizeVideoText(value: string): string {
+  return value.toLowerCase().replace(/&amp;/g, 'and').replace(/[^a-z0-9]+/g, ' ').trim()
+}
+
+function matchingFormula1Video(id: unknown, title: unknown, channelId: unknown, season: string, race: string): Formula1Video | null {
+  if (typeof id !== 'string' || !YOUTUBE_ID.test(id) || typeof title !== 'string' || channelId !== OFFICIAL_FORMULA1_CHANNEL_ID) return null
+  const normalizedTitle = normalizeVideoText(title)
+  const normalizedRace = normalizeVideoText(race).replace(/\bgrand prix\b/g, '').trim()
+  const raceWords = normalizedRace.split(' ').filter((word) => word.length > 2)
+  if (!normalizedTitle.includes(season) || !raceWords.length || !raceWords.every((word) => normalizedTitle.includes(word))) return null
+  if (/\bqualifying highlights\b/.test(normalizedTitle)) return { id, title: title.slice(0, 160), kind: 'qualifying-highlights' }
+  if (/\bsprint (highlights|shootout highlights)\b/.test(normalizedTitle)) return { id, title: title.slice(0, 160), kind: 'sprint-highlights' }
+  if (/\brace highlights\b/.test(normalizedTitle)) return { id, title: title.slice(0, 160), kind: 'race-highlights' }
+  if (/\b(key moments?|top 10|best moments?|overtakes?|battles?|dramatic moments?)\b/.test(normalizedTitle)) return { id, title: title.slice(0, 160), kind: 'race-moment' }
+  return null
+}
+
+function uniqueVideos(videos: Formula1Video[]): Formula1Video[] {
+  const priority: Record<Formula1Video['kind'], number> = { 'race-highlights': 0, 'qualifying-highlights': 1, 'sprint-highlights': 2, 'race-moment': 3 }
+  return videos
+    .filter((video, index, all) => all.findIndex((item) => item.id === video.id) === index)
+    .sort((a, b) => priority[a.kind] - priority[b.kind])
+}
+
+async function findVideosWithYoutubeApi(apiKey: string, season: string, race: string): Promise<Formula1Video[]> {
+  const videos: Formula1Video[] = []
+  const seenTokens = new Set<string>()
+  let pageToken: string | undefined
+  do {
+    const params = new URLSearchParams({ part: 'snippet', channelId: OFFICIAL_FORMULA1_CHANNEL_ID, type: 'video', videoEmbeddable: 'true', maxResults: '50', order: 'date', q: `${season} ${race}`, key: apiKey })
+    if (pageToken) params.set('pageToken', pageToken)
+    const response = await fetch(`https://www.googleapis.com/youtube/v3/search?${params}`)
+    if (!response.ok) throw new Error('YouTube search unavailable')
+    const data = await response.json() as YoutubeSearchResponse
+    videos.push(...(data.items || []).map((item) => matchingFormula1Video(item.id?.videoId, item.snippet?.title, item.snippet?.channelId, season, race)).filter((video): video is Formula1Video => video !== null))
+    pageToken = data.nextPageToken
+  } while (pageToken && !seenTokens.has(pageToken) && (seenTokens.add(pageToken), true))
+  return uniqueVideos(videos)
+}
+
+function xmlTag(entry: string, tag: string): string | null {
+  const match = entry.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, 'i'))
+  return match?.[1]?.trim() || null
+}
+
+async function findVideosWithOfficialRss(season: string, race: string): Promise<Formula1Video[]> {
+  const response = await fetch(`https://www.youtube.com/feeds/videos.xml?channel_id=${OFFICIAL_FORMULA1_CHANNEL_ID}`)
+  if (!response.ok) throw new Error('YouTube feed unavailable')
+  const entries = (await response.text()).match(/<entry>[\s\S]*?<\/entry>/gi) || []
+  return uniqueVideos(entries.map((entry) => matchingFormula1Video(xmlTag(entry, 'yt:videoId'), xmlTag(entry, 'title'), xmlTag(entry, 'yt:channelId'), season, race)).filter((video): video is Formula1Video => video !== null))
+}
+
+async function handleRaceVideos(request: Request, env: Env): Promise<Response> {
+  if (request.method !== 'GET') return error('method_not_allowed', 'Метод не підтримується.', 405)
+  const client = request.headers.get('CF-Connecting-IP') || 'anonymous'
+  if (isVideoRateLimited(client)) return error('rate_limited', 'Забагато запитів до відео. Спробуйте пізніше.', 429)
+  const url = new URL(request.url)
+  const season = url.searchParams.get('season') || ''
+  const round = url.searchParams.get('round') || ''
+  const race = (url.searchParams.get('race') || '').trim()
+  if (!/^\d{4}$/.test(season) || Number(season) < 1950 || Number(season) > new Date().getUTCFullYear() || !/^\d{1,2}$/.test(round) || Number(round) < 1 || Number(round) > 30 || race.length < 3 || race.length > 120) return error('invalid_request', 'Некоректні дані етапу.', 400)
+  try {
+    const primaryVideos = env.YOUTUBE_API_KEY
+      ? await findVideosWithYoutubeApi(env.YOUTUBE_API_KEY, season, race)
+      : await findVideosWithOfficialRss(season, race)
+    const videos = primaryVideos.length || !env.YOUTUBE_API_KEY ? primaryVideos : await findVideosWithOfficialRss(season, race)
+    return Response.json({ videos }, { headers: { 'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800', 'Content-Type': 'application/json; charset=utf-8' } })
+  } catch {
+    return Response.json({ videos: [] }, { headers: { 'Cache-Control': 'public, max-age=300', 'Content-Type': 'application/json; charset=utf-8' } })
+  }
 }
 
 function safeSource(uri: string, title?: string): SearchSource | null {
@@ -146,6 +233,7 @@ export default {
     if (url.pathname === '/api/push/subscription') return handlePushApi(request, env)
     if (url.pathname === '/api/push/config') return handlePushApi(request, env)
     if (url.pathname === '/api/f1-search') return handleSearch(request, env)
+    if (url.pathname === '/api/f1-videos') return handleRaceVideos(request, env)
     if (url.pathname.startsWith('/api/')) return error('not_found', 'Маршрут API не знайдено.', 404)
     return env.ASSETS.fetch(request)
   },
@@ -154,4 +242,4 @@ export default {
   }
 }
 
-export { handleSearch }
+export { handleRaceVideos, handleSearch }

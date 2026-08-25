@@ -5,6 +5,12 @@ GEMINI_API_KEY=
 # Optional non-secret local override. The Worker defaults to gemini-3.6-flash.
 GEMINI_MODEL=gemini-3.6-flash
 
+# The only setting needed for full official Formula 1 video history. Create a
+# YouTube Data API v3 key in Google Cloud and put it in a local .dev.vars file.
+# Keep this Worker secret private; never use VITE_. Leaving it empty retains the
+# automatic recent-video RSS fallback.
+YOUTUBE_API_KEY=
+
 # Web Push: copy values locally only. VAPID_PRIVATE_KEY must never be committed.
 VAPID_PUBLIC_KEY=
 VAPID_PRIVATE_KEY=

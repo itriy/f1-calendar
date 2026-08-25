@@ -1,8 +1,40 @@
-import { expect, test } from 'vitest'
-import { handleSearch } from '../src/worker'
+import { afterEach, expect, test, vi } from 'vitest'
+import { handleRaceVideos, handleSearch } from '../src/worker'
 import worker from '../src/worker'
 
 const assets = { fetch: async () => new Response('asset') }
+
+afterEach(() => vi.unstubAllGlobals())
+
+test('returns several matching videos only when YouTube identifies the Formula 1 channel', async () => {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ items: [
+    { id: { videoId: 'moment12345' }, snippet: { channelId: 'UCB_qr75-ydFVKSF9Dmo6izg', title: 'Top 10 moments | 2025 Australian Grand Prix' } },
+    { id: { videoId: 'md9-jG4RzXs' }, snippet: { channelId: 'UCB_qr75-ydFVKSF9Dmo6izg', title: 'Race Highlights | 2025 Australian Grand Prix' } },
+    { id: { videoId: 'Mr7T8TC-cZg' }, snippet: { channelId: 'UCB_qr75-ydFVKSF9Dmo6izg', title: 'Qualifying Highlights | 2025 Australian Grand Prix' } },
+    { id: { videoId: 'untrusted01' }, snippet: { channelId: 'not-the-official-channel', title: 'Race Highlights | 2025 Australian Grand Prix' } }
+  ] })))
+  const response = await handleRaceVideos(new Request('https://example.test/api/f1-videos?season=2025&round=1&race=Australian%20Grand%20Prix'), { ASSETS: assets, YOUTUBE_API_KEY: 'server-only-secret' })
+  expect(await response.json()).toEqual({ videos: [
+    { id: 'md9-jG4RzXs', title: 'Race Highlights | 2025 Australian Grand Prix', kind: 'race-highlights' },
+    { id: 'Mr7T8TC-cZg', title: 'Qualifying Highlights | 2025 Australian Grand Prix', kind: 'qualifying-highlights' },
+    { id: 'moment12345', title: 'Top 10 moments | 2025 Australian Grand Prix', kind: 'race-moment' }
+  ] })
+})
+
+test('keeps matching videos from every official search page in category priority order', async () => {
+  vi.stubGlobal('fetch', vi.fn()
+    .mockResolvedValueOnce(Response.json({ nextPageToken: 'page-2', items: [
+      { id: { videoId: 'moment12345' }, snippet: { channelId: 'UCB_qr75-ydFVKSF9Dmo6izg', title: 'Top 10 moments | 2025 Australian Grand Prix' } }
+    ] }))
+    .mockResolvedValueOnce(Response.json({ items: [
+      { id: { videoId: 'sprint12345' }, snippet: { channelId: 'UCB_qr75-ydFVKSF9Dmo6izg', title: 'Sprint Highlights | 2025 Australian Grand Prix' } }
+    ] })))
+  const response = await handleRaceVideos(new Request('https://example.test/api/f1-videos?season=2025&round=1&race=Australian%20Grand%20Prix'), { ASSETS: assets, YOUTUBE_API_KEY: 'server-only-secret' })
+  expect(await response.json()).toEqual({ videos: [
+    { id: 'sprint12345', title: 'Sprint Highlights | 2025 Australian Grand Prix', kind: 'sprint-highlights' },
+    { id: 'moment12345', title: 'Top 10 moments | 2025 Australian Grand Prix', kind: 'race-moment' }
+  ] })
+})
 
 test('returns a friendly configuration state without a Gemini secret', async () => {
   const response = await handleSearch(new Request('https://example.test/api/f1-search', { method: 'POST', body: JSON.stringify({ query: 'Хто виграв Монако?' }) }), { ASSETS: assets })

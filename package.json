@@ -4,9 +4,10 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "npm run dev:worker",
+    "dev": "npm run build && (npm run dev:assets & wrangler dev --local --port 8787)",
+    "dev:assets": "vite build --watch",
     "dev:vite": "vite",
-    "dev:worker": "npm run build && wrangler dev --local",
+    "dev:worker": "npm run build && wrangler dev --local --port 8787",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",

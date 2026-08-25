@@ -3,9 +3,6 @@
   "name": "f1-calendar",
   "compatibility_date": "2026-08-23",
   "main": "src/worker.ts",
-  "secrets": {
-    "required": ["GEMINI_API_KEY", "VAPID_PRIVATE_KEY"]
-  },
   "triggers": { "crons": ["*/5 * * * *"] },
   "d1_databases": [
     {
