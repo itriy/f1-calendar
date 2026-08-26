@@ -1,4 +1,5 @@
 import { handlePushApi, sendDueRaceReminders, type D1Database } from "./push";
+import { handleNewsFeed, refreshNewsFeed } from "./newsFeed";
 
 type Env = {
   ASSETS: { fetch(request: Request): Promise<Response> };
@@ -493,6 +494,7 @@ export default {
     if (url.pathname === "/api/f1-search") return handleSearch(request, env);
     if (url.pathname === "/api/f1-videos")
       return handleRaceVideos(request, env);
+    if (url.pathname === "/api/f1-feed") return handleNewsFeed(request, env);
     if (url.pathname.startsWith("/api/"))
       return error("not_found", "Маршрут API не знайдено.", 404);
     return env.ASSETS.fetch(request);
@@ -502,8 +504,8 @@ export default {
     env: Env,
     ctx: ExecutionContext,
   ) {
-    ctx.waitUntil(sendDueRaceReminders(env));
+    ctx.waitUntil(Promise.all([sendDueRaceReminders(env), refreshNewsFeed(env)]));
   },
 };
 
-export { handleRaceVideos, handleSearch };
+export { handleRaceVideos, handleSearch, handleNewsFeed };

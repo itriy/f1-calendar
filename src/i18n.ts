@@ -43,6 +43,18 @@ const messages = {
       countdownDays: "Через {days} дн. {hours} год.",
       countdownHours: "Через {hours} год. {minutes} хв.",
     },
+    feed: {
+      eyebrow: "LIVE · НОВИНИ ТА ПОДІЇ",
+      title: "Стрічка F1",
+      filters: "Фільтр стрічки",
+      all: "Усе",
+      news: "Новини",
+      event: "Події",
+      loading: "Завантажуємо актуальні новини…",
+      empty: "У цій категорії поки немає матеріалів.",
+      readSource: "ДЖЕРЕЛО",
+      round: "Етап {round}",
+    },
     calendar: {
       eyebrow: "КАЛЕНДАР · JOLPICA-F1",
       title: "Наступні гонки",

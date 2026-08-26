@@ -7,6 +7,8 @@ import StandingsTable from "./components/StandingsTable.vue";
 import LastRaceResults from "./components/LastRaceResults.vue";
 import RaceHistory from "./components/RaceHistory.vue";
 import RaceReminders from "./components/RaceReminders.vue";
+import NewsFeed from "./components/NewsFeed.vue";
+import { useF1Feed } from "./services/f1Feed";
 import {
   formatRaceStartLocal,
   getRaceStart,
@@ -52,6 +54,8 @@ const {
   closeHistoryRaceDetails,
 } = useF1Data();
 const { t } = useI18n();
+const { items: feedItems, loading: feedLoading, error: feedError, load: loadFeed } =
+  useF1Feed(computed(() => schedule.value));
 const contenders = computed(() =>
   estimateChampionshipChances(driverStandings.value, remainingRounds.value),
 );
@@ -247,6 +251,9 @@ const countdown = (
           @select-race="loadHistoryRaceDetails"
           @close-race="closeHistoryRaceDetails"
         />
+      </section>
+      <section class="mx-auto w-[min(90rem,calc(100%-1.75rem))] pb-10 lg:w-[min(90rem,calc(100%-3rem))]">
+        <NewsFeed :items="feedItems" :loading="feedLoading" :error="feedError" @retry="loadFeed" />
       </section>
       <section
         class="mx-auto grid w-[min(90rem,calc(100%-1.75rem))] grid-cols-1 gap-4 pb-10 lg:w-[min(90rem,calc(100%-3rem))] lg:grid-cols-2"

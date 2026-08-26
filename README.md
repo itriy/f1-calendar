@@ -1,5 +1,9 @@
 # F1 Calendar
 
+## News feed
+
+The Worker collects recent Formula 1 news from configured public RSS/Atom feeds, stores normalized entries in D1, and exposes them at `/api/f1-feed`. Apply `migrations/0003_news_feed.sql` to the configured D1 database before deployment. With `GEMINI_API_KEY`, new headlines receive a short Ukrainian synopsis; without it, the publisher headline and source link remain available. Telegram is intentionally not ingested in this version.
+
 ## Local development
 
 Run `npm run dev` and open [http://localhost:8787](http://localhost:8787). It builds the frontend, watches frontend assets, and serves them through the local Cloudflare Worker, so `/api/f1-videos` uses the same origin as the application. Worker code reloads through Wrangler; stop both processes with `Ctrl+C`.

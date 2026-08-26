@@ -144,7 +144,7 @@ async function disable() {
           {{ t("reminders.save") }}
         </button><button
           :disabled="loading"
-          class="px-3 py-2 text-xs font-bold text-zinc-400 underline disabled:opacity-50"
+          class="px-3 py-2 text-xs font-bold text-zinc-400 underline disabled:opacity-50 cursor-pointer"
           @click="disable"
         >
           {{ t("reminders.disable") }}
