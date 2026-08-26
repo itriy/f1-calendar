@@ -63,9 +63,6 @@ function closePreviewOnBlur(event: FocusEvent) {
   const current = event.currentTarget as HTMLElement;
   if (!current.contains(event.relatedTarget as Node | null)) closePreview();
 }
-function isTouchDevice() {
-  return window.matchMedia?.("(hover: none), (pointer: coarse)").matches ?? false;
-}
 async function startPositioning() {
   await nextTick();
   if (!previewTrigger.value || !previewPopover.value) return;
@@ -107,7 +104,6 @@ async function toggle() {
   try {
     media.value = await loadCircuitMedia(circuit.value);
     mediaUnavailable.value = !media.value;
-    if (media.value && isTouchDevice()) previewOpen.value = true;
   } catch {
     mediaUnavailable.value = true;
   } finally {
@@ -129,12 +125,15 @@ watch(
   <div class="mt-2 border-t border-white/15 pt-2">
     <button
       type="button"
-      class="flex w-full items-center justify-between gap-3 text-left text-xs font-bold text-white decoration-white/50 underline-offset-4 hover:decoration-white"
+      class="flex w-full items-center justify-between gap-3 text-left text-xs font-bold text-white decoration-white/50 underline-offset-4 hover:decoration-white cursor-pointer"
       :aria-expanded="expanded"
       :aria-controls="panelId"
       @click="toggle"
     >
-      <span class="underline">{{ t("circuit.about") }}</span><span class="no-underline" aria-hidden="true">{{ expanded ? "−" : "+" }}</span>
+      <span class="underline">{{ t("circuit.about") }}</span
+      ><span class="no-underline" aria-hidden="true">{{
+        expanded ? "−" : "+"
+      }}</span>
     </button>
     <div
       v-if="expanded"
@@ -181,7 +180,8 @@ watch(
           >
             <span v-if="mediaLoading" class="text-[12px] text-zinc-600">{{
               t("circuit.loading")
-            }}</span><span v-else aria-hidden="true">🏁</span>
+            }}</span
+            ><span v-else aria-hidden="true">🏁</span>
           </div>
           <div
             v-if="media && previewOpen"
@@ -213,7 +213,8 @@ watch(
           <p class="mt-1 text-white/70">
             {{ circuit?.Location?.locality || t("circuit.unknownCity")
             }}<span v-if="circuit?.Location?.country">
-              · {{ circuit.Location.country }}</span>
+              · {{ circuit.Location.country }}</span
+            >
           </p>
           <p
             v-if="circuit?.Location?.lat && circuit?.Location?.long"
@@ -232,14 +233,16 @@ watch(
             :href="media.sourceUrl"
             target="_blank"
             rel="noopener noreferrer"
-          >{{ t("circuit.sourceMedia") }} <span aria-hidden="true">↗</span></a><a
+            >{{ t("circuit.sourceMedia") }} <span aria-hidden="true">↗</span></a
+          ><a
             v-else-if="circuit?.url"
             class="mt-2 inline-block text-[12px] underline underline-offset-2 hover:text-white"
             :href="circuit.url"
             target="_blank"
             rel="noopener noreferrer"
-          >{{ t("circuit.sourceWikipedia") }}
-            <span aria-hidden="true">↗</span></a>
+            >{{ t("circuit.sourceWikipedia") }}
+            <span aria-hidden="true">↗</span></a
+          >
         </div>
       </div>
       <div v-if="sessions.length" class="border-t border-white/15 pt-3">
@@ -254,7 +257,8 @@ watch(
             :key="label"
             class="flex justify-between gap-3"
           >
-            <span>{{ label }}</span><time class="text-right text-white/70">{{
+            <span>{{ label }}</span
+            ><time class="text-right text-white/70">{{
               formatSession(session!)
             }}</time>
           </li>
