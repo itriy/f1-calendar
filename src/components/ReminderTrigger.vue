@@ -12,6 +12,7 @@ const { open } = useRemindersModal();
     type="button"
     @click="open"
   >
-    <span aria-hidden="true">🔔</span> {{ t("app.reminders") }}
+    <span aria-hidden="true" class="reminder-bell inline-block origin-top">🔔</span>
+    {{ t("app.reminders") }}
   </button>
 </template>

@@ -14,20 +14,27 @@ const { t } = useI18n();
 const details = ref<WeekendDetails | null>(null);
 const loading = ref(false);
 const error = ref(false);
-const tab = ref<"schedule" | "results" | "stats">("schedule");
+const allTabs = ["schedule", "race", "qualifying", "sprint", "stats"] as const;
+const tab = ref<(typeof allTabs)[number]>("schedule");
 const laps = ref<Lap[]>([]);
 const lapsLoading = ref(false);
 const lapLimit = ref(50);
 const isPast = computed(() =>
   Boolean(
     props.race.date &&
-    new Date(
-      `${props.race.date}T${props.race.time || "23:59:59Z"}`,
-    ).getTime() <= Date.now(),
+    new Date(`${props.race.date}T${props.race.time || "23:59:59Z"}`).getTime() <= Date.now(),
   ),
 );
+const tabs = computed(() => (isPast.value ? allTabs : ["schedule"]));
 const visibleLaps = computed(() => laps.value.slice(0, lapLimit.value));
 const raceResults = computed(() => details.value?.results.R || []);
+const selectedResults = computed(() =>
+  tab.value === "race"
+    ? details.value?.results.R || []
+    : tab.value === "qualifying"
+      ? details.value?.results.Q || []
+      : details.value?.results.SR || [],
+);
 const fastest = computed(
   () => raceResults.value.find((item) => item.fastestLap) || null,
 );
@@ -79,6 +86,9 @@ async function showLaps() {
 watch(() => `${props.race.season}-${props.race.round}`, load, {
   immediate: true,
 });
+watch(isPast, (past) => {
+  if (!past) tab.value = "schedule";
+}, { immediate: true });
 </script>
 
 <template>
@@ -89,7 +99,7 @@ watch(() => `${props.race.season}-${props.race.round}`, load, {
       :aria-label="t('weekend.tabs')"
     >
       <button
-        v-for="item in ['schedule', 'results', 'stats']"
+        v-for="item in tabs"
         :key="item"
         class="border-b-2 px-1 pb-2 text-[11px] font-extrabold tracking-wide"
         :class="
@@ -100,7 +110,6 @@ watch(() => `${props.race.season}-${props.race.round}`, load, {
         type="button"
         role="tab"
         :aria-selected="tab === item"
-        :disabled="item !== 'schedule' && !isPast"
         @click="tab = item as typeof tab"
       >
         {{ t(`weekend.${item}`) }}
@@ -134,38 +143,20 @@ watch(() => `${props.race.season}-${props.race.round}`, load, {
           </li>
         </ul>
       </div>
-      <div v-else-if="tab === 'results'" class="mt-3 space-y-4">
-        <p v-if="!raceResults.length" class="text-xs text-white/65">
+      <div v-else-if="tab !== 'stats'" class="mt-3">
+        <p v-if="!selectedResults.length" class="text-xs text-white/65">
           {{ t("weekend.resultsUnavailable") }}
         </p>
-        <template
-          v-for="[code, results] in Object.entries(details.results)"
-          :key="code"
-        >
-          <div v-if="results?.length">
-            <p
-              class="mb-1 text-[11px] font-extrabold tracking-wide text-white/65"
-            >
-              {{
-                code === "R"
-                  ? t("weekend.race")
-                  : code === "Q"
-                    ? t("weekend.qualifying")
-                    : t("weekend.sprint")
-              }}
-            </p>
-            <ol class="grid gap-1">
-              <li
-                v-for="result in results"
-                :key="`${code}-${result.driver}`"
-                class="grid grid-cols-[24px_1fr_auto] gap-2 border-b border-white/8 py-1"
-              >
-                <b>{{ result.position }}</b><span>{{ result.driver }}
-                  <small class="text-white/55">{{ result.team }}</small></span><span>{{ result.points }}</span>
-              </li>
-            </ol>
-          </div>
-        </template>
+        <ol v-else class="grid gap-1">
+          <li
+            v-for="result in selectedResults"
+            :key="`${tab}-${result.driver}`"
+            class="grid grid-cols-[24px_1fr_auto] gap-2 border-b border-white/8 py-1"
+          >
+            <b>{{ result.position }}</b><span>{{ result.driver }}
+              <small class="text-white/55">{{ result.team }}</small></span><span v-if="result.points > 0" class="text-f1-red">{{ result.points }} {{ t("common.points") }}</span>
+          </li>
+        </ol>
       </div>
       <div v-else class="mt-3 space-y-3">
         <div class="grid gap-2 sm:grid-cols-3">
