@@ -1,0 +1,35 @@
+const uk = {
+  methodNotAllowed: "Метод не підтримується.",
+  videoRateLimited: "Забагато запитів до відео. Спробуйте пізніше.",
+  invalidRaceData: "Некоректні дані етапу.",
+  rateLimited: "Забагато запитів. Спробуйте знову за кілька хвилин.",
+  payloadTooLarge: "Запит завеликий.",
+  invalidRequest: "Некоректний запит.",
+  invalidQuery: "Запит має містити від 3 до {max} символів.",
+  searchNotConfigured: "AI-пошук ще не налаштований.",
+  aiPrompt: "Ти — пошук для F1 Calendar. Відповідай українською, стисло й лише на теми Формули 1, F2, F3, WEC, команд, пілотів, трас, перегонів та автоспорту. Якщо запит не про автоспорт, поясни, що пошук підтримує лише F1 та суміжний автоспорт. Не вигадуй фактів; спирайся на результати веб-пошуку. Запит користувача: {query}",
+  providerRateLimited: "Вичерпано ліміт AI-пошуку. Спробуйте пізніше.",
+  providerAuthFailed: "Налаштування AI-пошуку відхилено. Зверніться до власника сайту.",
+  providerModelUnavailable: "Налаштована AI-модель недоступна. Зверніться до власника сайту.",
+  providerUnavailable: "AI-пошук тимчасово недоступний. Спробуйте пізніше.",
+  emptySearchResponse: "AI-пошук не повернув відповіді. Спробуйте змінити запит.",
+  providerError: "Сталася помилка під час AI-пошуку. Спробуйте ще раз.",
+  apiNotFound: "Маршрут API не знайдено.",
+  remindersNotConfigured: "Нагадування ще не налаштовані власником сайту.",
+  invalidSubscription: "Некоректна push-підписка.",
+  invalidPreferences: "Оберіть хоча б формат налаштувань нагадування.",
+  subscriptionNotFound: "Підписку не знайдено.",
+  reminderDay: "за 1 день",
+  reminderHour: "за 1 годину",
+  reminderNow: "зараз",
+  raceStarted: "Гонка стартує",
+  raceReminder: "Нагадування про гонку",
+  f1Round: "Етап Формули 1",
+  scheduledStartNow: "запланований старт зараз",
+  scheduledStart: "запланований старт {timing}",
+  newsSummaryPrompt: "Стисло, одним реченням українською перекажи заголовок новини Формули 1. Не додавай фактів: {title}",
+} as const;
+
+export function serverText(key: keyof typeof uk, values: Record<string, string | number> = {}): string {
+  return uk[key].replace(/\{(\w+)\}/g, (_, name: string) => String(values[name] ?? ""));
+}
