@@ -101,8 +101,13 @@ export async function handleNewsFeed(request: Request, env: NewsEnv): Promise<Re
   if (request.method !== "GET") return Response.json({ error: { code: "method_not_allowed", message: serverText("methodNotAllowed") } }, { status: 405 });
   if (!env.PUSH_DB) return Response.json({ news: [] }, { headers: { "Cache-Control": "public, max-age=60" } });
   const cutoff = new Date(Date.now() - NEWS_WINDOW_MS).toISOString();
-  const result = await env.PUSH_DB.prepare("SELECT id, source, source_url, title, summary_uk, language, image_url, published_at FROM news_items WHERE published_at >= ? ORDER BY published_at DESC LIMIT 60").bind(cutoff).all<{
+  const query = () => env.PUSH_DB!.prepare("SELECT id, source, source_url, title, summary_uk, language, image_url, published_at FROM news_items WHERE published_at >= ? ORDER BY published_at DESC LIMIT 60").bind(cutoff).all<{
     id: string; source: string; source_url: string; title: string; summary_uk: string | null; language: string; image_url: string | null; published_at: string;
   }>();
+  let result = await query();
+  if (!result.results.length) {
+    await refreshNewsFeed(env);
+    result = await query();
+  }
   return Response.json({ news: result.results.map((item) => ({ id: item.id, type: "news", source: item.source, sourceUrl: item.source_url, title: item.title, summary: item.summary_uk, language: item.language, imageUrl: item.image_url, publishedAt: item.published_at })) }, { headers: { "Cache-Control": "public, max-age=300, s-maxage=900", "Content-Type": "application/json; charset=utf-8" } });
 }

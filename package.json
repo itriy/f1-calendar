@@ -13,7 +13,9 @@
     "test:watch": "vitest",
     "typecheck": "vue-tsc --noEmit",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build && wrangler deploy",
+    "deploy:db": "wrangler d1 migrations apply f1-calendar-push --remote"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.8.0",
