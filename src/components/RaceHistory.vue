@@ -91,16 +91,26 @@ function toggleRace(race: HistoryRace) {
         </h2>
       </div>
       <label class="text-[12px] font-extrabold tracking-[.12em] text-zinc-500">{{ t("common.season")
-      }}<select
-        class="mt-1 block w-full cursor-pointer border border-white/15 bg-f1-panel px-3 py-2 text-xs font-bold text-white outline-none focus:border-f1-red sm:w-36"
-        :value="season"
-        :disabled="loading"
-        @change="selectSeason"
-      >
-        <option v-for="year in seasons" :key="year" :value="year">
-          {{ year }}
-        </option>
-      </select></label>
+      }}<span class="relative mt-1 block w-full sm:w-36">
+        <select
+          class="block w-full appearance-none cursor-pointer border border-white/15 bg-f1-panel py-2 pl-3 pr-10 text-xs font-bold text-white outline-none focus:border-f1-red"
+          :value="season"
+          :disabled="loading"
+          @change="selectSeason"
+        >
+          <option v-for="year in seasons" :key="year" :value="year">
+            {{ year }}
+          </option>
+        </select>
+        <svg
+          aria-hidden="true"
+          class="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-zinc-400"
+          viewBox="0 0 16 16"
+          fill="none"
+        >
+          <path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </span></label>
     </div>
     <p
       class="border-t border-white/10 px-5 py-3 text-[12px] leading-5 text-zinc-400 sm:px-7"

@@ -7,14 +7,15 @@ import {
   offset,
   shift,
 } from "@floating-ui/dom";
-import type { JolpicaRace, RaceSession } from "../types/f1";
+import type { JolpicaRace } from "../types/f1";
 import {
   loadCircuitMedia,
   type CircuitMedia,
 } from "../services/circuitWikipedia";
 import { useI18n } from "vue-i18n";
+import WeekendDetails from "./WeekendDetails.vue";
 
-const props = defineProps<{ race: JolpicaRace }>();
+const props = defineProps<{ race: JolpicaRace; forceOpen?: boolean }>();
 const { t } = useI18n();
 const expanded = ref(false);
 const media = ref<CircuitMedia>(null);
@@ -27,32 +28,6 @@ const previewStyle = ref<Record<string, string>>({});
 let cleanupPositioning: (() => void) | undefined;
 const panelId = "next-race-circuit-details";
 const circuit = computed(() => props.race.Circuit);
-const sessions = computed(() =>
-  (
-    [
-      [t("circuit.sessionFp1"), props.race.FirstPractice],
-      [t("circuit.sessionFp2"), props.race.SecondPractice],
-      [t("circuit.sessionFp3"), props.race.ThirdPractice],
-      [t("circuit.sessionQualifying"), props.race.Qualifying],
-      [t("circuit.sessionSprintQualifying"), props.race.SprintQualifying],
-      [t("circuit.sessionSprint"), props.race.Sprint],
-    ] as Array<[string, RaceSession | undefined]>
-  ).filter(([, session]) => Boolean(session?.date || session?.time)),
-);
-function formatSession(session: RaceSession) {
-  if (!session.date || !session.time) return t("circuit.timeUnknown");
-  const time = session.time.endsWith("Z") ? session.time : `${session.time}Z`;
-  const value = new Date(`${session.date}T${time}`);
-  return Number.isNaN(value.getTime())
-    ? t("circuit.timeUnknown")
-    : new Intl.DateTimeFormat("uk-UA", {
-        weekday: "short",
-        day: "numeric",
-        month: "short",
-        hour: "2-digit",
-        minute: "2-digit",
-      }).format(value);
-}
 function togglePreview() {
   if (media.value) previewOpen.value = !previewOpen.value;
 }
@@ -111,6 +86,13 @@ async function toggle() {
   }
 }
 watch(
+  () => props.forceOpen,
+  (forceOpen) => {
+    if (forceOpen && !expanded.value) void toggle();
+  },
+  { immediate: true },
+);
+watch(
   () => props.race.round,
   () => {
     expanded.value = false;
@@ -131,7 +113,7 @@ watch(
       @click="toggle"
     >
       <span class="underline">{{ t("circuit.about") }}</span
-      ><span class="no-underline" aria-hidden="true">{{
+      ><span class="no-underline text-2xl leading-none font-normal" aria-hidden="true">{{
         expanded ? "−" : "+"
       }}</span>
     </button>
@@ -245,25 +227,7 @@ watch(
           >
         </div>
       </div>
-      <div v-if="sessions.length" class="border-t border-white/15 pt-3">
-        <p
-          class="mb-2 text-[12px] font-extrabold tracking-[.12em] text-white/65"
-        >
-          {{ t("circuit.sessions") }}
-        </p>
-        <ul class="grid gap-1.5">
-          <li
-            v-for="[label, session] in sessions"
-            :key="label"
-            class="flex justify-between gap-3"
-          >
-            <span>{{ label }}</span
-            ><time class="text-right text-white/70">{{
-              formatSession(session!)
-            }}</time>
-          </li>
-        </ul>
-      </div>
+      <WeekendDetails :race="race" />
     </div>
   </div>
 </template>

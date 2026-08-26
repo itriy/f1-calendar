@@ -22,6 +22,7 @@ export interface JolpicaResult {
 }
 
 export interface JolpicaRace {
+  season?: string
   round: string
   raceName: string
   date?: string

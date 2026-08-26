@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, nextTick, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import ChampionshipChances from "./components/ChampionshipChances.vue";
 import RaceCalendar from "./components/RaceCalendar.vue";
@@ -7,7 +7,10 @@ import StandingsTable from "./components/StandingsTable.vue";
 import LastRaceResults from "./components/LastRaceResults.vue";
 import RaceHistory from "./components/RaceHistory.vue";
 import RaceReminders from "./components/RaceReminders.vue";
+import RaceRemindersModal from "./components/RaceRemindersModal.vue";
+import ReminderTrigger from "./components/ReminderTrigger.vue";
 import NewsFeed from "./components/NewsFeed.vue";
+// import AiSearch from "./components/AiSearch.vue";
 import { useF1Feed } from "./services/f1Feed";
 import {
   formatRaceStartLocal,
@@ -54,6 +57,14 @@ const {
   closeHistoryRaceDetails,
 } = useF1Data();
 const { t } = useI18n();
+const weekendDetailsRound = ref("");
+const showWeekendDetails = async (round: string) => {
+  weekendDetailsRound.value = round;
+  await nextTick();
+  document
+    .getElementById(`race-${round}`)
+    ?.scrollIntoView({ behavior: "smooth", block: "start" });
+};
 const {
   items: feedItems,
   loading: feedLoading,
@@ -62,6 +73,17 @@ const {
 } = useF1Feed(computed(() => schedule.value));
 const contenders = computed(() =>
   estimateChampionshipChances(driverStandings.value, remainingRounds.value),
+);
+const pastRaces = computed(() =>
+  schedule.value
+    .filter((race) => {
+      const start = getRaceStart(race);
+      if (start) return start.getTime() <= now.value;
+      return race.date
+        ? new Date(`${race.date}T23:59:59Z`).getTime() <= now.value
+        : false;
+    })
+    .reverse(),
 );
 const selectHistorySeason = (selectedSeason) => {
   loadRaceHistory(selectedSeason);
@@ -104,7 +126,7 @@ const countdown = (
         {{ t("common.season") }} <b class="ml-1 text-white">{{ season }}</b>
       </div>
       <a class="text-xs font-bold" href="#calendar">{{ t("app.calendar") }} <span class="pl-1 text-f1-red">↗</span></a>
-      <a class="text-xs font-bold" href="#reminders">{{ t("app.reminders") }} <span class="pl-1 text-f1-red">↗</span></a>
+      <ReminderTrigger />
     </nav>
     <section
       id="top"
@@ -197,6 +219,13 @@ const countdown = (
               ? t("app.nextRaceTime")
               : t("app.nextRaceTimeUnknown")
           }}</span>
+          <a
+            class="mt-3 inline-flex w-fit items-center border border-white/70 px-3 py-2 text-[11px] font-extrabold tracking-wide text-white transition hover:bg-white hover:text-f1-red focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-white"
+            :href="`#race-${nextRace.round}`"
+            @click.prevent="showWeekendDetails(nextRace.round)"
+          >
+            {{ t("app.weekendDetails") }} <span class="ml-2">↓</span>
+          </a>
         </div>
       </section>
       <section
@@ -208,7 +237,12 @@ const countdown = (
       <section
         class="mx-auto grid w-[min(90rem,calc(100%-1.75rem))] grid-cols-1 gap-4 py-10 lg:w-[min(90rem,calc(100%-3rem))] lg:grid-cols-[1.42fr_.9fr] lg:gap-6 lg:py-17"
       >
-        <RaceCalendar :races="upcomingRaces" :updated-at="updatedAt" />
+        <RaceCalendar
+          :races="upcomingRaces"
+          :past-races="pastRaces"
+          :updated-at="updatedAt"
+          :open-race-round="weekendDetailsRound"
+        />
         <div class="space-y-4">
           <ChampionshipChances
             :contenders="contenders"
@@ -256,7 +290,6 @@ const countdown = (
         />
       </section>
       <section
-        id="reminders"
         class="mx-auto grid w-[min(90rem,calc(100%-1.75rem))] grid-cols-1 gap-4 pb-10 lg:w-[min(90rem,calc(100%-3rem))] lg:grid-cols-2"
       >
         <RaceReminders />
@@ -277,9 +310,10 @@ const countdown = (
     <footer
       class="mx-auto mt-8 flex w-[min(90rem,calc(100%-1.75rem))] flex-wrap gap-3 border-t border-white/10 py-6 text-[12px] text-zinc-500 sm:mt-10 sm:w-[min(90rem,calc(100%-3rem))]"
     >
-      <span
-        class="w-full font-display text-sm font-extrabold text-white sm:mr-auto sm:w-auto"
-      ><b class="mr-1 bg-f1-red px-1">F1</b> CALENDAR</span><small>{{ t("app.footer") }}</small><small>© {{ season }}</small>
+      <span class="w-full font-display text-sm font-extrabold text-white sm:mr-auto sm:w-auto"
+        ><b class="mr-1 bg-f1-red px-1">F1</b> CALENDAR</span
+      ><small>{{ t("app.footer") }}</small><small>© {{ season }}</small>
     </footer>
   </main>
+  <RaceRemindersModal />
 </template>
