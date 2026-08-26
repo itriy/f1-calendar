@@ -1,5 +1,6 @@
 import { handlePushApi, sendDueRaceReminders, type D1Database } from "./push";
 import { handleNewsFeed, refreshNewsFeed } from "./newsFeed";
+import { serverText } from "./i18n/server";
 
 type Env = {
   ASSETS: { fetch(request: Request): Promise<Response> };
@@ -274,12 +275,12 @@ async function findVideosWithOfficialRss(
 
 async function handleRaceVideos(request: Request, env: Env): Promise<Response> {
   if (request.method !== "GET")
-    return error("method_not_allowed", "Метод не підтримується.", 405);
+    return error("method_not_allowed", serverText("methodNotAllowed"), 405);
   const client = request.headers.get("CF-Connecting-IP") || "anonymous";
   if (isVideoRateLimited(client))
     return error(
       "rate_limited",
-      "Забагато запитів до відео. Спробуйте пізніше.",
+      serverText("videoRateLimited"),
       429,
     );
   const url = new URL(request.url);
@@ -296,7 +297,7 @@ async function handleRaceVideos(request: Request, env: Env): Promise<Response> {
     race.length < 3 ||
     race.length > 120
   )
-    return error("invalid_request", "Некоректні дані етапу.", 400);
+    return error("invalid_request", serverText("invalidRaceData"), 400);
   try {
     const primaryVideos = env.YOUTUBE_API_KEY
       ? await findVideosWithYoutubeApi(env.YOUTUBE_API_KEY, season, race)
@@ -373,39 +374,39 @@ async function handleSearch(request: Request, env: Env): Promise<Response> {
       headers: { Allow: "POST, OPTIONS" },
     });
   if (request.method !== "POST")
-    return error("method_not_allowed", "Метод не підтримується.", 405);
+    return error("method_not_allowed", serverText("methodNotAllowed"), 405);
 
   const client = request.headers.get("CF-Connecting-IP") || "anonymous";
   if (isRateLimited(client))
     return error(
       "rate_limited",
-      "Забагато запитів. Спробуйте знову за кілька хвилин.",
+      serverText("rateLimited"),
       429,
     );
 
   const rawBody = await readBodyWithinLimit(request);
   if (rawBody === null)
-    return error("payload_too_large", "Запит завеликий.", 413);
+    return error("payload_too_large", serverText("payloadTooLarge"), 413);
 
   let query: unknown;
   try {
     query = (JSON.parse(rawBody) as { query?: unknown }).query;
   } catch {
-    return error("invalid_request", "Некоректний запит.", 400);
+    return error("invalid_request", serverText("invalidRequest"), 400);
   }
   if (typeof query !== "string")
-    return error("invalid_request", "Некоректний запит.", 400);
+    return error("invalid_request", serverText("invalidRequest"), 400);
   const normalizedQuery = query.trim();
   if (normalizedQuery.length < 3 || normalizedQuery.length > MAX_QUERY_LENGTH)
     return error(
       "invalid_query",
-      `Запит має містити від 3 до ${MAX_QUERY_LENGTH} символів.`,
+      serverText("invalidQuery", { max: MAX_QUERY_LENGTH }),
       400,
     );
   if (!env.GEMINI_API_KEY)
-    return error("not_configured", "AI-пошук ще не налаштований.", 503);
+    return error("not_configured", serverText("searchNotConfigured"), 503);
 
-  const prompt = `Ти — пошук для F1 Calendar. Відповідай українською, стисло й лише на теми Формули 1, F2, F3, WEC, команд, пілотів, трас, перегонів та автоспорту. Якщо запит не про автоспорт, поясни, що пошук підтримує лише F1 та суміжний автоспорт. Не вигадуй фактів; спирайся на результати веб-пошуку. Запит користувача: ${normalizedQuery}`;
+  const prompt = serverText("aiPrompt", { query: normalizedQuery });
   const model = env.GEMINI_MODEL || "gemini-3.6-flash";
 
   try {
@@ -431,24 +432,24 @@ async function handleSearch(request: Request, env: Env): Promise<Response> {
       if (geminiResponse.status === 429)
         return error(
           "provider_rate_limited",
-          "Вичерпано ліміт AI-пошуку. Спробуйте пізніше.",
+          serverText("providerRateLimited"),
           429,
         );
       if (geminiResponse.status === 401 || geminiResponse.status === 403)
         return error(
           "provider_auth_failed",
-          "Налаштування AI-пошуку відхилено. Зверніться до власника сайту.",
+          serverText("providerAuthFailed"),
           502,
         );
       if (geminiResponse.status === 404)
         return error(
           "provider_model_unavailable",
-          "Налаштована AI-модель недоступна. Зверніться до власника сайту.",
+          serverText("providerModelUnavailable"),
           502,
         );
       return error(
         "provider_unavailable",
-        "AI-пошук тимчасово недоступний. Спробуйте пізніше.",
+        serverText("providerUnavailable"),
         502,
       );
     }
@@ -462,7 +463,7 @@ async function handleSearch(request: Request, env: Env): Promise<Response> {
     if (!answer)
       return error(
         "empty_response",
-        "AI-пошук не повернув відповіді. Спробуйте змінити запит.",
+        serverText("emptySearchResponse"),
         502,
       );
     const sources = (candidate?.groundingMetadata?.groundingChunks || [])
@@ -479,7 +480,7 @@ async function handleSearch(request: Request, env: Env): Promise<Response> {
   } catch {
     return error(
       "provider_error",
-      "Сталася помилка під час AI-пошуку. Спробуйте ще раз.",
+      serverText("providerError"),
       502,
     );
   }
@@ -496,7 +497,7 @@ export default {
       return handleRaceVideos(request, env);
     if (url.pathname === "/api/f1-feed") return handleNewsFeed(request, env);
     if (url.pathname.startsWith("/api/"))
-      return error("not_found", "Маршрут API не знайдено.", 404);
+      return error("not_found", serverText("apiNotFound"), 404);
     return env.ASSETS.fetch(request);
   },
   async scheduled(

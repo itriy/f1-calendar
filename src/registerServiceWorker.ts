@@ -1,5 +1,4 @@
-const UPDATE_MESSAGE =
-  "Доступне оновлення F1 Calendar. Оновити застосунок зараз?";
+import { i18n } from "./i18n";
 
 export function registerServiceWorker() {
   if (!("serviceWorker" in navigator) || !window.isSecureContext) return;
@@ -17,7 +16,7 @@ export function registerServiceWorker() {
         });
 
         const offerUpdate = () => {
-          if (registration.waiting && window.confirm(UPDATE_MESSAGE))
+          if (registration.waiting && window.confirm(i18n.global.t("serviceWorker.update")))
             registration.waiting.postMessage({ type: "SKIP_WAITING" });
         };
 

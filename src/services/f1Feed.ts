@@ -1,17 +1,18 @@
 import { computed, onMounted, ref, type ComputedRef } from "vue";
 import type { JolpicaRace } from "../types/f1";
 import type { FeedEventItem, FeedItem, FeedNewsItem } from "../types/feed";
+import { i18n } from "../i18n";
 
 const EVENT_WINDOW_MS = 14 * 24 * 60 * 60 * 1_000;
 
 const sessions: Array<[keyof JolpicaRace, string]> = [
-  ["FirstPractice", "Перша практика"],
-  ["SecondPractice", "Друга практика"],
-  ["ThirdPractice", "Третя практика"],
-  ["SprintQualifying", "Спринт-кваліфікація"],
-  ["Sprint", "Спринт"],
-  ["Qualifying", "Кваліфікація"],
-  ["date", "Гонка"],
+  ["FirstPractice", "feed.sessionFp1"],
+  ["SecondPractice", "feed.sessionFp2"],
+  ["ThirdPractice", "feed.sessionFp3"],
+  ["SprintQualifying", "feed.sessionSprintQualifying"],
+  ["Sprint", "feed.sessionSprint"],
+  ["Qualifying", "feed.sessionQualifying"],
+  ["date", "feed.sessionRace"],
 ];
 
 function sessionDate(value: unknown, race: JolpicaRace): string | null {
@@ -36,7 +37,7 @@ export function calendarEvents(races: JolpicaRace[], now = Date.now()): FeedEven
         id: `event-${race.round}-${key}-${startsAt}`,
         type: "event" as const,
         startsAt,
-        session,
+        session: i18n.global.t(session),
         raceName: race.raceName,
         round: race.round,
       }];
@@ -67,7 +68,7 @@ export function useF1Feed(schedule: ComputedRef<JolpicaRace[]> | { value: Jolpic
       const body = (await response.json()) as { news?: FeedNewsItem[] };
       news.value = Array.isArray(body.news) ? body.news : [];
     } catch {
-      error.value = "Не вдалося завантажити новини.";
+      error.value = i18n.global.t("feed.loadError");
     } finally {
       loading.value = false;
     }

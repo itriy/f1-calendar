@@ -54,8 +54,12 @@ const {
   closeHistoryRaceDetails,
 } = useF1Data();
 const { t } = useI18n();
-const { items: feedItems, loading: feedLoading, error: feedError, load: loadFeed } =
-  useF1Feed(computed(() => schedule.value));
+const {
+  items: feedItems,
+  loading: feedLoading,
+  error: feedError,
+  load: loadFeed,
+} = useF1Feed(computed(() => schedule.value));
 const contenders = computed(() =>
   estimateChampionshipChances(driverStandings.value, remainingRounds.value),
 );
@@ -92,18 +96,15 @@ const countdown = (
     <nav
       class="mx-auto flex h-17 w-[min(90rem,calc(100%-1.75rem))] items-center gap-5 border-b border-white/10 sm:h-21 sm:w-[min(90rem,calc(100%-3rem))] sm:gap-8"
     >
-      <a class="font-display text-xl font-extrabold tracking-wide" href="#top"
-        ><span class="mr-1 inline-block -skew-x-9 bg-f1-red px-1.5">F1</span>
-        CALENDAR</a
-      >
+      <a class="font-display text-xl font-extrabold tracking-wide" href="#top"><span class="mr-1 inline-block -skew-x-9 bg-f1-red px-1.5">F1</span>
+        CALENDAR</a>
       <div
         class="mr-auto hidden text-[11px] tracking-widest text-zinc-400 sm:block"
       >
         {{ t("common.season") }} <b class="ml-1 text-white">{{ season }}</b>
       </div>
-      <a class="text-xs font-bold" href="#calendar"
-        >{{ t("app.calendar") }} <span class="pl-1 text-f1-red">↗</span></a
-      >
+      <a class="text-xs font-bold" href="#calendar">{{ t("app.calendar") }} <span class="pl-1 text-f1-red">↗</span></a>
+      <a class="text-xs font-bold" href="#reminders">{{ t("app.reminders") }} <span class="pl-1 text-f1-red">↗</span></a>
     </nav>
     <section
       id="top"
@@ -113,8 +114,7 @@ const countdown = (
         <p
           class="mb-3 text-[12px] font-extrabold tracking-[.16em] text-zinc-400"
         >
-          <i class="mr-2 inline-block size-2 rounded-full bg-f1-red"></i
-          >{{ t("app.formulaOne") }} · {{ season }}
+          <i class="mr-2 inline-block size-2 rounded-full bg-f1-red"></i>{{ t("app.formulaOne") }} · {{ season }}
           <span v-if="!loading && !error" class="ml-2 text-f1-red">{{
             t("common.live")
           }}</span>
@@ -135,20 +135,17 @@ const countdown = (
       <div v-if="nextRace" class="hidden sm:block">
         <span class="text-[12px] tracking-widest text-zinc-400">{{
           t("app.nextRound")
-        }}</span
-        ><div class="flex items-baseline gap-2">
+        }}</span>
+        <div class="flex items-baseline gap-2">
           <strong class="font-display text-7xl leading-none">{{
             nextRace.round
           }}</strong>
-          <span class="font-display text-3xl text-zinc-400"
-            >/ {{ schedule.length }}</span
-          >
+          <span class="font-display text-3xl text-zinc-400">/ {{ schedule.length }}</span>
         </div>
         <div class="my-2 h-0.5 bg-f1-red"></div>
         <b class="block font-display text-sm tracking-wide">{{
           formatRaceStartLocal(nextRace)
-        }}</b
-        ><a
+        }}</b><a
           class="mt-2 inline-block text-[12px] font-bold text-f1-red hover:underline focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-f1-red"
           href="#calendar"
         >{{ roundsLabel(remainingRounds) }}</a>
@@ -164,8 +161,7 @@ const countdown = (
       v-else-if="error"
       class="mx-auto flex w-[min(90rem,calc(100%-1.75rem))] items-center justify-between gap-4 border border-red-500/40 bg-red-950/30 p-5 text-sm text-red-100 sm:w-[min(90rem,calc(100%-3rem))]"
     >
-      <span>{{ error }}</span
-      ><button
+      <span>{{ error }}</span><button
         class="shrink-0 border border-white/30 px-3 py-2 text-xs font-bold"
         @click="load"
       >
@@ -189,17 +185,14 @@ const countdown = (
           >
             {{ nextRace.raceName }}
           </h2>
-          <span class="text-[11px]"
-            >{{
-              nextRace.Circuit?.Location?.locality ||
+          <span class="text-[11px]">{{
+            nextRace.Circuit?.Location?.locality ||
               t("common.unknownLocation")
-            }}
-            · {{ formatRaceStartLocal(nextRace) }}</span
-          >
+          }}
+            · {{ formatRaceStartLocal(nextRace) }}</span>
         </div>
         <div class="col-span-2 mt-3 flex flex-col sm:col-span-1 sm:mt-0">
-          <b class="font-display text-3xl">{{ countdown(nextRace, now) }}</b
-          ><span class="text-[12px]">{{
+          <b class="font-display text-3xl">{{ countdown(nextRace, now) }}</b><span class="text-[12px]">{{
             getRaceStart(nextRace)
               ? t("app.nextRaceTime")
               : t("app.nextRaceTimeUnknown")
@@ -252,10 +245,18 @@ const countdown = (
           @close-race="closeHistoryRaceDetails"
         />
       </section>
-      <section class="mx-auto w-[min(90rem,calc(100%-1.75rem))] pb-10 lg:w-[min(90rem,calc(100%-3rem))]">
-        <NewsFeed :items="feedItems" :loading="feedLoading" :error="feedError" @retry="loadFeed" />
+      <section
+        class="mx-auto w-[min(90rem,calc(100%-1.75rem))] pb-10 lg:w-[min(90rem,calc(100%-3rem))]"
+      >
+        <NewsFeed
+          :items="feedItems"
+          :loading="feedLoading"
+          :error="feedError"
+          @retry="loadFeed"
+        />
       </section>
       <section
+        id="reminders"
         class="mx-auto grid w-[min(90rem,calc(100%-1.75rem))] grid-cols-1 gap-4 pb-10 lg:w-[min(90rem,calc(100%-3rem))] lg:grid-cols-2"
       >
         <RaceReminders />
@@ -267,8 +268,7 @@ const countdown = (
     >
       <span
         class="flex size-4 shrink-0 items-center justify-center rounded-full border border-f1-red font-bold text-f1-red"
-        >i</span
-      >
+      >i</span>
       <p class="m-0">
         <b class="text-zinc-100">{{ t("app.liveDataTitle") }}</b>
         {{ t("app.liveDataDescription") }}
@@ -279,9 +279,7 @@ const countdown = (
     >
       <span
         class="w-full font-display text-sm font-extrabold text-white sm:mr-auto sm:w-auto"
-        ><b class="mr-1 bg-f1-red px-1">F1</b> CALENDAR</span
-      ><small>{{ t("app.footer") }}</small
-      ><small>© {{ season }}</small>
+      ><b class="mr-1 bg-f1-red px-1">F1</b> CALENDAR</span><small>{{ t("app.footer") }}</small><small>© {{ season }}</small>
     </footer>
   </main>
 </template>

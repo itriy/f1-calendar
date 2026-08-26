@@ -1,4 +1,5 @@
 import type { D1Database } from "./push";
+import { serverText } from "./i18n/server";
 
 export type NewsEnv = { PUSH_DB?: D1Database; GEMINI_API_KEY?: string; GEMINI_MODEL?: string };
 type Source = { name: string; url: string; language: string; dateFallback?: boolean; f1Only?: boolean };
@@ -63,7 +64,7 @@ async function summarize(title: string, env: NewsEnv): Promise<string | null> {
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(env.GEMINI_MODEL || "gemini-3.6-flash")}:generateContent`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
-      body: JSON.stringify({ contents: [{ parts: [{ text: `Стисло, одним реченням українською перекажи заголовок новини Формули 1. Не додавай фактів: ${title}` }] }], generationConfig: { temperature: 0.1, maxOutputTokens: 100 } }),
+      body: JSON.stringify({ contents: [{ parts: [{ text: serverText("newsSummaryPrompt", { title }) }] }], generationConfig: { temperature: 0.1, maxOutputTokens: 100 } }),
     });
     if (!response.ok) return null;
     const body = await response.json() as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
@@ -97,7 +98,7 @@ export async function refreshNewsFeed(env: NewsEnv, force = false): Promise<void
 }
 
 export async function handleNewsFeed(request: Request, env: NewsEnv): Promise<Response> {
-  if (request.method !== "GET") return Response.json({ error: { code: "method_not_allowed", message: "Метод не підтримується." } }, { status: 405 });
+  if (request.method !== "GET") return Response.json({ error: { code: "method_not_allowed", message: serverText("methodNotAllowed") } }, { status: 405 });
   if (!env.PUSH_DB) return Response.json({ news: [] }, { headers: { "Cache-Control": "public, max-age=60" } });
   const cutoff = new Date(Date.now() - NEWS_WINDOW_MS).toISOString();
   const result = await env.PUSH_DB.prepare("SELECT id, source, source_url, title, summary_uk, language, image_url, published_at FROM news_items WHERE published_at >= ? ORDER BY published_at DESC LIMIT 60").bind(cutoff).all<{

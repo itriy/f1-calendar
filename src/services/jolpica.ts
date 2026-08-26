@@ -1,4 +1,5 @@
 import type { JolpicaResponse } from "../types/f1";
+import { i18n } from "../i18n";
 
 const API_ROOT = "https://api.jolpi.ca/ergast/f1";
 
@@ -7,7 +8,7 @@ async function getJson(path: string): Promise<JolpicaResponse> {
     headers: { Accept: "application/json" },
   });
   if (!response.ok)
-    throw new Error(`Jolpica відповів зі статусом ${response.status}`);
+    throw new Error(i18n.global.t("services.jolpicaError", { status: response.status }));
   return response.json() as Promise<JolpicaResponse>;
 }
 

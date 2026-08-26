@@ -6,6 +6,7 @@ import {
   subscribe,
   unsubscribe,
 } from "@mmmike/web-push/client";
+import { i18n } from "../i18n";
 
 export type ReminderPreferences = {
   day: boolean;
@@ -24,7 +25,7 @@ async function api(path: string, method = "GET", body?: unknown) {
       error?: { message?: string };
     } | null;
     throw new Error(
-      data?.error?.message || "Не вдалося змінити налаштування нагадувань.",
+      data?.error?.message || i18n.global.t("services.remindersFailed"),
     );
   }
   return response.status === 204 ? null : response.json().catch(() => null);
@@ -49,7 +50,7 @@ export async function enablePush(preferences: ReminderPreferences) {
 }
 export async function updatePush(preferences: ReminderPreferences) {
   const subscription = await getCurrentSubscription();
-  if (!subscription) throw new Error("Браузерна підписка не знайдена.");
+  if (!subscription) throw new Error(i18n.global.t("services.subscriptionMissing"));
   await api("/api/push/subscription", "PATCH", {
     subscription: serializeSubscription(subscription),
     preferences,

@@ -3,6 +3,7 @@ import {
   WebPushError,
   type PushSubscriptionData,
 } from "@mmmike/web-push/send";
+import { serverText } from "./i18n/server";
 
 export type D1Result = { success: boolean; meta?: { changes?: number } };
 export type D1Statement = {
@@ -107,7 +108,7 @@ function configured(env: PushEnv): Response | null {
   if (!env.PUSH_DB || !env.VAPID_PUBLIC_KEY || !env.VAPID_PRIVATE_KEY)
     return failure(
       "not_configured",
-      "Нагадування ще не налаштовані власником сайту.",
+      serverText("remindersNotConfigured"),
       503,
     );
   return null;
@@ -127,7 +128,7 @@ export async function handlePushApi(
       ? response({ publicKey: env.VAPID_PUBLIC_KEY })
       : failure(
           "not_configured",
-          "Нагадування ще не налаштовані власником сайту.",
+          serverText("remindersNotConfigured"),
           503,
         );
   const missing = configured(env);
@@ -137,13 +138,13 @@ export async function handlePushApi(
     body = (await parseBody(request)) as Record<string, unknown>;
   } catch (cause) {
     return cause instanceof RangeError
-      ? failure("payload_too_large", "Запит завеликий.", 413)
-      : failure("invalid_request", "Некоректний запит.", 400);
+      ? failure("payload_too_large", serverText("payloadTooLarge"), 413)
+      : failure("invalid_request", serverText("invalidRequest"), 400);
   }
   const sub = subscription(body.subscription ?? body);
   const prefs = preferences(body.preferences);
   if (!sub)
-    return failure("invalid_subscription", "Некоректна push-підписка.", 400);
+    return failure("invalid_subscription", serverText("invalidSubscription"), 400);
   const now = Date.now();
   if (request.method === "DELETE") {
     await env
@@ -158,7 +159,7 @@ export async function handlePushApi(
   if (!prefs)
     return failure(
       "invalid_preferences",
-      "Оберіть хоча б формат налаштувань нагадування.",
+      serverText("invalidPreferences"),
       400,
     );
   if (request.method === "POST") {
@@ -195,9 +196,9 @@ export async function handlePushApi(
       .run();
     return result.meta?.changes
       ? response({ ok: true })
-      : failure("not_found", "Підписку не знайдено.", 404);
+      : failure("not_found", serverText("subscriptionNotFound"), 404);
   }
-  return failure("method_not_allowed", "Метод не підтримується.", 405);
+  return failure("method_not_allowed", serverText("methodNotAllowed"), 405);
 }
 
 type ScheduledRace = {
@@ -258,13 +259,13 @@ async function deliver(
   const claim = await claimDelivery(env.PUSH_DB!, sub.id, raceKey, type, now);
   if (!claim) return;
   const timing =
-    type === "day" ? "за 1 день" : type === "hour" ? "за 1 годину" : "зараз";
+    type === "day" ? serverText("reminderDay") : type === "hour" ? serverText("reminderHour") : serverText("reminderNow");
   try {
     const sent = await sendPushNotification(
       { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
       {
-        title: type === "start" ? "Гонка стартує" : "Нагадування про гонку",
-        body: `${race.raceName || "Етап Формули 1"} — ${type === "start" ? "запланований старт зараз" : `запланований старт ${timing}`}.`,
+        title: type === "start" ? serverText("raceStarted") : serverText("raceReminder"),
+        body: `${race.raceName || serverText("f1Round")} — ${type === "start" ? serverText("scheduledStartNow") : serverText("scheduledStart", { timing })}.`,
         url: "/",
         tag: `race-${raceKey}-${type}`,
       },

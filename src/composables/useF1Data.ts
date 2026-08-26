@@ -7,6 +7,7 @@ import {
   getSeasonData,
   getSeasonRaceWinners,
 } from "../services/jolpica";
+import { i18n } from "../i18n";
 import type {
   JolpicaConstructorStanding,
   JolpicaDriverStanding,
@@ -116,7 +117,7 @@ export function formatRaceStartLocal(
           day: "numeric",
           month: "long",
         }).format(new Date(`${race.date}T12:00:00Z`))
-      : "Дата уточнюється";
+      : i18n.global.t("common.dateUnknown");
   return new Intl.DateTimeFormat("uk-UA", {
     weekday: "long",
     day: "numeric",
@@ -172,6 +173,7 @@ export function useF1Data() {
   const upcomingRaces = computed(() => futureRaces.value);
   const nextRace = computed(() => upcomingRaces.value[0] ?? null);
   const remainingRounds = computed(() => futureRaces.value.length);
+  const t = i18n.global.t;
 
   function driver(item: JolpicaDriverStanding): StandingDriver {
     const constructor = item.Constructors?.[0];
@@ -210,14 +212,14 @@ export function useF1Data() {
           const resultTime = result.Time?.time || "";
           const isWinner = result.position === "1";
           const gap = isWinner
-            ? "Переможець"
+            ? t("data.winner")
             : result.status === "Lapped"
-              ? "На коло позаду"
+              ? t("data.lapDown")
               : resultTime.startsWith("+")
                 ? resultTime
                 : result.status === "Finished"
-                  ? "Розрив не вказано"
-                  : `Статус: ${result.status || "не класифікований"}`;
+                  ? t("data.gapUnknown")
+                  : t("data.status", { status: result.status || t("data.statusUnknown") });
           return {
             position: result.position,
             name: `${result.Driver.givenName} ${result.Driver.familyName}`,
@@ -226,7 +228,7 @@ export function useF1Data() {
             teamUrl: result.Constructor?.url || "",
             points: result.points,
             status: result.status || "",
-            raceTime: isWinner ? resultTime || "Час не вказано" : "",
+            raceTime: isWinner ? resultTime || t("data.timeUnknown") : "",
             gap,
           };
         }),
@@ -238,7 +240,7 @@ export function useF1Data() {
       round: race.round,
       name: race.raceName,
       date: race.date || "",
-      circuit: race.Circuit?.circuitName || "Траса уточнюється",
+      circuit: race.Circuit?.circuitName || t("data.circuitUnknown"),
       place: race.Circuit?.Location?.locality || "—",
       flag: flags[race.Circuit?.Location?.country || ""] || "🏁",
       winner: winner
@@ -253,11 +255,11 @@ export function useF1Data() {
   }
   function formatResultGap(result: JolpicaResult): string {
     const resultTime = result.Time?.time || "";
-    if (result.position === "1") return "Переможець";
-    if (result.status === "Lapped") return "На коло позаду";
+    if (result.position === "1") return t("data.winner");
+    if (result.status === "Lapped") return t("data.lapDown");
     if (resultTime.startsWith("+")) return resultTime;
-    if (result.status === "Finished") return "Розрив не вказано";
-    return `Статус: ${result.status || "не класифікований"}`;
+    if (result.status === "Finished") return t("data.gapUnknown");
+    return t("data.status", { status: result.status || t("data.statusUnknown") });
   }
   function normalizeRaceDetails(race: JolpicaRace): RaceDetails {
     return {
@@ -287,7 +289,7 @@ export function useF1Data() {
       data.constructors.MRData?.StandingsTable?.StandingsLists?.[0]
         ?.ConstructorStandings?.[0];
     if (!driverStanding || !constructorStanding)
-      throw new Error("Jolpica не повернув підсумок чемпіонату");
+      throw new Error(t("data.seasonSummaryMissing"));
     const driverTeam = driverStanding.Constructors?.[0];
     return {
       driver: {
@@ -311,12 +313,12 @@ export function useF1Data() {
       const data = await getLastRaceResults();
       const race = data.MRData?.RaceTable?.Races?.[0];
       if (!race?.Results?.length)
-        throw new Error("Jolpica не повернув результати останнього етапу");
+        throw new Error(t("data.lastRaceMissing"));
       lastRace.value = normalizeLastRace(race);
     } catch (cause) {
-      console.error("Не вдалося завантажити результати останньої гонки", cause);
+      console.error(t("data.lastRaceLog"), cause);
       resultsError.value =
-        "Не вдалося завантажити результати останнього етапу.";
+        t("data.lastRaceLoadError");
     } finally {
       resultsLoading.value = false;
     }
@@ -336,15 +338,15 @@ export function useF1Data() {
       const data = await getSeasonRaceWinners(historySeason.value);
       const races = data.MRData?.RaceTable?.Races;
       if (!Array.isArray(races))
-        throw new Error("Jolpica не повернув історію етапів");
+        throw new Error(t("data.historyMissing"));
       if (requestId !== historyRequestId) return;
       raceHistory.value = races
         .map(normalizeRaceWinner)
         .sort((a, b) => Number(b.round) - Number(a.round));
     } catch (cause) {
       if (requestId !== historyRequestId) return;
-      console.error("Не вдалося завантажити історію етапів", cause);
-      historyError.value = "Не вдалося завантажити історію завершених етапів.";
+      console.error(t("data.historyLog"), cause);
+      historyError.value = t("data.historyLoadError");
     } finally {
       if (requestId === historyRequestId) historyLoading.value = false;
     }
@@ -360,13 +362,13 @@ export function useF1Data() {
       const data = await getRaceResults(detailSeason, round);
       const race = data.MRData?.RaceTable?.Races?.[0];
       if (!race?.Results?.length)
-        throw new Error("Jolpica не повернув результати етапу");
+        throw new Error(t("data.raceDetailsMissing"));
       if (requestId !== historyDetailsRequestId) return;
       selectedHistoryRace.value = normalizeRaceDetails(race);
     } catch (cause) {
       if (requestId !== historyDetailsRequestId) return;
-      console.error("Не вдалося завантажити деталі етапу", cause);
-      historyDetailsError.value = "Не вдалося завантажити деталі цього етапу.";
+      console.error(t("data.detailsLog"), cause);
+      historyDetailsError.value = t("data.detailsLoadError");
     } finally {
       if (requestId === historyDetailsRequestId)
         historyDetailsLoading.value = false;
@@ -390,9 +392,9 @@ export function useF1Data() {
       seasonSummary.value = normalizeSeasonSummary(data);
     } catch (cause) {
       if (summarySeason !== String(historySeason.value)) return;
-      console.error("Не вдалося завантажити підсумок сезону", cause);
+      console.error(t("data.summaryLog"), cause);
       seasonSummaryError.value =
-        "Не вдалося завантажити підсумок чемпіонату цього сезону.";
+        t("data.summaryLoadError");
     } finally {
       if (summarySeason === String(historySeason.value))
         seasonSummaryLoading.value = false;
@@ -411,7 +413,7 @@ export function useF1Data() {
         data.constructors.MRData?.StandingsTable?.StandingsLists?.[0]
           ?.ConstructorStandings;
       if (!raceTable?.Races?.length || !driverList || !constructorList)
-        throw new Error("Jolpica повернув неповні дані сезону");
+        throw new Error(t("data.seasonIncomplete"));
       season.value = raceTable.season || season.value;
       historySeason.value = season.value;
       schedule.value = raceTable.Races.map((race) => ({
@@ -426,9 +428,9 @@ export function useF1Data() {
         minute: "2-digit",
       }).format(new Date());
     } catch (cause) {
-      console.error("Не вдалося завантажити Jolpica-F1", cause);
+      console.error(t("data.seasonLog"), cause);
       error.value =
-        "Не вдалося завантажити актуальні дані Jolpica-F1. Спробуйте оновити сторінку.";
+        t("data.seasonLoadError");
     } finally {
       loading.value = false;
     }
@@ -444,7 +446,7 @@ export function useF1Data() {
           .sort((a, b) => Number(b) - Number(a));
       })
       .catch((cause) =>
-        console.error("Не вдалося завантажити список сезонів", cause),
+        console.error(t("data.seasonsLog"), cause),
       );
     loadRaceHistory(season.value);
     loadSeasonSummary(season.value);
