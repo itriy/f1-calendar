@@ -126,3 +126,16 @@ test("circuit accordion and media preview open and close with click and keyboard
   expect(preview.attributes("aria-expanded")).toBe("false");
   expect(wrapper.find("#circuit-media-preview").exists()).toBe(false);
 });
+
+test("circuit preview opens immediately with the accordion on touch devices", async () => {
+  const matchMedia = vi.fn().mockReturnValue({ matches: true });
+  vi.stubGlobal("matchMedia", matchMedia);
+  const wrapper = mount(NextRaceCircuit, {
+    props: { race },
+    global: { plugins: [i18n] },
+  });
+  await wrapper.get("button").trigger("click");
+  await flushPromises();
+  expect(wrapper.find("#circuit-media-preview").exists()).toBe(true);
+  expect(matchMedia).toHaveBeenCalledWith("(hover: none), (pointer: coarse)");
+});

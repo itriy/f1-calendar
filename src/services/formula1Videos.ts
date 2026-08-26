@@ -47,10 +47,16 @@ export function getFallbackFormula1Videos(
   return fallbackVideosByRace[`${season}-${round}`] || [];
 }
 
-/** Keeps iframe sources constrained to YouTube's privacy-enhanced embed host. */
-export function officialYoutubeEmbedUrl(videoId: string): string | null {
+/** Builds links only from validated YouTube video IDs. */
+export function officialYoutubeWatchUrl(videoId: string): string | null {
   return youtubeId.test(videoId)
-    ? `https://www.youtube-nocookie.com/embed/${videoId}`
+    ? `https://www.youtube.com/watch?v=${videoId}`
+    : null;
+}
+
+export function officialYoutubeThumbnailUrl(videoId: string): string | null {
+  return youtubeId.test(videoId)
+    ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
     : null;
 }
 

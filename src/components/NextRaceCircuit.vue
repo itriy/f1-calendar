@@ -63,6 +63,9 @@ function closePreviewOnBlur(event: FocusEvent) {
   const current = event.currentTarget as HTMLElement;
   if (!current.contains(event.relatedTarget as Node | null)) closePreview();
 }
+function isTouchDevice() {
+  return window.matchMedia?.("(hover: none), (pointer: coarse)").matches ?? false;
+}
 async function startPositioning() {
   await nextTick();
   if (!previewTrigger.value || !previewPopover.value) return;
@@ -104,6 +107,7 @@ async function toggle() {
   try {
     media.value = await loadCircuitMedia(circuit.value);
     mediaUnavailable.value = !media.value;
+    if (media.value && isTouchDevice()) previewOpen.value = true;
   } catch {
     mediaUnavailable.value = true;
   } finally {
@@ -125,12 +129,12 @@ watch(
   <div class="mt-2 border-t border-white/15 pt-2">
     <button
       type="button"
-      class="flex w-full items-center justify-between gap-3 text-left text-xs font-bold text-white underline decoration-white/50 underline-offset-4 hover:decoration-white"
+      class="flex w-full items-center justify-between gap-3 text-left text-xs font-bold text-white decoration-white/50 underline-offset-4 hover:decoration-white"
       :aria-expanded="expanded"
       :aria-controls="panelId"
       @click="toggle"
     >
-      <span>{{ t("circuit.about") }}</span><span aria-hidden="true">{{ expanded ? "−" : "+" }}</span>
+      <span class="underline">{{ t("circuit.about") }}</span><span class="no-underline" aria-hidden="true">{{ expanded ? "−" : "+" }}</span>
     </button>
     <div
       v-if="expanded"

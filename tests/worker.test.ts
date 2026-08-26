@@ -34,6 +34,20 @@ test("returns several matching videos only when YouTube identifies the Formula 1
             },
           },
           {
+            id: { videoId: "formula2vid" },
+            snippet: {
+              channelId: "UCB_qr75-ydFVKSF9Dmo6izg",
+              title: "F2 Race Highlights | 2025 Australian Grand Prix",
+            },
+          },
+          {
+            id: { videoId: "formula3vid" },
+            snippet: {
+              channelId: "UCB_qr75-ydFVKSF9Dmo6izg",
+              title: "Formula 3 Race Highlights | 2025 Australian Grand Prix",
+            },
+          },
+          {
             id: { videoId: "untrusted01" },
             snippet: {
               channelId: "not-the-official-channel",

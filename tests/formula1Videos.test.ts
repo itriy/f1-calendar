@@ -1,7 +1,8 @@
 import { expect, test } from "vitest";
 import {
   getFallbackFormula1Videos,
-  officialYoutubeEmbedUrl,
+  officialYoutubeThumbnailUrl,
+  officialYoutubeWatchUrl,
 } from "../src/services/formula1Videos";
 
 test("provides only the curated Formula 1 YouTube videos for mapped races", () => {
@@ -27,12 +28,15 @@ test("provides only the curated Formula 1 YouTube videos for mapped races", () =
   expect(getFallbackFormula1Videos("2025", "99")).toEqual([]);
 });
 
-test("builds privacy-enhanced embeds only from valid eleven-character YouTube IDs", () => {
-  expect(officialYoutubeEmbedUrl("md9-jG4RzXs")).toBe(
-    "https://www.youtube-nocookie.com/embed/md9-jG4RzXs",
+test("builds official YouTube links only from valid eleven-character video IDs", () => {
+  expect(officialYoutubeWatchUrl("md9-jG4RzXs")).toBe(
+    "https://www.youtube.com/watch?v=md9-jG4RzXs",
+  );
+  expect(officialYoutubeThumbnailUrl("md9-jG4RzXs")).toBe(
+    "https://i.ytimg.com/vi/md9-jG4RzXs/hqdefault.jpg",
   );
   expect(
-    officialYoutubeEmbedUrl("https://example.test/not-a-video"),
+    officialYoutubeWatchUrl("https://example.test/not-a-video"),
   ).toBeNull();
-  expect(officialYoutubeEmbedUrl("short")).toBeNull();
+  expect(officialYoutubeThumbnailUrl("short")).toBeNull();
 });

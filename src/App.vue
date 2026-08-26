@@ -128,23 +128,26 @@ const countdown = (
           {{ t("app.intro") }}
         </p>
       </div>
-      <div v-if="nextRace" class="hidden grid-cols-[auto_auto] gap-x-3 sm:grid">
-        <span class="col-span-2 text-[12px] tracking-widest text-zinc-400">{{
+      <div v-if="nextRace" class="hidden sm:block">
+        <span class="text-[12px] tracking-widest text-zinc-400">{{
           t("app.nextRound")
         }}</span
-        ><strong class="font-display text-7xl leading-none">{{
-          nextRace.round
-        }}</strong
-        ><small class="self-end pb-2 text-zinc-400"
-          >{{ t("common.of") }} {{ schedule.length }}</small
-        >
-        <div class="col-span-2 my-2 h-0.5 bg-f1-red"></div>
-        <b class="col-span-2 font-display text-sm tracking-wide">{{
+        ><div class="flex items-baseline gap-2">
+          <strong class="font-display text-7xl leading-none">{{
+            nextRace.round
+          }}</strong>
+          <span class="font-display text-3xl text-zinc-400"
+            >/ {{ schedule.length }}</span
+          >
+        </div>
+        <div class="my-2 h-0.5 bg-f1-red"></div>
+        <b class="block font-display text-sm tracking-wide">{{
           formatRaceStartLocal(nextRace)
         }}</b
-        ><small class="col-span-2 mt-2 text-[12px] font-bold text-f1-red">{{
-          roundsLabel(remainingRounds)
-        }}</small>
+        ><a
+          class="mt-2 inline-block text-[12px] font-bold text-f1-red hover:underline focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-f1-red"
+          href="#calendar"
+        >{{ roundsLabel(remainingRounds) }}</a>
       </div>
     </section>
     <section

@@ -3,7 +3,8 @@ import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import {
   loadFormula1Videos,
-  officialYoutubeEmbedUrl,
+  officialYoutubeThumbnailUrl,
+  officialYoutubeWatchUrl,
   type Formula1Video,
 } from "../services/formula1Videos";
 
@@ -19,9 +20,16 @@ const loading = ref(true);
 const expanded = ref(false);
 const videos = computed(() =>
   sourceVideos.value
-    .map((video) => ({ ...video, embedUrl: officialYoutubeEmbedUrl(video.id) }))
-    .filter((video): video is typeof video & { embedUrl: string } =>
-      Boolean(video.embedUrl),
+    .map((video) => ({
+      ...video,
+      thumbnailUrl: officialYoutubeThumbnailUrl(video.id),
+      watchUrl: officialYoutubeWatchUrl(video.id),
+    }))
+    .filter((video): video is typeof video & {
+      thumbnailUrl: string;
+      watchUrl: string;
+    } =>
+      Boolean(video.thumbnailUrl && video.watchUrl),
     ),
 );
 
@@ -32,6 +40,7 @@ watch(
     controller = new AbortController();
     loading.value = true;
     expanded.value = false;
+    sourceVideos.value = [];
     try {
       sourceVideos.value = await loadFormula1Videos(
         props.season,
@@ -71,25 +80,28 @@ onBeforeUnmount(() => controller?.abort());
         :key="video.id"
         class="overflow-hidden border border-white/8 bg-black/25"
       >
-        <div class="aspect-video bg-black">
-          <iframe
-            class="size-full"
-            :src="video.embedUrl"
-            :title="video.title"
+        <a
+          class="group relative block aspect-video bg-black"
+          :href="video.watchUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          :aria-label="`${t('history.watchOnYoutube')}: ${video.title}`"
+        >
+          <img
+            class="size-full object-cover opacity-80 transition-opacity group-hover:opacity-100"
+            :src="video.thumbnailUrl"
+            :alt="video.title"
             loading="lazy"
-            referrerpolicy="strict-origin-when-cross-origin"
-            sandbox="allow-scripts allow-presentation"
-            allow="
-              accelerometer;
-              autoplay;
-              encrypted-media;
-              gyroscope;
-              picture-in-picture;
-              web-share;
-            "
-            allowfullscreen
           />
-        </div>
+          <span
+            class="absolute inset-0 flex items-center justify-center bg-black/20"
+            aria-hidden="true"
+          >
+            <span class="bg-f1-red px-4 py-2 text-[11px] font-extrabold tracking-[.08em] text-white">
+              {{ t("history.watchOnYoutube") }}
+            </span>
+          </span>
+        </a>
         <p class="p-3 text-xs font-bold">
           {{
             video.kind === "race-highlights"
@@ -115,9 +127,18 @@ onBeforeUnmount(() => controller?.abort());
           : t("history.videosShowAll", { count: videos.length })
       }}
     </button>
-    <p v-else-if="loading" class="text-xs leading-5 text-zinc-400">
+    <div
+      v-else-if="loading"
+      class="flex items-center gap-3 py-4 text-xs leading-5 text-zinc-400"
+      role="status"
+      aria-live="polite"
+    >
+      <span
+        class="size-5 shrink-0 animate-spin rounded-full border-2 border-white/20 border-t-f1-red"
+        aria-hidden="true"
+      />
       {{ t("history.videosLoading") }}
-    </p>
+    </div>
     <p v-else class="text-xs leading-5 text-zinc-400">
       {{ t("history.videosUnavailable", { race: raceName }) }}
     </p>

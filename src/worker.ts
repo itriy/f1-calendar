@@ -150,6 +150,8 @@ function matchingFormula1Video(
   )
     return null;
   const normalizedTitle = normalizeVideoText(title);
+  if (/\b(f2|f3|formula 2|formula 3)\b/.test(normalizedTitle))
+    return null;
   const normalizedRace = normalizeVideoText(race)
     .replace(/\bgrand prix\b/g, "")
     .trim();

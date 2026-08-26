@@ -39,7 +39,6 @@ async function enable() {
     const result = await enablePush(preferences);
     if (result === "denied") {
       permission.value = "denied";
-      message.value = t("reminders.enableDenied");
     } else if (result === "unsupported")
       message.value = t("reminders.enableUnsupported");
     else {
@@ -128,8 +127,32 @@ async function disable() {
     <p v-if="!supported" class="mt-4 text-xs text-amber-300">
       {{ t("reminders.unsupported") }}
     </p>
+    <div v-else class="mt-4 flex flex-wrap gap-2">
+      <button
+        v-if="!active"
+        :disabled="loading || permission === 'denied'"
+        class="bg-f1-red px-4 py-2 text-xs font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
+        @click="enable"
+      >
+        {{ loading ? t("reminders.wait") : t("reminders.enable") }}
+      </button><template v-else>
+        <button
+          :disabled="loading"
+          class="border border-white/30 px-4 py-2 text-xs font-bold text-white disabled:opacity-50"
+          @click="save"
+        >
+          {{ t("reminders.save") }}
+        </button><button
+          :disabled="loading"
+          class="px-3 py-2 text-xs font-bold text-zinc-400 underline disabled:opacity-50"
+          @click="disable"
+        >
+          {{ t("reminders.disable") }}
+        </button>
+      </template>
+    </div>
     <div
-      v-else-if="permission === 'denied'"
+      v-if="supported && permission === 'denied'"
       class="mt-4 border border-amber-300/40 bg-amber-300/8 p-4 text-xs text-amber-100"
       role="alert"
     >
@@ -149,30 +172,6 @@ async function disable() {
       >
         {{ t("reminders.checkPermission") }}
       </button>
-    </div>
-    <div v-else class="mt-4 flex flex-wrap gap-2">
-      <button
-        v-if="!active"
-        :disabled="loading"
-        class="bg-f1-red px-4 py-2 text-xs font-bold text-white disabled:opacity-50"
-        @click="enable"
-      >
-        {{ loading ? t("reminders.wait") : t("reminders.enable") }}
-      </button><template v-else>
-        <button
-          :disabled="loading"
-          class="border border-white/30 px-4 py-2 text-xs font-bold text-white disabled:opacity-50"
-          @click="save"
-        >
-          {{ t("reminders.save") }}
-        </button><button
-          :disabled="loading"
-          class="px-3 py-2 text-xs font-bold text-zinc-400 underline disabled:opacity-50"
-          @click="disable"
-        >
-          {{ t("reminders.disable") }}
-        </button>
-      </template>
     </div>
     <p v-if="message" role="status" class="mt-3 text-xs text-zinc-300">
       {{ message }}
