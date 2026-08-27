@@ -8,17 +8,32 @@
     {
       "binding": "PUSH_DB",
       "database_name": "f1-calendar-push",
-      "database_id": "647b3726-f229-47ac-a3a8-03567a916c3e"
-    }
+      "database_id": "647b3726-f229-47ac-a3a8-03567a916c3e",
+    },
   ],
   "vars": {
     "VAPID_PUBLIC_KEY": "BOxno_f1JsbnQMguGrqnn6Zd_FZCL_O4TRtL70ZVRyoK85_bAoJPHeH4-rW-eChK2dk-PJ0A4zwHF0DP26w8F1Y",
-    "VAPID_SUBJECT": "mailto:admin@f1-calendar.itriy1.workers.dev"
+    "VAPID_SUBJECT": "mailto:admin@f1-calendar.itriy1.workers.dev",
   },
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
     "run_worker_first": ["/api/*"],
-    "not_found_handling": "single-page-application"
-  }
+    "not_found_handling": "single-page-application",
+  },
+  "observability": {
+    "enabled": false,
+    "head_sampling_rate": 1,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true,
+      "invocation_logs": true,
+    },
+    "traces": {
+      "enabled": true,
+      "persist": true,
+      "head_sampling_rate": 1,
+    },
+  },
 }
