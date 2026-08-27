@@ -6,12 +6,11 @@ import RaceCalendar from "./components/RaceCalendar.vue";
 import StandingsTable from "./components/StandingsTable.vue";
 import LastRaceResults from "./components/LastRaceResults.vue";
 import RaceHistory from "./components/RaceHistory.vue";
-// import RaceReminders from "./components/RaceReminders.vue";
 import RaceRemindersModal from "./components/RaceRemindersModal.vue";
 import ReminderTrigger from "./components/ReminderTrigger.vue";
+import PwaInstall from "./components/PwaInstall.vue";
 import NewsFeed from "./components/NewsFeed.vue";
 import WatchProviders from "./components/WatchProviders.vue";
-// import AiSearch from "./components/AiSearch.vue";
 import { useF1Feed } from "./services/f1Feed";
 import {
   formatRaceStartLocal,
@@ -130,6 +129,7 @@ const countdown = (
           {{ t("common.season") }} <b class="ml-1 text-white">{{ season }}</b>
         </div>
         <a class="text-xs font-bold" href="#calendar">{{ t("app.calendar") }} <span class="pl-1 text-f1-red">↗</span></a>
+        <PwaInstall />
         <ReminderTrigger />
       </nav>
     </header>
@@ -302,8 +302,6 @@ const countdown = (
       <section
         class="mx-auto grid w-[min(90rem,calc(100%-1.75rem))] grid-cols-1 gap-4 pb-10 lg:w-[min(90rem,calc(100%-3rem))] lg:grid-cols-2"
       >
-<!--        <RaceReminders />-->
-        <!-- <AiSearch /> -->
       </section>
     </template>
     <section
