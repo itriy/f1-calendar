@@ -35,7 +35,7 @@ const localeLoaders: Record<SupportedLocale, () => Promise<{ default: Record<str
 };
 const loadedLocales = new Set<SupportedLocale>();
 
-export const i18n: any = createI18n({
+export const i18n = createI18n({
   legacy: false,
   locale: "uk",
   fallbackLocale: "uk",
