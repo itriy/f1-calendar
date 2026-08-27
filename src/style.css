@@ -54,6 +54,16 @@
   animation: reminder-bell-ring 5s ease-in-out infinite;
 }
 
+.horizontal-scroll-hidden {
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.horizontal-scroll-hidden::-webkit-scrollbar {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reminder-bell {
     animation: none;

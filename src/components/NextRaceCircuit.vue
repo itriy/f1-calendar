@@ -227,7 +227,7 @@ watch(
           >
         </div>
       </div>
-      <WeekendDetails :race="race" />
+      <WeekendDetails class="min-w-0" :race="race" />
     </div>
   </div>
 </template>

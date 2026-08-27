@@ -175,6 +175,44 @@ test("accepts a current-season upload when its title omits the year", async () =
   });
 });
 
+test("searches the official channel when an older race is outside the recent uploads", async () => {
+  vi.stubGlobal(
+    "fetch",
+    vi
+      .fn()
+      .mockResolvedValueOnce(Response.json({ items: [] }))
+      .mockResolvedValueOnce(
+        Response.json({
+          items: [
+            {
+              id: { videoId: "austria2026" },
+              snippet: {
+                channelId: "UCB_qr75-ydFVKSF9Dmo6izg",
+                title: "Race Highlights | 2026 Austrian Grand Prix",
+                publishedAt: "2026-06-28T17:00:00Z",
+              },
+            },
+          ],
+        }),
+      ),
+  );
+  const response = await handleRaceVideos(
+    new Request(
+      "https://example.test/api/f1-videos?season=2026&round=8&race=Austrian%20Grand%20Prix",
+    ),
+    { ASSETS: assets, YOUTUBE_API_KEY: "server-only-secret" },
+  );
+  expect(await response.json()).toEqual({
+    videos: [
+      {
+        id: "austria2026",
+        title: "Race Highlights | 2026 Austrian Grand Prix",
+        kind: "race-highlights",
+      },
+    ],
+  });
+});
+
 test("returns an explicit provider error instead of masking a YouTube failure", async () => {
   vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 403 })));
   const response = await handleRaceVideos(

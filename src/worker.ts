@@ -46,7 +46,7 @@ type Formula1Video = {
     | "sprint-highlights"
     | "race-moment";
 };
-type YoutubeSearchResponse = {
+type YoutubePlaylistResponse = {
   nextPageToken?: string;
   items?: Array<{
     snippet?: {
@@ -55,6 +55,12 @@ type YoutubeSearchResponse = {
       publishedAt?: string;
       resourceId?: { videoId?: string };
     };
+  }>;
+};
+type YoutubeSearchResponse = {
+  items?: Array<{
+    id?: { videoId?: string };
+    snippet?: { channelId?: string; title?: string; publishedAt?: string };
   }>;
 };
 
@@ -227,7 +233,7 @@ async function findVideosWithYoutubeApi(
       console.error("YouTube playlist request failed", response.status);
       throw new Error("YouTube playlist unavailable");
     }
-    const data = (await response.json()) as YoutubeSearchResponse;
+    const data = (await response.json()) as YoutubePlaylistResponse;
     videos.push(
       ...(data.items || [])
         .map((item) =>
@@ -251,6 +257,45 @@ async function findVideosWithYoutubeApi(
     (seenTokens.add(pageToken), true)
   );
   return uniqueVideos(videos);
+}
+
+async function findVideosWithYoutubeSearch(
+  apiKey: string,
+  season: string,
+  race: string,
+): Promise<Formula1Video[]> {
+  const params = new URLSearchParams({
+    part: "snippet",
+    channelId: OFFICIAL_FORMULA1_CHANNEL_ID,
+    type: "video",
+    videoEmbeddable: "true",
+    maxResults: "50",
+    order: "relevance",
+    q: `${season} ${race}`,
+    key: apiKey,
+  });
+  const response = await fetch(
+    `https://www.googleapis.com/youtube/v3/search?${params}`,
+  );
+  if (!response.ok) {
+    console.error("YouTube search request failed", response.status);
+    throw new Error("YouTube search unavailable");
+  }
+  const data = (await response.json()) as YoutubeSearchResponse;
+  return uniqueVideos(
+    (data.items || [])
+      .map((item) =>
+        matchingFormula1Video(
+          item.id?.videoId,
+          item.snippet?.title,
+          item.snippet?.channelId,
+          season,
+          race,
+          item.snippet?.publishedAt,
+        ),
+      )
+      .filter((video): video is Formula1Video => video !== null),
+  );
 }
 
 async function handleRaceVideos(request: Request, env: Env): Promise<Response> {
@@ -281,11 +326,14 @@ async function handleRaceVideos(request: Request, env: Env): Promise<Response> {
   if (!env.YOUTUBE_API_KEY)
     return error("not_configured", serverText("videoNotConfigured"), 503);
   try {
-    const videos = await findVideosWithYoutubeApi(
+    const playlistVideos = await findVideosWithYoutubeApi(
       env.YOUTUBE_API_KEY,
       season,
       race,
     );
+    const videos = playlistVideos.length
+      ? playlistVideos
+      : await findVideosWithYoutubeSearch(env.YOUTUBE_API_KEY, season, race);
     return Response.json(
       { videos },
       {

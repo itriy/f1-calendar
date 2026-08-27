@@ -98,16 +98,16 @@ watch(
 </script>
 
 <template>
-  <section class="border-t border-white/15 pt-3">
+  <section class="min-w-0 border-t border-white/15 pt-3">
     <div
-      class="flex gap-4 border-b border-white/15"
+      class="horizontal-scroll-hidden flex w-full max-w-full gap-4 overflow-x-scroll border-b border-white/15"
       role="tablist"
       :aria-label="t('weekend.tabs')"
     >
       <button
         v-for="item in tabs"
         :key="item"
-        class="border-b-2 px-1 pb-2 text-[11px] font-extrabold tracking-wide"
+        class="shrink-0 whitespace-nowrap border-b-2 px-1 pb-2 text-[11px] font-extrabold tracking-wide"
         :class="
           tab === item
             ? 'border-f1-red text-white'
