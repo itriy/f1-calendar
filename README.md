@@ -1,5 +1,9 @@
 # F1 Calendar
 
+## Architecture
+
+The frontend is organized with Feature-Sliced Design. See [the layer guide](src/ARCHITECTURE.md) for ownership and import-direction rules. Cloudflare Worker handlers live separately in `src/server`.
+
 ## News feed
 
 The Worker collects recent Formula 1 news from configured public RSS/Atom feeds, stores normalized entries in D1, and exposes them at `/api/f1-feed`. Apply `migrations/0003_news_feed.sql` to the configured D1 database before deployment. With `GEMINI_API_KEY`, new headlines receive a short Ukrainian synopsis; without it, the publisher headline and source link remain available. Telegram is intentionally not ingested in this version.

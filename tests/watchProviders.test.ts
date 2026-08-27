@@ -3,7 +3,7 @@ import {
   handleWatchProviders,
   parseBroadcastCatalog,
   providersForCountry,
-} from "../src/watchProviders";
+} from "../src/server/watchProviders";
 
 afterEach(() => vi.unstubAllGlobals());
 

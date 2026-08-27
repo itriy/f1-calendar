@@ -1,6 +1,6 @@
 import { afterEach, expect, test, vi } from "vitest";
-import { handleRaceVideos, handleSearch } from "../src/worker";
-import worker from "../src/worker";
+import { handleRaceVideos, handleSearch } from "../src/server/worker";
+import worker from "../src/server/worker";
 
 const assets = { fetch: async () => new Response("asset") };
 

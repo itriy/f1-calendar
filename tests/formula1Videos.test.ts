@@ -3,7 +3,7 @@ import {
   getFallbackFormula1Videos,
   officialYoutubeThumbnailUrl,
   officialYoutubeWatchUrl,
-} from "../src/services/formula1Videos";
+} from "../src/entities/race/api/formula1Videos";
 
 test("provides only the curated Formula 1 YouTube videos for mapped races", () => {
   expect(getFallbackFormula1Videos("2025", "1")).toEqual([

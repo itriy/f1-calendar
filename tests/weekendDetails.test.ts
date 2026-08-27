@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from "vitest";
-import { loadWeekendDetails } from "../src/services/weekendDetails";
+import { loadWeekendDetails } from "../src/entities/race/api/weekendDetails";
 
 afterEach(() => vi.unstubAllGlobals());
 

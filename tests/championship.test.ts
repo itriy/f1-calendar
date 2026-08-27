@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { estimateChampionshipChances } from "../src/utils/championship";
+import { estimateChampionshipChances } from "../src/features/championship/model/championship";
 
 const standings = [
   {

@@ -2,7 +2,7 @@ import { expect, test, vi } from "vitest";
 import {
   getCircuitWikipediaArticle,
   loadCircuitMedia,
-} from "../src/services/circuitWikipedia";
+} from "../src/entities/race/api/circuitWikipedia";
 
 test("derives a decoded title and matching REST endpoint from Jolpica Circuit.url", () => {
   expect(

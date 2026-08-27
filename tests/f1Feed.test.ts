@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
-import { calendarEvents } from "../src/services/f1Feed";
-import { parseFeed } from "../src/newsFeed";
+import { calendarEvents } from "../src/entities/feed/api/f1Feed";
+import { parseFeed } from "../src/server/newsFeed";
 
 test("keeps only recent, valid RSS articles", () => {
   const recent = new Date().toUTCString();

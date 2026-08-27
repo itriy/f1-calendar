@@ -1,8 +1,8 @@
 import { flushPromises, mount } from "@vue/test-utils";
 import { expect, test, vi } from "vitest";
-import { i18n } from "../src/i18n";
+import { i18n } from "../src/shared/config/i18n";
 
-vi.mock("../src/composables/useF1Data", async () => {
+vi.mock("../src/entities/race/model/useF1Data", async () => {
   const { ref } = await import("vue");
   return {
     getRaceStart: () => null,
@@ -44,7 +44,7 @@ vi.mock("../src/composables/useF1Data", async () => {
   };
 });
 
-vi.mock("../src/services/circuitWikipedia", () => ({
+vi.mock("@/entities/race/api/circuitWikipedia", () => ({
   loadCircuitMedia: vi
     .fn()
     .mockResolvedValue({
@@ -53,9 +53,9 @@ vi.mock("../src/services/circuitWikipedia", () => ({
     }),
 }));
 
-import App from "../src/App.vue";
-import NextRaceCircuit from "../src/components/NextRaceCircuit.vue";
-import RaceCalendar from "../src/components/RaceCalendar.vue";
+import App from "../src/app/App.vue";
+import NextRaceCircuit from "../src/widgets/race-calendar/ui/NextRaceCircuit.vue";
+import RaceCalendar from "../src/widgets/race-calendar/ui/RaceCalendar.vue";
 
 const circuit = {
   circuitId: "monaco",

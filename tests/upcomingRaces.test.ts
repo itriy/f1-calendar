@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { getUpcomingRaces } from "../src/composables/useF1Data";
+import { getUpcomingRaces } from "../src/entities/race/model/useF1Data";
 
 test("keeps every future round shown in the schedule, including the eleventh", () => {
   const races = Array.from({ length: 11 }, (_, index) => ({
