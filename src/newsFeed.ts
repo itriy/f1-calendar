@@ -20,6 +20,7 @@ type ParsedArticle = {
   publishedAt: string;
   language: string;
   imageUrl: string | null;
+  description: string | null;
 };
 
 const REFRESH_INTERVAL_MS = 15 * 60 * 1_000;
@@ -119,10 +120,19 @@ export function parseFeed(xml: string, source: Source): ParsedArticle[] {
         return [];
       if (source.f1Only && !/\b(formula\s*1|f1|grand prix)\b/i.test(title))
         return [];
+      const description = text(
+        tag(block, "description") ||
+          tag(block, "content:encoded") ||
+          tag(block, "summary") ||
+          tag(block, "content"),
+      ).slice(0, 700);
       const image = validUrl(
         block.match(
           /<(?:media:)?(?:thumbnail|content)[^>]+url=["']([^"']+)["']/i,
-        )?.[1] || null,
+        )?.[1] ||
+          block.match(/<enclosure[^>]+url=["']([^"']+)["'][^>]*>/i)?.[1] ||
+          block.match(/<img[^>]+src=["']([^"']+)["']/i)?.[1] ||
+          null,
       );
       return [
         {
@@ -132,6 +142,10 @@ export function parseFeed(xml: string, source: Source): ParsedArticle[] {
           publishedAt: publishedAt.toISOString(),
           language: source.language,
           imageUrl: image,
+          description:
+            description && description.toLowerCase() !== title.toLowerCase()
+              ? description
+              : null,
         },
       ];
     })
@@ -215,7 +229,7 @@ export async function refreshNewsFeed(
     const summary = existing ? null : await summarize(article.title, env);
     await db
       .prepare(
-        "INSERT INTO news_items (id, source, source_url, title, summary_uk, language, image_url, published_at, fetched_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(source_url) DO UPDATE SET fetched_at = excluded.fetched_at",
+        "INSERT INTO news_items (id, source, source_url, title, summary_uk, description, language, image_url, published_at, fetched_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(source_url) DO UPDATE SET title = excluded.title, description = excluded.description, image_url = COALESCE(excluded.image_url, news_items.image_url), published_at = excluded.published_at, fetched_at = excluded.fetched_at",
       )
       .bind(
         articleId(article.sourceUrl),
@@ -223,6 +237,7 @@ export async function refreshNewsFeed(
         article.sourceUrl,
         article.title,
         summary,
+        article.description,
         article.language,
         article.imageUrl,
         article.publishedAt,
@@ -262,7 +277,7 @@ export async function handleNewsFeed(
   const query = () =>
     env
       .PUSH_DB!.prepare(
-        "SELECT id, source, source_url, title, summary_uk, language, image_url, published_at FROM news_items WHERE published_at >= ? ORDER BY published_at DESC LIMIT 60",
+        "SELECT id, source, source_url, title, summary_uk, description, language, image_url, published_at FROM news_items WHERE published_at >= ? ORDER BY published_at DESC LIMIT 60",
       )
       .bind(cutoff)
       .all<{
@@ -271,15 +286,13 @@ export async function handleNewsFeed(
         source_url: string;
         title: string;
         summary_uk: string | null;
+        description: string | null;
         language: string;
         image_url: string | null;
         published_at: string;
       }>();
-  let result = await query();
-  if (!result.results.length) {
-    await refreshNewsFeed(env);
-    result = await query();
-  }
+  await refreshNewsFeed(env);
+  const result = await query();
   return Response.json(
     {
       news: result.results.map((item) => ({
@@ -289,6 +302,7 @@ export async function handleNewsFeed(
         sourceUrl: item.source_url,
         title: item.title,
         summary: item.summary_uk,
+        description: item.description,
         language: item.language,
         imageUrl: item.image_url,
         publishedAt: item.published_at,

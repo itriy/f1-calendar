@@ -49,8 +49,12 @@ type Formula1Video = {
 type YoutubeSearchResponse = {
   nextPageToken?: string;
   items?: Array<{
-    id?: { videoId?: string };
-    snippet?: { channelId?: string; title?: string };
+    snippet?: {
+      channelId?: string;
+      title?: string;
+      publishedAt?: string;
+      resourceId?: { videoId?: string };
+    };
   }>;
 };
 
@@ -62,6 +66,7 @@ const requestLog = new Map<string, number[]>();
 const videoRequestLog = new Map<string, number[]>();
 const OFFICIAL_FORMULA1_CHANNEL_ID = "UCB_qr75-ydFVKSF9Dmo6izg";
 const YOUTUBE_ID = /^[A-Za-z0-9_-]{11}$/;
+const MAX_YOUTUBE_PLAYLIST_PAGES = 3;
 
 function json(body: unknown, status = 200): Response {
   return Response.json(body, {
@@ -143,6 +148,7 @@ function matchingFormula1Video(
   channelId: unknown,
   season: string,
   race: string,
+  publishedAt?: unknown,
 ): Formula1Video | null {
   if (
     typeof id !== "string" ||
@@ -158,8 +164,11 @@ function matchingFormula1Video(
     .replace(/\bgrand prix\b/g, "")
     .trim();
   const raceWords = normalizedRace.split(" ").filter((word) => word.length > 2);
+  const isCurrentSeason =
+    normalizedTitle.includes(season) ||
+    (typeof publishedAt === "string" && publishedAt.startsWith(season));
   if (
-    !normalizedTitle.includes(season) ||
+    !isCurrentSeason ||
     !raceWords.length ||
     !raceWords.every((word) => normalizedTitle.includes(word))
   )
@@ -202,75 +211,46 @@ async function findVideosWithYoutubeApi(
   const videos: Formula1Video[] = [];
   const seenTokens = new Set<string>();
   let pageToken: string | undefined;
+  let pageCount = 0;
   do {
     const params = new URLSearchParams({
       part: "snippet",
-      channelId: OFFICIAL_FORMULA1_CHANNEL_ID,
-      type: "video",
-      videoEmbeddable: "true",
+      playlistId: `UU${OFFICIAL_FORMULA1_CHANNEL_ID.slice(2)}`,
       maxResults: "50",
-      order: "date",
-      q: `${season} ${race}`,
       key: apiKey,
     });
     if (pageToken) params.set("pageToken", pageToken);
     const response = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?${params}`,
+      `https://www.googleapis.com/youtube/v3/playlistItems?${params}`,
     );
-    if (!response.ok) throw new Error("YouTube search unavailable");
+    if (!response.ok) {
+      console.error("YouTube playlist request failed", response.status);
+      throw new Error("YouTube playlist unavailable");
+    }
     const data = (await response.json()) as YoutubeSearchResponse;
     videos.push(
       ...(data.items || [])
         .map((item) =>
           matchingFormula1Video(
-            item.id?.videoId,
+            item.snippet?.resourceId?.videoId,
             item.snippet?.title,
             item.snippet?.channelId,
             season,
             race,
+            item.snippet?.publishedAt,
           ),
         )
         .filter((video): video is Formula1Video => video !== null),
     );
     pageToken = data.nextPageToken;
+    pageCount += 1;
   } while (
     pageToken &&
     !seenTokens.has(pageToken) &&
+    pageCount < MAX_YOUTUBE_PLAYLIST_PAGES &&
     (seenTokens.add(pageToken), true)
   );
   return uniqueVideos(videos);
-}
-
-function xmlTag(entry: string, tag: string): string | null {
-  const match = entry.match(
-    new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, "i"),
-  );
-  return match?.[1]?.trim() || null;
-}
-
-async function findVideosWithOfficialRss(
-  season: string,
-  race: string,
-): Promise<Formula1Video[]> {
-  const response = await fetch(
-    `https://www.youtube.com/feeds/videos.xml?channel_id=${OFFICIAL_FORMULA1_CHANNEL_ID}`,
-  );
-  if (!response.ok) throw new Error("YouTube feed unavailable");
-  const entries =
-    (await response.text()).match(/<entry>[\s\S]*?<\/entry>/gi) || [];
-  return uniqueVideos(
-    entries
-      .map((entry) =>
-        matchingFormula1Video(
-          xmlTag(entry, "yt:videoId"),
-          xmlTag(entry, "title"),
-          xmlTag(entry, "yt:channelId"),
-          season,
-          race,
-        ),
-      )
-      .filter((video): video is Formula1Video => video !== null),
-  );
 }
 
 async function handleRaceVideos(request: Request, env: Env): Promise<Response> {
@@ -298,34 +278,28 @@ async function handleRaceVideos(request: Request, env: Env): Promise<Response> {
     race.length > 120
   )
     return error("invalid_request", serverText("invalidRaceData"), 400);
+  if (!env.YOUTUBE_API_KEY)
+    return error("not_configured", serverText("videoNotConfigured"), 503);
   try {
-    const primaryVideos = env.YOUTUBE_API_KEY
-      ? await findVideosWithYoutubeApi(env.YOUTUBE_API_KEY, season, race)
-      : await findVideosWithOfficialRss(season, race);
-    const videos =
-      primaryVideos.length || !env.YOUTUBE_API_KEY
-        ? primaryVideos
-        : await findVideosWithOfficialRss(season, race);
+    const videos = await findVideosWithYoutubeApi(
+      env.YOUTUBE_API_KEY,
+      season,
+      race,
+    );
     return Response.json(
       { videos },
       {
         headers: {
-          "Cache-Control":
-            "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",
+          "Cache-Control": videos.length
+            ? "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800"
+            : "public, max-age=300",
           "Content-Type": "application/json; charset=utf-8",
         },
       },
     );
-  } catch {
-    return Response.json(
-      { videos: [] },
-      {
-        headers: {
-          "Cache-Control": "public, max-age=300",
-          "Content-Type": "application/json; charset=utf-8",
-        },
-      },
-    );
+  } catch (cause) {
+    console.error("YouTube videos unavailable", cause);
+    return error("provider_unavailable", serverText("videoUnavailable"), 502);
   }
 }
 

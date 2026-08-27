@@ -22,7 +22,9 @@ const lapLimit = ref(50);
 const isPast = computed(() =>
   Boolean(
     props.race.date &&
-    new Date(`${props.race.date}T${props.race.time || "23:59:59Z"}`).getTime() <= Date.now(),
+    new Date(
+      `${props.race.date}T${props.race.time || "23:59:59Z"}`,
+    ).getTime() <= Date.now(),
   ),
 );
 const tabs = computed(() => (isPast.value ? allTabs : ["schedule"]));
@@ -86,9 +88,13 @@ async function showLaps() {
 watch(() => `${props.race.season}-${props.race.round}`, load, {
   immediate: true,
 });
-watch(isPast, (past) => {
-  if (!past) tab.value = "schedule";
-}, { immediate: true });
+watch(
+  isPast,
+  (past) => {
+    if (!past) tab.value = "schedule";
+  },
+  { immediate: true },
+);
 </script>
 
 <template>

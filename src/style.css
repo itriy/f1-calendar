@@ -28,12 +28,26 @@
 }
 
 @keyframes reminder-bell-ring {
-  0%, 72%, 100% { transform: rotate(0) scale(1); }
-  76% { transform: rotate(14deg) scale(1.12); }
-  80% { transform: rotate(-13deg) scale(1.12); }
-  84% { transform: rotate(10deg) scale(1.08); }
-  88% { transform: rotate(-7deg) scale(1.05); }
-  92% { transform: rotate(3deg) scale(1.02); }
+  0%,
+  72%,
+  100% {
+    transform: rotate(0) scale(1);
+  }
+  76% {
+    transform: rotate(14deg) scale(1.12);
+  }
+  80% {
+    transform: rotate(-13deg) scale(1.12);
+  }
+  84% {
+    transform: rotate(10deg) scale(1.08);
+  }
+  88% {
+    transform: rotate(-7deg) scale(1.05);
+  }
+  92% {
+    transform: rotate(3deg) scale(1.02);
+  }
 }
 
 .reminder-bell {

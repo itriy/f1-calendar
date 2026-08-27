@@ -4,6 +4,7 @@ export type FeedNewsItem = {
   publishedAt: string;
   title: string;
   summary: string | null;
+  description: string | null;
   source: string;
   sourceUrl: string;
   language: string;

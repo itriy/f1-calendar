@@ -1,7 +1,7 @@
 /**
- * Small, verified fallback for videos that are older than YouTube's public RSS
- * feed. The primary source is the Worker endpoint, which validates results from
- * the official FORMULA 1 channel before returning them to the browser.
+ * Curated fallbacks for a small number of historical races. The primary source
+ * is the Worker endpoint, which validates uploads from the official FORMULA 1
+ * channel before returning them to the browser.
  */
 export type Formula1Video = {
   id: string;

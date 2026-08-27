@@ -5,10 +5,10 @@ import { parseFeed } from "../src/newsFeed";
 test("keeps only recent, valid RSS articles", () => {
   const recent = new Date().toUTCString();
   const articles = parseFeed(
-    `<rss><channel><item><title><![CDATA[Fresh F1 news]]></title><link>https://example.test/fresh</link><pubDate>${recent}</pubDate></item><item><title>Broken</title><link>javascript:bad</link><pubDate>${recent}</pubDate></item></channel></rss>`,
+    `<rss><channel><item><title><![CDATA[Fresh F1 news]]></title><description>A useful article preview.</description><link>https://example.test/fresh</link><pubDate>${recent}</pubDate></item><item><title>Broken</title><link>javascript:bad</link><pubDate>${recent}</pubDate></item></channel></rss>`,
     { name: "Example", url: "https://example.test/feed", language: "en" },
   );
-  expect(articles).toEqual([expect.objectContaining({ title: "Fresh F1 news", sourceUrl: "https://example.test/fresh" })]);
+  expect(articles).toEqual([expect.objectContaining({ title: "Fresh F1 news", sourceUrl: "https://example.test/fresh", description: "A useful article preview." })]);
 });
 
 test("uses fetch time only for sources that explicitly lack article dates", () => {

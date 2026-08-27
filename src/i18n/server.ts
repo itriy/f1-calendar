@@ -1,6 +1,8 @@
 const uk = {
   methodNotAllowed: "Метод не підтримується.",
   videoRateLimited: "Забагато запитів до відео. Спробуйте пізніше.",
+  videoNotConfigured: "Відео Formula 1 ще не налаштовані власником сайту.",
+  videoUnavailable: "Відео Formula 1 тимчасово недоступні. Спробуйте пізніше.",
   invalidRaceData: "Некоректні дані етапу.",
   rateLimited: "Забагато запитів. Спробуйте знову за кілька хвилин.",
   payloadTooLarge: "Запит завеликий.",

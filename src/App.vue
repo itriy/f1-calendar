@@ -114,20 +114,24 @@ const countdown = (
 </script>
 
 <template>
-  <main class="min-h-screen overflow-hidden">
-    <nav
-      class="mx-auto flex h-17 w-[min(90rem,calc(100%-1.75rem))] items-center gap-5 border-b border-white/10 sm:h-21 sm:w-[min(90rem,calc(100%-3rem))] sm:gap-8"
+  <main class="min-h-screen">
+    <header
+      class="sticky top-0 z-50 border-b border-white/10 bg-[#0d0d0f]/95 backdrop-blur-md"
     >
-      <a class="font-display text-xl font-extrabold tracking-wide" href="#top"><span class="mr-1 inline-block -skew-x-9 bg-f1-red px-1.5">F1</span>
-        CALENDAR</a>
-      <div
-        class="mr-auto hidden text-[11px] tracking-widest text-zinc-400 sm:block"
+      <nav
+        class="mx-auto flex h-17 w-[min(90rem,calc(100%-1.75rem))] items-center gap-5 sm:h-21 sm:w-[min(90rem,calc(100%-3rem))] sm:gap-8"
       >
-        {{ t("common.season") }} <b class="ml-1 text-white">{{ season }}</b>
-      </div>
-      <a class="text-xs font-bold" href="#calendar">{{ t("app.calendar") }} <span class="pl-1 text-f1-red">↗</span></a>
-      <ReminderTrigger />
-    </nav>
+        <a class="font-display text-xl font-extrabold tracking-wide" href="#top"><span class="mr-1 inline-block -skew-x-9 bg-f1-red px-1.5">F1</span>
+          CALENDAR</a>
+        <div
+          class="mr-auto hidden text-[11px] tracking-widest text-zinc-400 sm:block"
+        >
+          {{ t("common.season") }} <b class="ml-1 text-white">{{ season }}</b>
+        </div>
+        <a class="text-xs font-bold" href="#calendar">{{ t("app.calendar") }} <span class="pl-1 text-f1-red">↗</span></a>
+        <ReminderTrigger />
+      </nav>
+    </header>
     <section
       id="top"
       class="mx-auto flex min-h-75 w-[min(90rem,calc(100%-1.75rem))] items-start justify-between py-12 sm:min-h-80 sm:w-[min(90rem,calc(100%-3rem))] sm:items-end sm:py-16"
@@ -292,7 +296,7 @@ const countdown = (
       <section
         class="mx-auto grid w-[min(90rem,calc(100%-1.75rem))] grid-cols-1 gap-4 pb-10 lg:w-[min(90rem,calc(100%-3rem))] lg:grid-cols-2"
       >
-        <RaceReminders />
+<!--        <RaceReminders />-->
         <!-- <AiSearch /> -->
       </section>
     </template>
@@ -310,9 +314,12 @@ const countdown = (
     <footer
       class="mx-auto mt-8 flex w-[min(90rem,calc(100%-1.75rem))] flex-wrap gap-3 border-t border-white/10 py-6 text-[12px] text-zinc-500 sm:mt-10 sm:w-[min(90rem,calc(100%-3rem))]"
     >
-      <span class="w-full font-display text-sm font-extrabold text-white sm:mr-auto sm:w-auto"
-        ><b class="mr-1 bg-f1-red px-1">F1</b> CALENDAR</span
-      ><small>{{ t("app.footer") }}</small><small>© {{ season }}</small>
+      <span
+        class="w-full font-display text-sm font-extrabold text-white sm:mr-auto sm:w-auto"
+      >
+        <b class="mr-1 bg-f1-red px-1">F1</b> CALENDAR
+      </span>
+      <small>{{ t("app.footer") }}</small><small>© {{ season }}</small>
     </footer>
   </main>
   <RaceRemindersModal />

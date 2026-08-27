@@ -13,45 +13,45 @@ test("returns several matching videos only when YouTube identifies the Formula 1
       Response.json({
         items: [
           {
-            id: { videoId: "moment12345" },
             snippet: {
               channelId: "UCB_qr75-ydFVKSF9Dmo6izg",
               title: "Top 10 moments | 2025 Australian Grand Prix",
+              resourceId: { videoId: "moment12345" },
             },
           },
           {
-            id: { videoId: "md9-jG4RzXs" },
             snippet: {
               channelId: "UCB_qr75-ydFVKSF9Dmo6izg",
               title: "Race Highlights | 2025 Australian Grand Prix",
+              resourceId: { videoId: "md9-jG4RzXs" },
             },
           },
           {
-            id: { videoId: "Mr7T8TC-cZg" },
             snippet: {
               channelId: "UCB_qr75-ydFVKSF9Dmo6izg",
               title: "Qualifying Highlights | 2025 Australian Grand Prix",
+              resourceId: { videoId: "Mr7T8TC-cZg" },
             },
           },
           {
-            id: { videoId: "formula2vid" },
             snippet: {
               channelId: "UCB_qr75-ydFVKSF9Dmo6izg",
               title: "F2 Race Highlights | 2025 Australian Grand Prix",
+              resourceId: { videoId: "formula2vid" },
             },
           },
           {
-            id: { videoId: "formula3vid" },
             snippet: {
               channelId: "UCB_qr75-ydFVKSF9Dmo6izg",
               title: "Formula 3 Race Highlights | 2025 Australian Grand Prix",
+              resourceId: { videoId: "formula3vid" },
             },
           },
           {
-            id: { videoId: "untrusted01" },
             snippet: {
               channelId: "not-the-official-channel",
               title: "Race Highlights | 2025 Australian Grand Prix",
+              resourceId: { videoId: "untrusted01" },
             },
           },
         ],
@@ -95,10 +95,10 @@ test("keeps matching videos from every official search page in category priority
           nextPageToken: "page-2",
           items: [
             {
-              id: { videoId: "moment12345" },
-              snippet: {
-                channelId: "UCB_qr75-ydFVKSF9Dmo6izg",
-                title: "Top 10 moments | 2025 Australian Grand Prix",
+            snippet: {
+              channelId: "UCB_qr75-ydFVKSF9Dmo6izg",
+              title: "Top 10 moments | 2025 Australian Grand Prix",
+              resourceId: { videoId: "moment12345" },
               },
             },
           ],
@@ -108,10 +108,10 @@ test("keeps matching videos from every official search page in category priority
         Response.json({
           items: [
             {
-              id: { videoId: "sprint12345" },
-              snippet: {
-                channelId: "UCB_qr75-ydFVKSF9Dmo6izg",
-                title: "Sprint Highlights | 2025 Australian Grand Prix",
+            snippet: {
+              channelId: "UCB_qr75-ydFVKSF9Dmo6izg",
+              title: "Sprint Highlights | 2025 Australian Grand Prix",
+              resourceId: { videoId: "sprint12345" },
               },
             },
           ],
@@ -137,6 +137,58 @@ test("keeps matching videos from every official search page in category priority
         kind: "race-moment",
       },
     ],
+  });
+});
+
+test("accepts a current-season upload when its title omits the year", async () => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue(
+      Response.json({
+        items: [
+          {
+            snippet: {
+              channelId: "UCB_qr75-ydFVKSF9Dmo6izg",
+              title: "Race Highlights | Dutch Grand Prix",
+              publishedAt: "2026-08-23T17:00:00Z",
+              resourceId: { videoId: "dutch2026ab" },
+            },
+          },
+        ],
+      }),
+    ),
+  );
+  const response = await handleRaceVideos(
+    new Request(
+      "https://example.test/api/f1-videos?season=2026&round=12&race=Dutch%20Grand%20Prix",
+    ),
+    { ASSETS: assets, YOUTUBE_API_KEY: "server-only-secret" },
+  );
+  expect(await response.json()).toEqual({
+    videos: [
+      {
+        id: "dutch2026ab",
+        title: "Race Highlights | Dutch Grand Prix",
+        kind: "race-highlights",
+      },
+    ],
+  });
+});
+
+test("returns an explicit provider error instead of masking a YouTube failure", async () => {
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 403 })));
+  const response = await handleRaceVideos(
+    new Request(
+      "https://example.test/api/f1-videos?season=2026&round=12&race=Dutch%20Grand%20Prix",
+    ),
+    { ASSETS: assets, YOUTUBE_API_KEY: "server-only-secret" },
+  );
+  expect(response.status).toBe(502);
+  expect(await response.json()).toEqual({
+    error: {
+      code: "provider_unavailable",
+      message: "Відео Formula 1 тимчасово недоступні. Спробуйте пізніше.",
+    },
   });
 });
 

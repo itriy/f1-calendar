@@ -39,17 +39,24 @@ const formatTime = (value: string) =>
     </div>
     <div v-else-if="!visibleItems.length" class="border border-white/10 bg-f1-panel p-5 text-sm text-zinc-400">{{ t("feed.empty") }}</div>
     <ol v-else class="grid gap-3 sm:grid-cols-2">
-      <li v-for="item in visibleItems" :key="item.id" class="border border-white/10 bg-f1-panel p-4">
+      <li v-for="item in visibleItems" :key="item.id" class="overflow-hidden border border-white/10 bg-f1-panel">
         <template v-if="item.type === 'news'">
-          <div class="mb-2 flex items-center justify-between gap-3 text-[11px] font-bold tracking-wide text-zinc-400"><span>{{ item.source }} · {{ item.language.toUpperCase() }}</span><time :datetime="item.publishedAt">{{ formatTime(item.publishedAt) }}</time></div>
-          <h3 class="font-display text-2xl leading-none font-bold">{{ item.summary || item.title }}</h3>
-          <p v-if="item.summary" class="mt-2 text-xs leading-5 text-zinc-400">{{ item.title }}</p>
-          <a class="mt-3 inline-block text-[11px] font-bold text-f1-red hover:underline" :href="item.sourceUrl" target="_blank" rel="noopener noreferrer">{{ t("feed.readSource") }} ↗</a>
+          <a v-if="item.imageUrl" class="block aspect-[16/8] overflow-hidden bg-black" :href="item.sourceUrl" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true">
+            <img class="size-full object-cover transition-transform duration-300 hover:scale-105" :src="item.imageUrl" alt="" loading="lazy" />
+          </a>
+          <div class="p-4">
+            <div class="mb-2 flex items-center justify-between gap-3 text-[11px] font-bold tracking-wide text-zinc-400"><span>{{ item.source }} · {{ item.language.toUpperCase() }}</span><time :datetime="item.publishedAt">{{ formatTime(item.publishedAt) }}</time></div>
+            <h3 class="font-display text-2xl leading-none font-bold">{{ item.title }}</h3>
+            <p v-if="item.summary || item.description" class="mt-3 text-xs leading-5 text-zinc-400">{{ item.summary || item.description }}</p>
+            <a class="mt-3 inline-block text-[11px] font-bold text-f1-red hover:underline" :href="item.sourceUrl" target="_blank" rel="noopener noreferrer">{{ t("feed.readSource") }} ↗</a>
+          </div>
         </template>
         <template v-else>
-          <div class="mb-2 flex items-center justify-between gap-3 text-[11px] font-bold tracking-wide text-f1-red"><span>{{ t("feed.event") }}</span><time :datetime="item.startsAt">{{ formatTime(item.startsAt) }}</time></div>
-          <h3 class="font-display text-3xl leading-none font-bold">{{ item.session }}</h3>
-          <p class="mt-2 text-sm text-zinc-300">{{ item.raceName }} · {{ t("feed.round", { round: item.round }) }}</p>
+          <div class="p-4">
+            <div class="mb-2 flex items-center justify-between gap-3 text-[11px] font-bold tracking-wide text-f1-red"><span>{{ t("feed.event") }}</span><time :datetime="item.startsAt">{{ formatTime(item.startsAt) }}</time></div>
+            <h3 class="font-display text-3xl leading-none font-bold">{{ item.session }}</h3>
+            <p class="mt-2 text-sm text-zinc-300">{{ item.raceName }} · {{ t("feed.round", { round: item.round }) }}</p>
+          </div>
         </template>
       </li>
     </ol>
