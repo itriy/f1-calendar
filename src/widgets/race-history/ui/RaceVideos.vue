@@ -61,7 +61,7 @@ onBeforeUnmount(() => controller?.abort());
 <template>
   <section
     class="mt-5 border-t border-white/8 pt-4"
-    aria-label="Official Formula 1 videos"
+    :aria-label="t('history.videosTitle')"
   >
     <div class="mb-3 flex items-baseline justify-between gap-3">
       <p class="text-[12px] font-extrabold tracking-[.12em] text-zinc-500">

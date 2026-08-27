@@ -9,7 +9,7 @@ const props = defineProps<{
   error: string;
 }>();
 defineEmits<{ retry: [] }>();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const filter = ref<"all" | "news" | "event">("all");
 const visibleItems = computed(() =>
   filter.value === "all"
@@ -17,7 +17,7 @@ const visibleItems = computed(() =>
     : props.items.filter((item) => item.type === filter.value),
 );
 const formatTime = (value: string) =>
-  new Intl.DateTimeFormat("uk-UA", {
+  new Intl.DateTimeFormat(locale.value, {
     day: "numeric",
     month: "short",
     hour: "2-digit",

@@ -113,12 +113,12 @@ export function formatRaceStartLocal(
   const start = getRaceStart(race);
   if (!start)
     return race?.date
-      ? new Intl.DateTimeFormat("uk-UA", {
+      ? new Intl.DateTimeFormat(i18n.global.locale.value, {
           day: "numeric",
           month: "long",
         }).format(new Date(`${race.date}T12:00:00Z`))
       : i18n.global.t("common.dateUnknown");
-  return new Intl.DateTimeFormat("uk-UA", {
+  return new Intl.DateTimeFormat(i18n.global.locale.value, {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -423,7 +423,7 @@ export function useF1Data() {
       driverStandings.value = driverList.map(driver);
       drivers.value = driverStandings.value.slice(0, 5);
       constructors.value = constructorList.slice(0, 5).map(constructor);
-      updatedAt.value = new Intl.DateTimeFormat("uk-UA", {
+      updatedAt.value = new Intl.DateTimeFormat(i18n.global.locale.value, {
         hour: "2-digit",
         minute: "2-digit",
       }).format(new Date());

@@ -1,7 +1,7 @@
 import { handlePushApi, sendDueRaceReminders, type D1Database } from "./push";
 import { handleNewsFeed, refreshNewsFeed } from "./newsFeed";
 import { handleWatchProviders } from "./watchProviders";
-import { serverText } from "@/shared/config/i18n/server";
+import { requestLocale, serverText } from "@/shared/config/i18n/server";
 
 type Env = {
   ASSETS: { fetch(request: Request): Promise<Response> };
@@ -412,24 +412,27 @@ async function handleSearch(request: Request, env: Env): Promise<Response> {
     return error("payload_too_large", serverText("payloadTooLarge"), 413);
 
   let query: unknown;
+  let locale = requestLocale(request);
   try {
-    query = (JSON.parse(rawBody) as { query?: unknown }).query;
+    const body = JSON.parse(rawBody) as { query?: unknown; locale?: unknown };
+    query = body.query;
+    locale = requestLocale(request, body.locale);
   } catch {
-    return error("invalid_request", serverText("invalidRequest"), 400);
+    return error("invalid_request", serverText("invalidRequest", {}, locale), 400);
   }
   if (typeof query !== "string")
-    return error("invalid_request", serverText("invalidRequest"), 400);
+    return error("invalid_request", serverText("invalidRequest", {}, locale), 400);
   const normalizedQuery = query.trim();
   if (normalizedQuery.length < 3 || normalizedQuery.length > MAX_QUERY_LENGTH)
     return error(
       "invalid_query",
-      serverText("invalidQuery", { max: MAX_QUERY_LENGTH }),
+      serverText("invalidQuery", { max: MAX_QUERY_LENGTH }, locale),
       400,
     );
   if (!env.GEMINI_API_KEY)
-    return error("not_configured", serverText("searchNotConfigured"), 503);
+    return error("not_configured", serverText("searchNotConfigured", {}, locale), 503);
 
-  const prompt = serverText("aiPrompt", { query: normalizedQuery });
+  const prompt = serverText("aiPrompt", { query: normalizedQuery }, locale);
   const model = env.GEMINI_MODEL || "gemini-3.6-flash";
 
   try {
@@ -455,24 +458,24 @@ async function handleSearch(request: Request, env: Env): Promise<Response> {
       if (geminiResponse.status === 429)
         return error(
           "provider_rate_limited",
-          serverText("providerRateLimited"),
+          serverText("providerRateLimited", {}, locale),
           429,
         );
       if (geminiResponse.status === 401 || geminiResponse.status === 403)
         return error(
           "provider_auth_failed",
-          serverText("providerAuthFailed"),
+          serverText("providerAuthFailed", {}, locale),
           502,
         );
       if (geminiResponse.status === 404)
         return error(
           "provider_model_unavailable",
-          serverText("providerModelUnavailable"),
+          serverText("providerModelUnavailable", {}, locale),
           502,
         );
       return error(
         "provider_unavailable",
-        serverText("providerUnavailable"),
+        serverText("providerUnavailable", {}, locale),
         502,
       );
     }
@@ -486,7 +489,7 @@ async function handleSearch(request: Request, env: Env): Promise<Response> {
     if (!answer)
       return error(
         "empty_response",
-        serverText("emptySearchResponse"),
+        serverText("emptySearchResponse", {}, locale),
         502,
       );
     const sources = (candidate?.groundingMetadata?.groundingChunks || [])
@@ -503,7 +506,7 @@ async function handleSearch(request: Request, env: Env): Promise<Response> {
   } catch {
     return error(
       "provider_error",
-      serverText("providerError"),
+      serverText("providerError", {}, locale),
       502,
     );
   }

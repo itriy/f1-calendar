@@ -11,6 +11,8 @@ import ReminderTrigger from "@/features/race-reminders/ui/ReminderTrigger.vue";
 import PwaInstall from "@/features/pwa-install/ui/PwaInstall.vue";
 import NewsFeed from "@/widgets/news-feed/ui/NewsFeed.vue";
 import WatchProviders from "@/widgets/watch-providers/ui/WatchProviders.vue";
+import LanguageSelector from "@/shared/ui/LanguageSelector.vue";
+import { updatePushLocale } from "@/features/race-reminders/api/pushReminders";
 import { useF1Feed } from "@/entities/feed/api/f1Feed";
 import {
   formatRaceStartLocal,
@@ -128,7 +130,18 @@ const countdown = (
         >
           {{ t("common.season") }} <b class="ml-1 text-white">{{ season }}</b>
         </div>
-        <a class="text-xs font-bold" href="#calendar">{{ t("app.calendar") }} <span class="pl-1 text-f1-red">↗</span></a>
+        <a
+          class="grid size-9 place-items-center text-zinc-200 transition hover:text-f1-red focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-f1-red"
+          href="#calendar"
+          :aria-label="t('app.calendar')"
+          :title="t('app.calendar')"
+        >
+          <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <rect x="3.5" y="5" width="17" height="15" rx="1.5" />
+            <path d="M7.5 3.5v3M16.5 3.5v3M3.5 9h17M8 13h3M13 13h3M8 17h3" />
+          </svg>
+        </a>
+        <LanguageSelector @changed="updatePushLocale" />
         <PwaInstall />
         <ReminderTrigger />
       </nav>

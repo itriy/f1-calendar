@@ -10,7 +10,7 @@ import {
 } from "@/entities/race/api/weekendDetails";
 
 const props = defineProps<{ race: JolpicaRace }>();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const details = ref<WeekendDetails | null>(null);
 const loading = ref(false);
 const error = ref(false);
@@ -54,7 +54,7 @@ const lapUrl = computed(
 );
 
 const formatSession = (value: string) =>
-  new Intl.DateTimeFormat("uk-UA", {
+  new Intl.DateTimeFormat(locale.value, {
     weekday: "short",
     day: "numeric",
     month: "short",

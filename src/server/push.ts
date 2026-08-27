@@ -3,7 +3,8 @@ import {
   WebPushError,
   type PushSubscriptionData,
 } from "@mmmike/web-push/send";
-import { serverText } from "@/shared/config/i18n/server";
+import { requestLocale, serverText } from "@/shared/config/i18n/server";
+import type { SupportedLocale } from "@/shared/config/i18n";
 
 export type D1Result = { success: boolean; meta?: { changes?: number } };
 export type D1Statement = {
@@ -29,6 +30,7 @@ type StoredSubscription = {
   remind_day: number;
   remind_hour: number;
   remind_start: number;
+  locale: SupportedLocale;
 };
 type Delivery = {
   id: number;
@@ -143,6 +145,7 @@ export async function handlePushApi(
   }
   const sub = subscription(body.subscription ?? body);
   const prefs = preferences(body.preferences);
+  const locale = requestLocale(request, body.locale);
   if (!sub)
     return failure("invalid_subscription", serverText("invalidSubscription"), 400);
   const now = Date.now();
@@ -156,7 +159,7 @@ export async function handlePushApi(
       headers: { "Cache-Control": "no-store" },
     });
   }
-  if (!prefs)
+  if (!prefs && request.method !== "PATCH")
     return failure(
       "invalid_preferences",
       serverText("invalidPreferences"),
@@ -165,8 +168,8 @@ export async function handlePushApi(
   if (request.method === "POST") {
     await env
       .PUSH_DB!.prepare(
-        `INSERT INTO push_subscriptions (endpoint, p256dh, auth, remind_day, remind_hour, remind_start, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(endpoint) DO UPDATE SET p256dh=excluded.p256dh, auth=excluded.auth, remind_day=excluded.remind_day, remind_hour=excluded.remind_hour, remind_start=excluded.remind_start, updated_at=excluded.updated_at`,
+        `INSERT INTO push_subscriptions (endpoint, p256dh, auth, remind_day, remind_hour, remind_start, locale, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(endpoint) DO UPDATE SET p256dh=excluded.p256dh, auth=excluded.auth, remind_day=excluded.remind_day, remind_hour=excluded.remind_hour, remind_start=excluded.remind_start, locale=excluded.locale, updated_at=excluded.updated_at`,
       )
       .bind(
         sub.endpoint,
@@ -175,6 +178,7 @@ export async function handlePushApi(
         Number(prefs.day),
         Number(prefs.hour),
         Number(prefs.start),
+        locale,
         now,
         now,
       )
@@ -182,14 +186,20 @@ export async function handlePushApi(
     return response({ ok: true }, 201);
   }
   if (request.method === "PATCH") {
+    if (!prefs) {
+      const result = await env.PUSH_DB!.prepare("UPDATE push_subscriptions SET locale=?, updated_at=? WHERE endpoint=?")
+        .bind(locale, now, sub.endpoint).run();
+      return result.meta?.changes ? response({ ok: true }) : failure("not_found", serverText("subscriptionNotFound", {}, locale), 404);
+    }
     const result = await env
       .PUSH_DB!.prepare(
-        "UPDATE push_subscriptions SET remind_day=?, remind_hour=?, remind_start=?, updated_at=? WHERE endpoint=?",
+        "UPDATE push_subscriptions SET remind_day=?, remind_hour=?, remind_start=?, locale=?, updated_at=? WHERE endpoint=?",
       )
       .bind(
         Number(prefs.day),
         Number(prefs.hour),
         Number(prefs.start),
+        locale,
         now,
         sub.endpoint,
       )
@@ -259,13 +269,13 @@ async function deliver(
   const claim = await claimDelivery(env.PUSH_DB!, sub.id, raceKey, type, now);
   if (!claim) return;
   const timing =
-    type === "day" ? serverText("reminderDay") : type === "hour" ? serverText("reminderHour") : serverText("reminderNow");
+    type === "day" ? serverText("reminderDay", {}, sub.locale) : type === "hour" ? serverText("reminderHour", {}, sub.locale) : serverText("reminderNow", {}, sub.locale);
   try {
     const sent = await sendPushNotification(
       { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
       {
-        title: type === "start" ? serverText("raceStarted") : serverText("raceReminder"),
-        body: `${race.raceName || serverText("f1Round")} — ${type === "start" ? serverText("scheduledStartNow") : serverText("scheduledStart", { timing })}.`,
+        title: type === "start" ? serverText("raceStarted", {}, sub.locale) : serverText("raceReminder", {}, sub.locale),
+        body: `${race.raceName || serverText("f1Round", {}, sub.locale)} — ${type === "start" ? serverText("scheduledStartNow", {}, sub.locale) : serverText("scheduledStart", { timing }, sub.locale)}.`,
         url: "/",
         tag: `race-${raceKey}-${type}`,
       },
@@ -334,7 +344,7 @@ export async function sendDueRaceReminders(env: PushEnv, now = Date.now()) {
   ).MRData?.RaceTable;
   if (!races?.Races) return;
   const subs = await env.PUSH_DB.prepare(
-    "SELECT id, endpoint, p256dh, auth, remind_day, remind_hour, remind_start FROM push_subscriptions",
+    "SELECT id, endpoint, p256dh, auth, remind_day, remind_hour, remind_start, locale FROM push_subscriptions",
   ).all<StoredSubscription>();
   for (const race of races.Races) {
     const start = startAt(race);

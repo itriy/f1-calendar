@@ -16,7 +16,7 @@ export async function searchF1(query: string): Promise<F1SearchResult> {
   const response = await fetch("/api/f1-search", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query }),
+    body: JSON.stringify({ query, locale: i18n.global.locale.value }),
   });
   const data = (await response.json().catch(() => null)) as
     (F1SearchResult & SearchError) | null;

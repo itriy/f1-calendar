@@ -1,4 +1,4 @@
-import { computed, onMounted, ref, type ComputedRef } from "vue";
+import { computed, onMounted, ref, watch, type ComputedRef } from "vue";
 import type { JolpicaRace } from "@/entities/race/model/types";
 import type { FeedEventItem, FeedItem, FeedNewsItem } from "../model/types";
 import { i18n } from "@/shared/config/i18n";
@@ -63,7 +63,7 @@ export function useF1Feed(schedule: ComputedRef<JolpicaRace[]> | { value: Jolpic
     loading.value = true;
     error.value = "";
     try {
-      const response = await fetch("/api/f1-feed");
+      const response = await fetch(`/api/f1-feed?locale=${encodeURIComponent(i18n.global.locale.value)}`);
       if (!response.ok) throw new Error("Feed unavailable");
       const body = (await response.json()) as { news?: FeedNewsItem[] };
       news.value = Array.isArray(body.news) ? body.news : [];
@@ -75,5 +75,6 @@ export function useF1Feed(schedule: ComputedRef<JolpicaRace[]> | { value: Jolpic
   }
 
   onMounted(load);
+  watch(() => i18n.global.locale.value, load);
   return { items, loading, error, load };
 }

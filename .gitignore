@@ -10,3 +10,4 @@ docs/
 !.dev.vars.example
 .DS_Store
 ARCHITECTURE.md
+AGENTS.md

@@ -1,4 +1,5 @@
 import type { WatchProvider, WatchProvidersResponse } from "@/entities/watch-provider/model/types";
+import { requestLocale } from "@/shared/config/i18n/server";
 
 const BROADCAST_INFO_URL =
   "https://www.formula1.com/en/information/f1-broadcast-information.45y3LNsT1D6VoK0ZmX8ciJ";
@@ -115,9 +116,9 @@ export function providersForCountry(
   );
 }
 
-function countryName(countryCode: string): string {
+function countryName(countryCode: string, locale: string): string {
   return (
-    new Intl.DisplayNames(["uk"], { type: "region" }).of(countryCode) ||
+    new Intl.DisplayNames([locale], { type: "region" }).of(countryCode) ||
     countryCode
   );
 }
@@ -147,6 +148,7 @@ async function loadCatalog(): Promise<
 export async function handleWatchProviders(
   request: Request,
 ): Promise<Response> {
+  const locale = requestLocale(request);
   if (request.method !== "GET")
     return Response.json({ error: "method_not_allowed" }, { status: 405 });
   const requestedCountry = (request as Request & { cf?: { country?: unknown } })
@@ -166,7 +168,7 @@ export async function handleWatchProviders(
   }
   const body: WatchProvidersResponse = {
     countryCode,
-    countryName: countryName(countryCode),
+    countryName: countryName(countryCode, locale),
     providers,
   };
   return Response.json(body, {

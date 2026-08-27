@@ -1,5 +1,6 @@
 import type { D1Database } from "./push";
-import { serverText } from "@/shared/config/i18n/server";
+import { requestLocale, serverText } from "@/shared/config/i18n/server";
+import { supportedLocales, type SupportedLocale } from "@/shared/config/i18n";
 
 export type NewsEnv = {
   PUSH_DB?: D1Database;
@@ -152,7 +153,7 @@ export function parseFeed(xml: string, source: Source): ParsedArticle[] {
     .slice(0, MAX_ARTICLES_PER_SOURCE);
 }
 
-async function summarize(title: string, env: NewsEnv): Promise<string | null> {
+async function summarize(title: string, env: NewsEnv, locale: SupportedLocale): Promise<string | null> {
   if (!env.GEMINI_API_KEY) return null;
   try {
     const response = await fetch(
@@ -165,7 +166,7 @@ async function summarize(title: string, env: NewsEnv): Promise<string | null> {
         },
         body: JSON.stringify({
           contents: [
-            { parts: [{ text: serverText("newsSummaryPrompt", { title }) }] },
+            { parts: [{ text: serverText("newsSummaryPrompt", { title }, locale) }] },
           ],
           generationConfig: { temperature: 0.1, maxOutputTokens: 100 },
         }),
@@ -226,7 +227,11 @@ export async function refreshNewsFeed(
       .prepare("SELECT id FROM news_items WHERE source_url = ?")
       .bind(article.sourceUrl)
       .first<{ id: string }>();
-    const summary = existing ? null : await summarize(article.title, env);
+    const summaries = existing
+      ? []
+      : (await Promise.all(supportedLocales.map(async (locale) => [locale, await summarize(article.title, env, locale)] as const)))
+          .filter((entry): entry is [SupportedLocale, string] => Boolean(entry[1]));
+    const summary = summaries.find(([locale]) => locale === "uk")?.[1] || null;
     await db
       .prepare(
         "INSERT INTO news_items (id, source, source_url, title, summary_uk, description, language, image_url, published_at, fetched_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(source_url) DO UPDATE SET title = excluded.title, description = excluded.description, image_url = COALESCE(excluded.image_url, news_items.image_url), published_at = excluded.published_at, fetched_at = excluded.fetched_at",
@@ -244,6 +249,10 @@ export async function refreshNewsFeed(
         new Date().toISOString(),
       )
       .run();
+    for (const [locale, localizedSummary] of summaries)
+      await db.prepare(
+        "INSERT INTO news_item_summaries (news_id, locale, summary, created_at) VALUES (?, ?, ?, ?) ON CONFLICT(news_id, locale) DO UPDATE SET summary=excluded.summary, created_at=excluded.created_at",
+      ).bind(articleId(article.sourceUrl), locale, localizedSummary, new Date().toISOString()).run();
   }
   for (const source of SOURCES)
     await db
@@ -258,12 +267,13 @@ export async function handleNewsFeed(
   request: Request,
   env: NewsEnv,
 ): Promise<Response> {
+  const locale = requestLocale(request);
   if (request.method !== "GET")
     return Response.json(
       {
         error: {
           code: "method_not_allowed",
-          message: serverText("methodNotAllowed"),
+          message: serverText("methodNotAllowed", {}, locale),
         },
       },
       { status: 405 },
@@ -277,15 +287,15 @@ export async function handleNewsFeed(
   const query = () =>
     env
       .PUSH_DB!.prepare(
-        "SELECT id, source, source_url, title, summary_uk, description, language, image_url, published_at FROM news_items WHERE published_at >= ? ORDER BY published_at DESC LIMIT 60",
+        "SELECT id, source, source_url, title, COALESCE((SELECT summary FROM news_item_summaries WHERE news_id = news_items.id AND locale = ?), summary_uk) AS summary, description, language, image_url, published_at FROM news_items WHERE published_at >= ? ORDER BY published_at DESC LIMIT 60",
       )
-      .bind(cutoff)
+      .bind(locale, cutoff)
       .all<{
         id: string;
         source: string;
         source_url: string;
         title: string;
-        summary_uk: string | null;
+        summary: string | null;
         description: string | null;
         language: string;
         image_url: string | null;
@@ -301,7 +311,7 @@ export async function handleNewsFeed(
         source: item.source,
         sourceUrl: item.source_url,
         title: item.title,
-        summary: item.summary_uk,
+        summary: item.summary,
         description: item.description,
         language: item.language,
         imageUrl: item.image_url,

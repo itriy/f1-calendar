@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { loadWatchProviders } from "@/entities/watch-provider/api/watchProviders";
 import type { WatchProvidersResponse } from "@/entities/watch-provider/model/types";
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const data = ref<WatchProvidersResponse | null>(null);
 const loading = ref(true);
 const error = ref(false);
@@ -22,6 +22,7 @@ async function load() {
 }
 
 onMounted(load);
+watch(locale, load);
 </script>
 
 <template>

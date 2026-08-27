@@ -18,7 +18,7 @@ async function api(path: string, method = "GET", body?: unknown) {
   const response = await fetch(path, {
     method,
     headers: body ? { "Content-Type": "application/json" } : undefined,
-    body: body ? JSON.stringify(body) : undefined,
+    body: body ? JSON.stringify({ ...(body as object), locale: i18n.global.locale.value }) : undefined,
   });
   if (!response.ok) {
     const data = (await response.json().catch(() => null)) as {
@@ -55,6 +55,16 @@ export async function updatePush(preferences: ReminderPreferences) {
     subscription: serializeSubscription(subscription),
     preferences,
   });
+}
+export async function updatePushLocale() {
+  const subscription = await getCurrentSubscription();
+  if (!subscription) return;
+  const response = await fetch("/api/push/subscription", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ subscription: serializeSubscription(subscription), locale: i18n.global.locale.value }),
+  });
+  if (!response.ok) throw new Error(i18n.global.t("services.remindersFailed"));
 }
 export async function disablePush() {
   const subscription = await getCurrentSubscription();
