@@ -8,7 +8,7 @@
     {
       "binding": "PUSH_DB",
       "database_name": "f1-calendar-push",
-      "database_id": "647b3726-f229-47ac-a3a8-03567a916c3e",
+      "database_id": "647b3726-f229-47ac-a3a8-03567a916c3e"
     }
   ],
   "vars": {
@@ -22,12 +22,12 @@
       "enabled": true,
       "head_sampling_rate": 1,
       "persist": true,
-      "invocation_logs": true,
+      "invocation_logs": true
     },
     "traces": {
       "enabled": true,
       "persist": true,
-      "head_sampling_rate": 1,
+      "head_sampling_rate": 1
     }
   },
   "assets": {
