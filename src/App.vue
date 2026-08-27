@@ -6,7 +6,7 @@ import RaceCalendar from "./components/RaceCalendar.vue";
 import StandingsTable from "./components/StandingsTable.vue";
 import LastRaceResults from "./components/LastRaceResults.vue";
 import RaceHistory from "./components/RaceHistory.vue";
-import RaceReminders from "./components/RaceReminders.vue";
+// import RaceReminders from "./components/RaceReminders.vue";
 import RaceRemindersModal from "./components/RaceRemindersModal.vue";
 import ReminderTrigger from "./components/ReminderTrigger.vue";
 import NewsFeed from "./components/NewsFeed.vue";

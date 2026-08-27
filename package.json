@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "npm run build && (npm run dev:assets & wrangler dev --local --port 8787)",
+    "dev": "npm run build && npm run dev:db && (npm run dev:assets & wrangler dev --local --port 8787)",
+    "dev:db": "wrangler d1 migrations apply f1-calendar-push --local",
     "dev:assets": "vite build --watch",
     "dev:vite": "vite",
     "dev:worker": "npm run build && wrangler dev --local --port 8787",
