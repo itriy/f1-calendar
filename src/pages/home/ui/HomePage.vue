@@ -118,7 +118,7 @@ const countdown = (
 <template>
   <main class="min-h-screen">
     <header
-      class="sticky top-0 z-50 border-b border-white/10 bg-[#0d0d0f]/95 backdrop-blur-md"
+      class="sticky top-0 z-50 border-b border-white/10 bg-f1-bg backdrop-blur-md"
     >
       <nav
         class="mx-auto flex h-17 w-[min(90rem,calc(100%-1.75rem))] items-center gap-5 sm:h-21 sm:w-[min(90rem,calc(100%-3rem))] sm:gap-8"
@@ -136,7 +136,14 @@ const countdown = (
           :aria-label="t('app.calendar')"
           :title="t('app.calendar')"
         >
-          <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <svg
+            class="size-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            aria-hidden="true"
+          >
             <rect x="3.5" y="5" width="17" height="15" rx="1.5" />
             <path d="M7.5 3.5v3M16.5 3.5v3M3.5 9h17M8 13h3M13 13h3M8 17h3" />
           </svg>
@@ -314,8 +321,7 @@ const countdown = (
       </section>
       <section
         class="mx-auto grid w-[min(90rem,calc(100%-1.75rem))] grid-cols-1 gap-4 pb-10 lg:w-[min(90rem,calc(100%-3rem))] lg:grid-cols-2"
-      >
-      </section>
+      ></section>
     </template>
     <section
       class="mx-auto flex w-[min(90rem,calc(100%-1.75rem))] gap-3 border border-white/10 bg-white/3 p-4 text-[12px] leading-5 text-zinc-400 sm:w-[min(90rem,calc(100%-3rem))]"
