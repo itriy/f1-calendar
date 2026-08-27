@@ -10,6 +10,7 @@ import RaceHistory from "./components/RaceHistory.vue";
 import RaceRemindersModal from "./components/RaceRemindersModal.vue";
 import ReminderTrigger from "./components/ReminderTrigger.vue";
 import NewsFeed from "./components/NewsFeed.vue";
+import WatchProviders from "./components/WatchProviders.vue";
 // import AiSearch from "./components/AiSearch.vue";
 import { useF1Feed } from "./services/f1Feed";
 import {
@@ -282,6 +283,11 @@ const countdown = (
           @select-race="loadHistoryRaceDetails"
           @close-race="closeHistoryRaceDetails"
         />
+      </section>
+      <section
+        class="mx-auto w-[min(90rem,calc(100%-1.75rem))] pb-10 lg:w-[min(90rem,calc(100%-3rem))]"
+      >
+        <WatchProviders />
       </section>
       <section
         class="mx-auto w-[min(90rem,calc(100%-1.75rem))] pb-10 lg:w-[min(90rem,calc(100%-3rem))]"

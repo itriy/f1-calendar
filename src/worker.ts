@@ -1,5 +1,6 @@
 import { handlePushApi, sendDueRaceReminders, type D1Database } from "./push";
 import { handleNewsFeed, refreshNewsFeed } from "./newsFeed";
+import { handleWatchProviders } from "./watchProviders";
 import { serverText } from "./i18n/server";
 
 type Env = {
@@ -518,6 +519,8 @@ export default {
     if (url.pathname === "/api/f1-videos")
       return handleRaceVideos(request, env);
     if (url.pathname === "/api/f1-feed") return handleNewsFeed(request, env);
+    if (url.pathname === "/api/watch-providers")
+      return handleWatchProviders(request);
     if (url.pathname.startsWith("/api/"))
       return error("not_found", serverText("apiNotFound"), 404);
     return env.ASSETS.fetch(request);
