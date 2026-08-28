@@ -78,7 +78,9 @@ const race = {
 };
 
 test("hero heading renders the punctuation supplied by i18n without appending a period", () => {
-  const messages = i18n.global.getLocaleMessage("uk");
+  const messages = i18n.global.getLocaleMessage("uk") as {
+    app: Record<string, string>;
+  };
   const original = messages.app.headlineEnd;
   i18n.global.setLocaleMessage("uk", {
     ...messages,

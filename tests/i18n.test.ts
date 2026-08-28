@@ -16,9 +16,14 @@ test("persists a manually selected locale", async () => {
 });
 
 test("translates the title-chances section in every supported locale", async () => {
-  const ukrainian = i18n.global.getLocaleMessage("uk").chances.title;
+  const ukrainian = (
+    i18n.global.getLocaleMessage("uk") as { chances: { title: string } }
+  ).chances.title;
   for (const locale of supportedLocales.filter((locale) => locale !== "uk")) {
     await loadLocale(locale);
-    expect(i18n.global.getLocaleMessage(locale).chances.title).not.toBe(ukrainian);
+    expect(
+      (i18n.global.getLocaleMessage(locale) as { chances: { title: string } })
+        .chances.title,
+    ).not.toBe(ukrainian);
   }
 });

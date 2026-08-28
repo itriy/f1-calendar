@@ -1,4 +1,5 @@
 import { createI18n } from "vue-i18n";
+import type ukMessages from "./locales/uk.json";
 
 export const supportedLocales = [
   "uk",
@@ -63,11 +64,11 @@ const localeLoaders: Record<
 };
 const loadedLocales = new Set<SupportedLocale>();
 
-export const i18n = createI18n({
+export const i18n = createI18n<typeof ukMessages, SupportedLocale, false>({
   legacy: false,
   locale: "uk",
   fallbackLocale: "uk",
-  messages: {},
+  messages: {} as Record<SupportedLocale, typeof ukMessages>,
 });
 
 export async function loadLocale(locale: SupportedLocale) {

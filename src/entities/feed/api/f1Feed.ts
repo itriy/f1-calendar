@@ -1,4 +1,4 @@
-import { computed, onMounted, ref, watch, type ComputedRef } from "vue";
+import { computed, onMounted, ref, type ComputedRef } from "vue";
 import type { JolpicaRace } from "@/entities/race/model/types";
 import type { FeedEventItem, FeedItem, FeedNewsItem } from "../model/types";
 import { i18n } from "@/shared/config/i18n";
@@ -26,44 +26,59 @@ function sessionDate(value: unknown, race: JolpicaRace): string | null {
   return `${session.date}T${session.time.endsWith("Z") ? session.time : `${session.time}Z`}`;
 }
 
-export function calendarEvents(races: JolpicaRace[], now = Date.now()): FeedEventItem[] {
+export function calendarEvents(
+  races: JolpicaRace[],
+  now = Date.now(),
+): FeedEventItem[] {
   return races.flatMap((race) =>
     sessions.flatMap(([key, session]) => {
       const startsAt = sessionDate(race[key], race);
       const time = startsAt ? new Date(startsAt).getTime() : NaN;
-      if (!startsAt || Number.isNaN(time) || time < now || time > now + EVENT_WINDOW_MS)
+      if (
+        !startsAt ||
+        Number.isNaN(time) ||
+        time < now ||
+        time > now + EVENT_WINDOW_MS
+      )
         return [];
-      return [{
-        id: `event-${race.round}-${key}-${startsAt}`,
-        type: "event" as const,
-        startsAt,
-        session: i18n.global.t(session),
-        raceName: race.raceName,
-        round: race.round,
-      }];
+      return [
+        {
+          id: `event-${race.round}-${key}-${startsAt}`,
+          type: "event" as const,
+          startsAt,
+          session: i18n.global.t(session),
+          raceName: race.raceName,
+          round: race.round,
+        },
+      ];
     }),
   );
 }
 
-export function useF1Feed(schedule: ComputedRef<JolpicaRace[]> | { value: JolpicaRace[] }) {
+export function useF1Feed(
+  schedule: ComputedRef<JolpicaRace[]> | { value: JolpicaRace[] },
+) {
   const news = ref<FeedNewsItem[]>([]);
   const loading = ref(true);
   const error = ref("");
 
   const items = computed<FeedItem[]>(() =>
-    [...news.value, ...calendarEvents(schedule.value)]
-      .sort((a, b) => {
-        const left = new Date(a.type === "news" ? a.publishedAt : a.startsAt).getTime();
-        const right = new Date(b.type === "news" ? b.publishedAt : b.startsAt).getTime();
-        return right - left;
-      }),
+    [...news.value, ...calendarEvents(schedule.value)].sort((a, b) => {
+      const left = new Date(
+        a.type === "news" ? a.publishedAt : a.startsAt,
+      ).getTime();
+      const right = new Date(
+        b.type === "news" ? b.publishedAt : b.startsAt,
+      ).getTime();
+      return right - left;
+    }),
   );
 
   async function load() {
     loading.value = true;
     error.value = "";
     try {
-      const response = await fetch(`/api/f1-feed?locale=${encodeURIComponent(i18n.global.locale.value)}`);
+      const response = await fetch("/api/f1-feed");
       if (!response.ok) throw new Error("Feed unavailable");
       const body = (await response.json()) as { news?: FeedNewsItem[] };
       news.value = Array.isArray(body.news) ? body.news : [];
@@ -75,6 +90,5 @@ export function useF1Feed(schedule: ComputedRef<JolpicaRace[]> | { value: Jolpic
   }
 
   onMounted(load);
-  watch(() => i18n.global.locale.value, load);
   return { items, loading, error, load };
 }
