@@ -42,14 +42,15 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
         run: |
-          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
+          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ] && [ -n "$VAPID_PRIVATE_KEY" ]; then
             echo "configured=true" >> "$GITHUB_OUTPUT"
           else
             echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "Cloudflare deployment skipped: configure CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID repository secrets."
+            echo "Cloudflare deployment skipped: configure CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, and VAPID_PRIVATE_KEY repository secrets."
           fi
-      - name: Deploy to Cloudflare Workers
+      - name: Deploy website and API Worker
         if: steps.cloudflare-secrets.outputs.configured == 'true'
         uses: cloudflare/wrangler-action@v4
         with:
@@ -57,3 +58,15 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: '4.125.0'
           command: deploy
+      - name: Deploy scheduled refresh Worker
+        if: steps.cloudflare-secrets.outputs.configured == 'true'
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '4.125.0'
+          command: deploy --config wrangler.refresh.jsonc
+          secrets: |
+            VAPID_PRIVATE_KEY
+        env:
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}

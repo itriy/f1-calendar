@@ -1,5 +1,5 @@
-import { handlePushApi, sendDueRaceReminders, type D1Database } from "./push";
-import { handleNewsFeed, refreshNewsFeedSafely } from "./newsFeed";
+import { handlePushApi, type D1Database } from "./push";
+import { handleNewsFeed } from "./newsFeed";
 import { handleWatchProviders } from "./watchProviders";
 import { serverText } from "@/shared/config/i18n/server";
 
@@ -11,12 +11,6 @@ type Env = {
   VAPID_SUBJECT?: string;
   YOUTUBE_API_KEY?: string;
 };
-type ScheduledController = {
-  scheduledTime: number;
-  cron: string;
-  noRetry(): void;
-};
-type ExecutionContext = { waitUntil(promise: Promise<unknown>): void };
 
 type Formula1Video = {
   id: string;
@@ -288,33 +282,19 @@ async function handleRaceVideos(request: Request, env: Env): Promise<Response> {
 }
 
 export default {
-  async fetch(
-    request: Request,
-    env: Env,
-    ctx?: ExecutionContext,
-  ): Promise<Response> {
+  async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     if (url.pathname === "/api/push/subscription")
       return handlePushApi(request, env);
     if (url.pathname === "/api/push/config") return handlePushApi(request, env);
     if (url.pathname === "/api/f1-videos")
       return handleRaceVideos(request, env);
-    if (url.pathname === "/api/f1-feed")
-      return handleNewsFeed(request, env, ctx);
+    if (url.pathname === "/api/f1-feed") return handleNewsFeed(request, env);
     if (url.pathname === "/api/watch-providers")
       return handleWatchProviders(request);
     if (url.pathname.startsWith("/api/"))
       return error("not_found", serverText("apiNotFound"), 404);
     return env.ASSETS.fetch(request);
-  },
-  async scheduled(
-    _controller: ScheduledController,
-    env: Env,
-    ctx: ExecutionContext,
-  ) {
-    ctx.waitUntil(
-      Promise.all([sendDueRaceReminders(env), refreshNewsFeedSafely(env)]),
-    );
   },
 };
 

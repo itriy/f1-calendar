@@ -8,6 +8,10 @@ The frontend is organized with Feature-Sliced Design. See [the layer guide](src/
 
 The Worker collects recent Formula 1 news from configured public RSS/Atom feeds, stores normalized entries in D1, and exposes them at `/api/f1-feed`. Apply `migrations/0003_news_feed.sql` to the configured D1 database before deployment. The publisher headline and source link remain available without AI processing. Telegram is intentionally not ingested in this version.
 
+## Scheduled refresh Worker
+
+`f1-calendar-refresh` runs every five minutes and owns RSS refreshes and push-reminder delivery. It shares the `f1-calendar-push` D1 database with the website/API Worker. Deploy it with `npx wrangler deploy --config wrangler.refresh.jsonc`; set its `VAPID_PRIVATE_KEY` secret before enabling push reminders. In GitHub Actions, add the same value as the `VAPID_PRIVATE_KEY` repository secret so both Workers are deployed together.
+
 ## Local development
 
 Run `npm run dev` and open [http://localhost:8787](http://localhost:8787). It builds the frontend, watches frontend assets, and serves them through the local Cloudflare Worker, so `/api/f1-videos` uses the same origin as the application. Worker code reloads through Wrangler; stop both processes with `Ctrl+C`.

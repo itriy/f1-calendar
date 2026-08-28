@@ -4,13 +4,26 @@ import {
   handleRaceVideos,
 } from "../src/server/worker";
 import type { D1Database, D1Statement } from "../src/server/push";
+import refreshWorker from "../src/server/refresh-worker";
 import worker from "../src/server/worker";
 
 const assets = { fetch: async () => new Response("asset") };
 
 afterEach(() => vi.unstubAllGlobals());
 
-test("serves stored news before scheduling a refresh", async () => {
+test("runs scheduled tasks in the dedicated refresh Worker", async () => {
+  const waitUntil = vi.fn();
+
+  await refreshWorker.scheduled(
+    { scheduledTime: Date.now(), cron: "*/5 * * * *", noRetry: () => {} },
+    {},
+    { waitUntil },
+  );
+
+  expect(waitUntil).toHaveBeenCalledTimes(1);
+});
+
+test("serves stored news without refreshing it in the API Worker", async () => {
   const refreshedAt = new Date().toISOString();
   const statement: D1Statement = {
     bind: () => statement,
@@ -34,12 +47,9 @@ test("serves stored news before scheduling a refresh", async () => {
     run: async () => ({ success: true }),
   };
   const db: D1Database = { prepare: () => statement };
-  const waitUntil = vi.fn();
-
   const response = await handleNewsFeed(
     new Request("https://example.test/api/f1-feed"),
     { PUSH_DB: db },
-    { waitUntil },
   );
 
   expect(await response.json()).toEqual({
@@ -47,7 +57,6 @@ test("serves stored news before scheduling a refresh", async () => {
       expect.objectContaining({ id: "news-1", title: "Fresh news" }),
     ],
   });
-  expect(waitUntil).toHaveBeenCalledTimes(1);
 });
 
 test("returns several matching videos only when YouTube identifies the Formula 1 channel", async () => {

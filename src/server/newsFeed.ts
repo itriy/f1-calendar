@@ -243,7 +243,6 @@ export async function refreshNewsFeedSafely(env: NewsEnv): Promise<void> {
 export async function handleNewsFeed(
   request: Request,
   env: NewsEnv,
-  ctx?: { waitUntil(promise: Promise<unknown>): void },
 ): Promise<Response> {
   if (request.method !== "GET")
     return Response.json(
@@ -279,7 +278,6 @@ export async function handleNewsFeed(
         published_at: string;
       }>();
   const result = await query();
-  if (ctx) ctx.waitUntil(refreshNewsFeedSafely(env));
   return Response.json(
     {
       news: result.results.map((item) => ({
