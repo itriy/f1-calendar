@@ -219,7 +219,9 @@ export function useF1Data() {
                 ? resultTime
                 : result.status === "Finished"
                   ? t("data.gapUnknown")
-                  : t("data.status", { status: result.status || t("data.statusUnknown") });
+                  : t("data.status", {
+                      status: result.status || t("data.statusUnknown"),
+                    });
           return {
             position: result.position,
             name: `${result.Driver.givenName} ${result.Driver.familyName}`,
@@ -259,7 +261,9 @@ export function useF1Data() {
     if (result.status === "Lapped") return t("data.lapDown");
     if (resultTime.startsWith("+")) return resultTime;
     if (result.status === "Finished") return t("data.gapUnknown");
-    return t("data.status", { status: result.status || t("data.statusUnknown") });
+    return t("data.status", {
+      status: result.status || t("data.statusUnknown"),
+    });
   }
   function normalizeRaceDetails(race: JolpicaRace): RaceDetails {
     return {
@@ -312,13 +316,11 @@ export function useF1Data() {
     try {
       const data = await getLastRaceResults();
       const race = data.MRData?.RaceTable?.Races?.[0];
-      if (!race?.Results?.length)
-        throw new Error(t("data.lastRaceMissing"));
+      if (!race?.Results?.length) throw new Error(t("data.lastRaceMissing"));
       lastRace.value = normalizeLastRace(race);
     } catch (cause) {
       console.error(t("data.lastRaceLog"), cause);
-      resultsError.value =
-        t("data.lastRaceLoadError");
+      resultsError.value = t("data.lastRaceLoadError");
     } finally {
       resultsLoading.value = false;
     }
@@ -337,8 +339,7 @@ export function useF1Data() {
     try {
       const data = await getSeasonRaceWinners(historySeason.value);
       const races = data.MRData?.RaceTable?.Races;
-      if (!Array.isArray(races))
-        throw new Error(t("data.historyMissing"));
+      if (!Array.isArray(races)) throw new Error(t("data.historyMissing"));
       if (requestId !== historyRequestId) return;
       raceHistory.value = races
         .map(normalizeRaceWinner)
@@ -361,8 +362,7 @@ export function useF1Data() {
     try {
       const data = await getRaceResults(detailSeason, round);
       const race = data.MRData?.RaceTable?.Races?.[0];
-      if (!race?.Results?.length)
-        throw new Error(t("data.raceDetailsMissing"));
+      if (!race?.Results?.length) throw new Error(t("data.raceDetailsMissing"));
       if (requestId !== historyDetailsRequestId) return;
       selectedHistoryRace.value = normalizeRaceDetails(race);
     } catch (cause) {
@@ -393,8 +393,7 @@ export function useF1Data() {
     } catch (cause) {
       if (summarySeason !== String(historySeason.value)) return;
       console.error(t("data.summaryLog"), cause);
-      seasonSummaryError.value =
-        t("data.summaryLoadError");
+      seasonSummaryError.value = t("data.summaryLoadError");
     } finally {
       if (summarySeason === String(historySeason.value))
         seasonSummaryLoading.value = false;
@@ -429,8 +428,7 @@ export function useF1Data() {
       }).format(new Date());
     } catch (cause) {
       console.error(t("data.seasonLog"), cause);
-      error.value =
-        t("data.seasonLoadError");
+      error.value = t("data.seasonLoadError");
     } finally {
       loading.value = false;
     }
@@ -445,9 +443,7 @@ export function useF1Data() {
           )
           .sort((a, b) => Number(b) - Number(a));
       })
-      .catch((cause) =>
-        console.error(t("data.seasonsLog"), cause),
-      );
+      .catch((cause) => console.error(t("data.seasonsLog"), cause));
     loadRaceHistory(season.value);
     loadSeasonSummary(season.value);
   }
