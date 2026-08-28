@@ -112,10 +112,13 @@ watch(
       :aria-controls="panelId"
       @click="toggle"
     >
-      <span class="underline">{{ t("circuit.about") }}</span
-      ><span class="no-underline text-2xl leading-none font-normal" aria-hidden="true">{{
-        expanded ? "−" : "+"
-      }}</span>
+      <span class="underline">{{ t("circuit.about") }}</span>
+      <span
+        class="no-underline text-2xl leading-none font-normal"
+        aria-hidden="true"
+      >
+        {{ expanded ? "−" : "+" }}
+      </span>
     </button>
     <div
       v-if="expanded"
@@ -160,10 +163,10 @@ watch(
             role="img"
             :aria-label="t('circuit.imageUnavailable')"
           >
-            <span v-if="mediaLoading" class="text-[12px] text-zinc-600">{{
-              t("circuit.loading")
-            }}</span
-            ><span v-else aria-hidden="true">🏁</span>
+            <span v-if="mediaLoading" class="text-[12px] text-zinc-600">
+              {{ t("circuit.loading") }}
+            </span>
+            <span v-else aria-hidden="true">🏁</span>
           </div>
           <div
             v-if="media && previewOpen"
@@ -193,10 +196,10 @@ watch(
             {{ circuit?.circuitName || t("circuit.unknownCircuit") }}
           </p>
           <p class="mt-1 text-white/70">
-            {{ circuit?.Location?.locality || t("circuit.unknownCity")
-            }}<span v-if="circuit?.Location?.country">
-              · {{ circuit.Location.country }}</span
-            >
+            {{ circuit?.Location?.locality || t("circuit.unknownCity") }}
+            <span v-if="circuit?.Location?.country">
+              · {{ circuit.Location.country }}
+            </span>
           </p>
           <p
             v-if="circuit?.Location?.lat && circuit?.Location?.long"
@@ -215,16 +218,14 @@ watch(
             :href="media.sourceUrl"
             target="_blank"
             rel="noopener noreferrer"
-            >{{ t("circuit.sourceMedia") }} <span aria-hidden="true">↗</span></a
-          ><a
+          >{{ t("circuit.sourceMedia") }} <span aria-hidden="true">↗</span></a><a
             v-else-if="circuit?.url"
             class="mt-2 inline-block text-[12px] underline underline-offset-2 hover:text-white"
             :href="circuit.url"
             target="_blank"
             rel="noopener noreferrer"
-            >{{ t("circuit.sourceWikipedia") }}
-            <span aria-hidden="true">↗</span></a
-          >
+          >{{ t("circuit.sourceWikipedia") }}
+            <span aria-hidden="true">↗</span></a>
         </div>
       </div>
       <WeekendDetails class="min-w-0" :race="race" />

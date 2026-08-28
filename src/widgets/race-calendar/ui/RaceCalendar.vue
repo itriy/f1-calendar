@@ -15,7 +15,7 @@ const props = withDefaults(
     updatedAt?: string;
     openRaceRound?: string;
   }>(),
-  { pastRaces: () => [] },
+  { pastRaces: () => [], updatedAt: "", openRaceRound: "" },
 );
 const { t, locale } = useI18n();
 const tabs = ["upcoming", "past"] as const;
