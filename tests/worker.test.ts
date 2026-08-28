@@ -316,3 +316,49 @@ test("routes DELETE push unsubscribe requests to push validation instead of the 
     },
   });
 });
+
+test("serves crawl directives and the localized sitemap", async () => {
+  const robots = await worker.fetch(
+    new Request("https://f1-calendar.date/robots.txt"),
+    { ASSETS: assets },
+  );
+  expect(robots.headers.get("content-type")).toContain("text/plain");
+  expect(await robots.text()).toContain(
+    "Sitemap: https://f1-calendar.date/sitemap.xml",
+  );
+
+  const sitemap = await worker.fetch(
+    new Request("https://f1-calendar.date/sitemap.xml"),
+    { ASSETS: assets },
+  );
+  const xml = await sitemap.text();
+  expect(sitemap.headers.get("content-type")).toContain("application/xml");
+  expect(xml).toContain("https://f1-calendar.date/uk/");
+  expect(xml).toContain("https://f1-calendar.date/zh-CN/");
+  expect((xml.match(/<loc>/g) || [])).toHaveLength(8);
+});
+
+test("redirects the root and workers.dev pages to canonical localized URLs", async () => {
+  const root = await worker.fetch(new Request("https://f1-calendar.date/"), {
+    ASSETS: assets,
+  });
+  expect(root.status).toBe(301);
+  expect(root.headers.get("location")).toBe("https://f1-calendar.date/uk/");
+
+  const legacy = await worker.fetch(
+    new Request("https://f1-calendar.itriy1.workers.dev/en/?source=test"),
+    { ASSETS: assets },
+  );
+  expect(legacy.status).toBe(301);
+  expect(legacy.headers.get("location")).toBe(
+    "https://f1-calendar.date/en/?source=test",
+  );
+});
+
+test("does not return the SPA shell for unknown document routes", async () => {
+  const response = await worker.fetch(
+    new Request("https://f1-calendar.date/not-a-page"),
+    { ASSETS: assets },
+  );
+  expect(response.status).toBe(404);
+});

@@ -2,6 +2,13 @@ import { handlePushApi, type D1Database } from "./push";
 import { handleNewsFeed } from "./newsFeed";
 import { handleWatchProviders } from "./watchProviders";
 import { serverText } from "@/shared/config/i18n/server";
+import {
+  SITE_ORIGIN,
+  canonicalUrl,
+  localeFromPathname,
+  localePath,
+  seoLocales,
+} from "@/shared/config/seo";
 
 type Env = {
   ASSETS: { fetch(request: Request): Promise<Response> };
@@ -44,6 +51,50 @@ const videoRequestLog = new Map<string, number[]>();
 const OFFICIAL_FORMULA1_CHANNEL_ID = "UCB_qr75-ydFVKSF9Dmo6izg";
 const YOUTUBE_ID = /^[A-Za-z0-9_-]{11}$/;
 const MAX_YOUTUBE_PLAYLIST_PAGES = 3;
+const WORKERS_DEV_HOST = "f1-calendar.itriy1.workers.dev";
+
+function robotsTxt(): Response {
+  return new Response(
+    `User-agent: *\nAllow: /\nSitemap: ${SITE_ORIGIN}/sitemap.xml\n`,
+    {
+      headers: {
+        "Cache-Control": "public, max-age=3600",
+        "Content-Type": "text/plain; charset=utf-8",
+      },
+    },
+  );
+}
+
+function sitemapXml(): Response {
+  const urls = seoLocales
+    .map((locale) => `  <url><loc>${canonicalUrl(locale)}</loc></url>`)
+    .join("\n");
+  return new Response(
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`,
+    {
+      headers: {
+        "Cache-Control": "public, max-age=3600",
+        "Content-Type": "application/xml; charset=utf-8",
+      },
+    },
+  );
+}
+
+function notFound(): Response {
+  return new Response("Not found", {
+    status: 404,
+    headers: { "Content-Type": "text/plain; charset=utf-8" },
+  });
+}
+
+function redirect(url: URL, pathname: string): Response {
+  const destination = new URL(url);
+  destination.protocol = "https:";
+  destination.hostname = "f1-calendar.date";
+  destination.port = "";
+  destination.pathname = pathname;
+  return Response.redirect(destination.toString(), 301);
+}
 
 function json(body: unknown, status = 200): Response {
   return Response.json(body, {
@@ -94,8 +145,7 @@ function matchingFormula1Video(
   )
     return null;
   const normalizedTitle = normalizeVideoText(title);
-  if (/\b(f2|f3|formula 2|formula 3)\b/.test(normalizedTitle))
-    return null;
+  if (/\b(f2|f3|formula 2|formula 3)\b/.test(normalizedTitle)) return null;
   const normalizedRace = normalizeVideoText(race)
     .replace(/\bgrand prix\b/g, "")
     .trim();
@@ -233,11 +283,7 @@ async function handleRaceVideos(request: Request, env: Env): Promise<Response> {
     return error("method_not_allowed", serverText("methodNotAllowed"), 405);
   const client = request.headers.get("CF-Connecting-IP") || "anonymous";
   if (isVideoRateLimited(client))
-    return error(
-      "rate_limited",
-      serverText("videoRateLimited"),
-      429,
-    );
+    return error("rate_limited", serverText("videoRateLimited"), 429);
   const url = new URL(request.url);
   const season = url.searchParams.get("season") || "";
   const round = url.searchParams.get("round") || "";
@@ -284,6 +330,9 @@ async function handleRaceVideos(request: Request, env: Env): Promise<Response> {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+    const isApi = url.pathname.startsWith("/api/");
+    if (url.hostname === WORKERS_DEV_HOST && !isApi)
+      return redirect(url, url.pathname);
     if (url.pathname === "/api/push/subscription")
       return handlePushApi(request, env);
     if (url.pathname === "/api/push/config") return handlePushApi(request, env);
@@ -294,8 +343,19 @@ export default {
       return handleWatchProviders(request);
     if (url.pathname.startsWith("/api/"))
       return error("not_found", serverText("apiNotFound"), 404);
+    if (url.pathname === "/robots.txt") return robotsTxt();
+    if (url.pathname === "/sitemap.xml") return sitemapXml();
+    if (url.pathname === "/") return redirect(url, localePath("uk"));
+
+    const locale = localeFromPathname(url.pathname);
+    if (locale && url.pathname === `/${locale}`)
+      return redirect(url, localePath(locale));
+    if (locale && url.pathname === localePath(locale))
+      return env.ASSETS.fetch(request);
+
+    if (!url.pathname.includes(".")) return notFound();
     return env.ASSETS.fetch(request);
   },
 };
 
-export { handleRaceVideos, handleNewsFeed };
+export { handleRaceVideos, handleNewsFeed, robotsTxt, sitemapXml };

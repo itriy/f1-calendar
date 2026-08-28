@@ -13,7 +13,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "vue-tsc --noEmit",
-    "build": "vite build",
+    "build": "vite build && tsx scripts/generate-seo-pages.ts",
     "preview": "vite preview",
     "deploy": "npm run build && wrangler deploy",
     "deploy:db": "wrangler d1 migrations apply f1-calendar-push --remote"

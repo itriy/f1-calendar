@@ -15,6 +15,13 @@ test("persists a manually selected locale", async () => {
   expect(document.documentElement.lang).toBe("ja");
 });
 
+test("uses the locale encoded in the URL before local storage", async () => {
+  localStorage.setItem("f1-calendar-locale", "ja");
+  history.replaceState({}, "", "/de/");
+  expect(initialLocale()).toBe("de");
+  history.replaceState({}, "", "/");
+});
+
 test("translates the title-chances section in every supported locale", async () => {
   const ukrainian = (
     i18n.global.getLocaleMessage("uk") as { chances: { title: string } }

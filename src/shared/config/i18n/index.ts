@@ -1,5 +1,6 @@
 import { createI18n } from "vue-i18n";
 import type ukMessages from "./locales/uk.json";
+import { localeFromPathname } from "@/shared/config/seo";
 
 export const supportedLocales = [
   "uk",
@@ -44,6 +45,8 @@ export function normalizeLocale(value?: string | null): SupportedLocale {
 }
 export function initialLocale(): SupportedLocale {
   if (typeof window === "undefined") return "en";
+  const localeInUrl = localeFromPathname(window.location.pathname);
+  if (localeInUrl) return localeInUrl;
   const saved = window.localStorage.getItem(LOCALE_STORAGE_KEY);
   if (saved) return normalizeLocale(saved);
   return normalizeLocale(navigator.languages?.[0] || navigator.language);
