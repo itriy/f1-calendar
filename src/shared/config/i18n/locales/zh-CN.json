@@ -113,7 +113,7 @@
   },
   "install": {
     "label": "安装 F1 日历",
-    "action": "安装",
+    "action": "安装应用",
     "helpTitle": "安装应用程序",
     "iosInstructions": "在 Safari 中，单击“共享”，然后选择“转到开始屏幕”。",
     "browserInstructions": "打开浏览器菜单并选择“安装应用程序”或“添加到主屏幕”。",

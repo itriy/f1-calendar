@@ -113,7 +113,7 @@
   },
   "install": {
     "label": "Install F1 Calendar",
-    "action": "INSTALL",
+    "action": "INSTALL APP",
     "helpTitle": "Install the application",
     "iosInstructions": "In Safari, click Share, then select Go to Start Screen.",
     "browserInstructions": "Open the browser menu and select \"Install application\" or \"Add to home screen\".",

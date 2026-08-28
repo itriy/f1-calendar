@@ -78,7 +78,7 @@ onBeforeUnmount(() => {
 <template>
   <div v-if="!isInstalled" class="relative">
     <button
-      class="inline-flex size-9 items-center justify-center border border-white/15 text-zinc-300 transition hover:border-white/40 hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-f1-red sm:size-auto sm:gap-1.5 sm:px-2.5 sm:py-2"
+      class="cursor-pointer inline-flex size-9 items-center justify-center border border-white/15 text-zinc-300 transition hover:border-white/40 hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-f1-red sm:size-auto sm:gap-1.5 sm:px-2.5 sm:py-2"
       type="button"
       :aria-expanded="isOpen"
       aria-controls="pwa-install-help"

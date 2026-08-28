@@ -113,7 +113,7 @@
   },
   "install": {
     "label": "Installer le calendrier F1",
-    "action": "INSTALLER",
+    "action": "INSTALLER L’APPLICATION",
     "helpTitle": "Installer l'application",
     "iosInstructions": "Dans Safari, cliquez sur Partager, puis sélectionnez Aller à l'écran de démarrage.",
     "browserInstructions": "Ouvrez le menu du navigateur et sélectionnez « Installer l'application » ou « Ajouter à l'écran d'accueil ».",

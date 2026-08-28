@@ -113,7 +113,7 @@
   },
   "install": {
     "label": "Installieren Sie den F1-Kalender",
-    "action": "INSTALLIEREN",
+    "action": "APP INSTALLIEREN",
     "helpTitle": "Installieren Sie die Anwendung",
     "iosInstructions": "Klicken Sie in Safari auf „Teilen“ und wählen Sie dann „Zum Startbildschirm“ aus.",
     "browserInstructions": "Öffnen Sie das Browsermenü und wählen Sie „Anwendung installieren“ oder „Zum Startbildschirm hinzufügen“.",
