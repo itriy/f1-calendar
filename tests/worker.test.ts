@@ -1,10 +1,54 @@
 import { afterEach, expect, test, vi } from "vitest";
-import { handleRaceVideos, handleSearch } from "../src/server/worker";
+import {
+  handleNewsFeed,
+  handleRaceVideos,
+} from "../src/server/worker";
+import type { D1Database, D1Statement } from "../src/server/push";
 import worker from "../src/server/worker";
 
 const assets = { fetch: async () => new Response("asset") };
 
 afterEach(() => vi.unstubAllGlobals());
+
+test("serves stored news before scheduling a refresh", async () => {
+  const refreshedAt = new Date().toISOString();
+  const statement: D1Statement = {
+    bind: () => statement,
+    first: async <T>() => ({ refreshed_at: refreshedAt }) as T,
+    all: async <T>() =>
+      ({
+        results: [
+          {
+            id: "news-1",
+            source: "Formula 1",
+            source_url: "https://example.test/article",
+            title: "Fresh news",
+            summary: null,
+            description: null,
+            language: "en",
+            image_url: null,
+            published_at: refreshedAt,
+          },
+        ],
+      }) as { results: T[] },
+    run: async () => ({ success: true }),
+  };
+  const db: D1Database = { prepare: () => statement };
+  const waitUntil = vi.fn();
+
+  const response = await handleNewsFeed(
+    new Request("https://example.test/api/f1-feed"),
+    { PUSH_DB: db },
+    { waitUntil },
+  );
+
+  expect(await response.json()).toEqual({
+    news: [
+      expect.objectContaining({ id: "news-1", title: "Fresh news" }),
+    ],
+  });
+  expect(waitUntil).toHaveBeenCalledTimes(1);
+});
 
 test("returns several matching videos only when YouTube identifies the Formula 1 channel", async () => {
   vi.stubGlobal(
@@ -230,38 +274,6 @@ test("returns an explicit provider error instead of masking a YouTube failure", 
   });
 });
 
-test("returns a friendly configuration state without a Gemini secret", async () => {
-  const response = await handleSearch(
-    new Request("https://example.test/api/f1-search", {
-      method: "POST",
-      body: JSON.stringify({ query: "Хто виграв Монако?" }),
-    }),
-    { ASSETS: assets },
-  );
-  expect(response.status).toBe(503);
-  expect(await response.json()).toEqual({
-    error: { code: "not_configured", message: "AI-пошук ще не налаштований." },
-  });
-});
-
-test("rejects invalid and oversized requests before any provider call", async () => {
-  const invalid = await handleSearch(
-    new Request("https://example.test/api/f1-search", {
-      method: "POST",
-      body: "{}",
-    }),
-    { ASSETS: assets },
-  );
-  expect(invalid.status).toBe(400);
-  const oversized = await handleSearch(
-    new Request("https://example.test/api/f1-search", {
-      method: "POST",
-      body: JSON.stringify({ query: "x".repeat(2_000) }),
-    }),
-    { ASSETS: assets },
-  );
-  expect(oversized.status).toBe(413);
-});
 
 test("routes DELETE push unsubscribe requests to push validation instead of the API 404 fallback", async () => {
   const db = {

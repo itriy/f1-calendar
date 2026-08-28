@@ -1,12 +1,5 @@
 # Local-only Worker secrets. Copy this file to .dev.vars and add your own key there.
 # Never commit .dev.vars and never use a VITE_ prefix for server-side secrets.
-GEMINI_API_KEY=
-
-# Optional non-secret local override. The Worker defaults to gemini-3.6-flash.
-GEMINI_MODEL=gemini-3.6-flash
-
-# This same server-only key optionally generates short Ukrainian news summaries.
-
 # The only setting needed for full official Formula 1 video history. Create a
 # YouTube Data API v3 key in Google Cloud and put it in a local .dev.vars file.
 # Keep this Worker secret private; never use VITE_. Leaving it empty retains the

@@ -3,8 +3,6 @@ import { serverText } from "@/shared/config/i18n/server";
 
 export type NewsEnv = {
   PUSH_DB?: D1Database;
-  GEMINI_API_KEY?: string;
-  GEMINI_MODEL?: string;
 };
 type Source = {
   name: string;
@@ -26,6 +24,7 @@ type ParsedArticle = {
 const REFRESH_INTERVAL_MS = 15 * 60 * 1_000;
 const NEWS_WINDOW_MS = 7 * 24 * 60 * 60 * 1_000;
 const MAX_ARTICLES_PER_SOURCE = 12;
+const RSS_FETCH_TIMEOUT_MS = 8_000;
 const SOURCES: Source[] = [
   {
     name: "Formula 1",
@@ -92,6 +91,20 @@ function articleId(url: string): string {
   return `news-${(hash >>> 0).toString(36)}`;
 }
 
+async function fetchWithTimeout(
+  input: RequestInfo | URL,
+  init: RequestInit,
+  timeoutMs: number,
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 export function parseFeed(xml: string, source: Source): ParsedArticle[] {
   const blocks =
     xml.match(/<(?:item|entry)(?:\s[^>]*)?>[\s\S]*?<\/(?:item|entry)>/gi) || [];
@@ -152,41 +165,6 @@ export function parseFeed(xml: string, source: Source): ParsedArticle[] {
     .slice(0, MAX_ARTICLES_PER_SOURCE);
 }
 
-async function summarize(title: string, env: NewsEnv): Promise<string | null> {
-  if (!env.GEMINI_API_KEY) return null;
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(env.GEMINI_MODEL || "gemini-3.6-flash")}:generateContent`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": env.GEMINI_API_KEY,
-        },
-        body: JSON.stringify({
-          contents: [
-            { parts: [{ text: serverText("newsSummaryPrompt", { title }) }] },
-          ],
-          generationConfig: { temperature: 0.1, maxOutputTokens: 100 },
-        }),
-      },
-    );
-    if (!response.ok) return null;
-    const body = (await response.json()) as {
-      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-    };
-    return (
-      body.candidates?.[0]?.content?.parts
-        ?.map((part) => part.text || "")
-        .join("")
-        .trim()
-        .slice(0, 500) || null
-    );
-  } catch {
-    return null;
-  }
-}
-
 async function wasRecentlyRefreshed(db: D1Database): Promise<boolean> {
   const row = await db
     .prepare("SELECT MIN(refreshed_at) AS refreshed_at FROM news_feed_state")
@@ -205,11 +183,16 @@ export async function refreshNewsFeed(
   if (!db || (!force && (await wasRecentlyRefreshed(db)))) return;
   const responses = await Promise.allSettled(
     SOURCES.map(async (source) => {
-      const response = await fetch(source.url, {
-        headers: {
-          Accept: "application/rss+xml, application/atom+xml, application/xml",
+      const response = await fetchWithTimeout(
+        source.url,
+        {
+          headers: {
+            Accept:
+              "application/rss+xml, application/atom+xml, application/xml",
+          },
         },
-      });
+        RSS_FETCH_TIMEOUT_MS,
+      );
       if (!response.ok) throw new Error("Feed unavailable");
       return parseFeed(await response.text(), source);
     }),
@@ -220,13 +203,8 @@ export async function refreshNewsFeed(
     .filter(
       (article) =>
         !seen.has(article.sourceUrl) && (seen.add(article.sourceUrl), true),
-    );
+  );
   for (const article of articles) {
-    const existing = await db
-      .prepare("SELECT id FROM news_items WHERE source_url = ?")
-      .bind(article.sourceUrl)
-      .first<{ id: string }>();
-    const summary = existing ? null : await summarize(article.title, env);
     await db
       .prepare(
         "INSERT INTO news_items (id, source, source_url, title, summary_uk, description, language, image_url, published_at, fetched_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(source_url) DO UPDATE SET title = excluded.title, description = excluded.description, image_url = COALESCE(excluded.image_url, news_items.image_url), published_at = excluded.published_at, fetched_at = excluded.fetched_at",
@@ -236,7 +214,7 @@ export async function refreshNewsFeed(
         article.source,
         article.sourceUrl,
         article.title,
-        summary,
+        null,
         article.description,
         article.language,
         article.imageUrl,
@@ -254,9 +232,18 @@ export async function refreshNewsFeed(
       .run();
 }
 
+export async function refreshNewsFeedSafely(env: NewsEnv): Promise<void> {
+  try {
+    await refreshNewsFeed(env);
+  } catch (cause) {
+    console.warn("News feed refresh failed", cause);
+  }
+}
+
 export async function handleNewsFeed(
   request: Request,
   env: NewsEnv,
+  ctx?: { waitUntil(promise: Promise<unknown>): void },
 ): Promise<Response> {
   if (request.method !== "GET")
     return Response.json(
@@ -291,8 +278,8 @@ export async function handleNewsFeed(
         image_url: string | null;
         published_at: string;
       }>();
-  await refreshNewsFeed(env);
   const result = await query();
+  if (ctx) ctx.waitUntil(refreshNewsFeedSafely(env));
   return Response.json(
     {
       news: result.results.map((item) => ({
