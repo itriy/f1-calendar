@@ -125,8 +125,9 @@ const formatTime = (value: string) =>
             <p
               v-if="item.summary || item.description"
               class="mt-3 text-xs leading-5 text-zinc-400"
-              v-html="item.summary || item.description"
-            />
+            >
+              {{ item.summary || item.description }}
+            </p>
             <a
               class="mt-3 inline-block text-[11px] font-bold text-f1-red hover:underline"
               :href="item.sourceUrl"

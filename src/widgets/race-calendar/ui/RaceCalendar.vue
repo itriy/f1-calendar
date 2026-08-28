@@ -87,8 +87,8 @@ const raceStart = (race: CalendarRace) => {
     </div>
     <article
       v-for="(race, index) in displayedRaces"
-      :key="race.round"
       :id="`race-${race.round}`"
+      :key="race.round"
       class="grid min-h-18 grid-cols-[36px_35px_1fr_85px_12px] items-center gap-1 border-t border-white/10 px-4 py-2 sm:grid-cols-[47px_42px_1fr_132px] sm:gap-2 sm:px-6"
       :class="{ 'bg-linear-to-r from-red-950/35 to-transparent': activeTab === 'upcoming' && index === 0 }"
     >
@@ -106,9 +106,9 @@ const raceStart = (race: CalendarRace) => {
       </div>
       <div class="text-right text-[12px] font-bold sm:text-[11px]">
         {{ raceDate(race) }}
-        <small class="block pt-1 text-[10px] font-bold tracking-wide text-zinc-400"
-          >{{ t("calendar.start") }} · {{ raceStart(race) }}</small
-        >
+        <small class="block pt-1 text-[10px] font-bold tracking-wide text-zinc-400">
+          {{ t("calendar.start") }} · {{ raceStart(race) }}
+        </small>
         <small
           v-if="activeTab === 'upcoming' && index === 0"
           class="block pt-1 text-[10px] font-bold tracking-wide text-f1-red"
