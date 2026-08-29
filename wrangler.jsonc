@@ -12,7 +12,7 @@
   ],
   "vars": {
     "VAPID_PUBLIC_KEY": "BOxno_f1JsbnQMguGrqnn6Zd_FZCL_O4TRtL70ZVRyoK85_bAoJPHeH4-rW-eChK2dk-PJ0A4zwHF0DP26w8F1Y",
-    "VAPID_SUBJECT": "mailto:admin@f1-calendar.itriy1.workers.dev"
+    "VAPID_SUBJECT": "mailto:itriy1@gmail.com"
   },
   "observability": {
     "enabled": false,
