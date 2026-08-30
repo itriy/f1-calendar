@@ -8,7 +8,9 @@ async function getJson(path: string): Promise<JolpicaResponse> {
     headers: { Accept: "application/json" },
   });
   if (!response.ok)
-    throw new Error(i18n.global.t("services.jolpicaError", { status: response.status }));
+    throw new Error(
+      i18n.global.t("services.jolpicaError", { status: response.status }),
+    );
   return response.json() as Promise<JolpicaResponse>;
 }
 

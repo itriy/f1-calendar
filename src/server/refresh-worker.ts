@@ -15,7 +15,11 @@ type ScheduledController = {
 type ExecutionContext = { waitUntil(promise: Promise<unknown>): void };
 
 export default {
-  async scheduled(_controller: ScheduledController, env: Env, ctx: ExecutionContext) {
+  async scheduled(
+    _controller: ScheduledController,
+    env: Env,
+    ctx: ExecutionContext,
+  ) {
     ctx.waitUntil(
       Promise.all([sendDueRaceReminders(env), refreshNewsFeedSafely(env)]),
     );

@@ -203,7 +203,7 @@ export async function refreshNewsFeed(
     .filter(
       (article) =>
         !seen.has(article.sourceUrl) && (seen.add(article.sourceUrl), true),
-  );
+    );
   for (const article of articles) {
     await db
       .prepare(

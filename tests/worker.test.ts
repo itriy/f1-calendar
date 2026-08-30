@@ -1,8 +1,5 @@
 import { afterEach, expect, test, vi } from "vitest";
-import {
-  handleNewsFeed,
-  handleRaceVideos,
-} from "../src/server/worker";
+import { handleNewsFeed, handleRaceVideos } from "../src/server/worker";
 import type { D1Database, D1Statement } from "../src/server/push";
 import refreshWorker from "../src/server/refresh-worker";
 import worker from "../src/server/worker";
@@ -53,9 +50,7 @@ test("serves stored news without refreshing it in the API Worker", async () => {
   );
 
   expect(await response.json()).toEqual({
-    news: [
-      expect.objectContaining({ id: "news-1", title: "Fresh news" }),
-    ],
+    news: [expect.objectContaining({ id: "news-1", title: "Fresh news" })],
   });
 });
 
@@ -148,10 +143,10 @@ test("keeps matching videos from every official search page in category priority
           nextPageToken: "page-2",
           items: [
             {
-            snippet: {
-              channelId: "UCB_qr75-ydFVKSF9Dmo6izg",
-              title: "Top 10 moments | 2025 Australian Grand Prix",
-              resourceId: { videoId: "moment12345" },
+              snippet: {
+                channelId: "UCB_qr75-ydFVKSF9Dmo6izg",
+                title: "Top 10 moments | 2025 Australian Grand Prix",
+                resourceId: { videoId: "moment12345" },
               },
             },
           ],
@@ -161,10 +156,10 @@ test("keeps matching videos from every official search page in category priority
         Response.json({
           items: [
             {
-            snippet: {
-              channelId: "UCB_qr75-ydFVKSF9Dmo6izg",
-              title: "Sprint Highlights | 2025 Australian Grand Prix",
-              resourceId: { videoId: "sprint12345" },
+              snippet: {
+                channelId: "UCB_qr75-ydFVKSF9Dmo6izg",
+                title: "Sprint Highlights | 2025 Australian Grand Prix",
+                resourceId: { videoId: "sprint12345" },
               },
             },
           ],
@@ -267,7 +262,10 @@ test("searches the official channel when an older race is outside the recent upl
 });
 
 test("returns an explicit provider error instead of masking a YouTube failure", async () => {
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 403 })));
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue(new Response(null, { status: 403 })),
+  );
   const response = await handleRaceVideos(
     new Request(
       "https://example.test/api/f1-videos?season=2026&round=12&race=Dutch%20Grand%20Prix",
@@ -282,7 +280,6 @@ test("returns an explicit provider error instead of masking a YouTube failure", 
     },
   });
 });
-
 
 test("routes DELETE push unsubscribe requests to push validation instead of the API 404 fallback", async () => {
   const db = {
@@ -335,7 +332,7 @@ test("serves crawl directives and the localized sitemap", async () => {
   expect(sitemap.headers.get("content-type")).toContain("application/xml");
   expect(xml).toContain("https://f1-calendar.date/uk/");
   expect(xml).toContain("https://f1-calendar.date/zh-CN/");
-  expect((xml.match(/<loc>/g) || [])).toHaveLength(8);
+  expect(xml.match(/<loc>/g) || []).toHaveLength(8);
 });
 
 test("redirects the root and workers.dev pages to canonical localized URLs", async () => {
@@ -361,4 +358,6 @@ test("does not return the SPA shell for unknown document routes", async () => {
     { ASSETS: assets },
   );
   expect(response.status).toBe(404);
+  expect(response.headers.get("content-type")).toContain("text/html");
+  expect(await response.text()).toContain("404 — сторінку не знайдено");
 });

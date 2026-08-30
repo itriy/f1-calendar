@@ -25,11 +25,13 @@ const videos = computed(() =>
       thumbnailUrl: officialYoutubeThumbnailUrl(video.id),
       watchUrl: officialYoutubeWatchUrl(video.id),
     }))
-    .filter((video): video is typeof video & {
-      thumbnailUrl: string;
-      watchUrl: string;
-    } =>
-      Boolean(video.thumbnailUrl && video.watchUrl),
+    .filter(
+      (
+        video,
+      ): video is typeof video & {
+        thumbnailUrl: string;
+        watchUrl: string;
+      } => Boolean(video.thumbnailUrl && video.watchUrl),
     ),
 );
 
@@ -97,7 +99,9 @@ onBeforeUnmount(() => controller?.abort());
             class="absolute inset-0 flex items-center justify-center bg-black/20"
             aria-hidden="true"
           >
-            <span class="bg-f1-red px-4 py-2 text-[11px] font-extrabold tracking-[.08em] text-white">
+            <span
+              class="bg-f1-red px-4 py-2 text-[11px] font-extrabold tracking-[.08em] text-white"
+            >
               {{ t("history.watchOnYoutube") }}
             </span>
           </span>

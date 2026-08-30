@@ -45,7 +45,10 @@ test("parses official broadcaster links from the Formula 1 catalog", () => {
 });
 
 test("uses the verified Ukrainian viewing platforms instead of the rights holder", () => {
-  const providers = providersForCountry(parseBroadcastCatalog(catalogHtml), "UA");
+  const providers = providersForCountry(
+    parseBroadcastCatalog(catalogHtml),
+    "UA",
+  );
   expect(providers.map((provider) => provider.name)).toEqual([
     "SWEET.TV",
     "MEGOGO",
@@ -71,11 +74,9 @@ test("does not CDN-cache a country-specific response", async () => {
   );
   const response = await handleWatchProviders(request);
   expect(response.headers.get("cache-control")).toBe("private, no-store");
-  expect((await response.json()).providers.map((provider: { name: string }) => provider.name)).toEqual([
-    "SWEET.TV",
-    "MEGOGO",
-    "Київстар ТБ",
-    "Vodafone TV",
-    "Ланет.TV",
-  ]);
+  expect(
+    (await response.json()).providers.map(
+      (provider: { name: string }) => provider.name,
+    ),
+  ).toEqual(["SWEET.TV", "MEGOGO", "Київстар ТБ", "Vodafone TV", "Ланет.TV"]);
 });

@@ -9,6 +9,7 @@ import {
   localePath,
   seoLocales,
 } from "@/shared/config/seo";
+import type { SupportedLocale } from "@/shared/config/i18n";
 
 type Env = {
   ASSETS: { fetch(request: Request): Promise<Response> };
@@ -80,11 +81,75 @@ function sitemapXml(): Response {
   );
 }
 
-function notFound(): Response {
-  return new Response("Not found", {
-    status: 404,
-    headers: { "Content-Type": "text/plain; charset=utf-8" },
-  });
+const notFoundCopy: Record<
+  SupportedLocale,
+  { title: string; heading: string; description: string; action: string }
+> = {
+  uk: {
+    title: "Сторінку не знайдено",
+    heading: "404 — сторінку не знайдено",
+    description:
+      "Можливо, посилання застаріло або сторінки ніколи не існувало.",
+    action: "На головну",
+  },
+  en: {
+    title: "Page not found",
+    heading: "404 — page not found",
+    description: "The link may be outdated, or this page never existed.",
+    action: "Go to home page",
+  },
+  de: {
+    title: "Seite nicht gefunden",
+    heading: "404 — Seite nicht gefunden",
+    description:
+      "Der Link ist möglicherweise veraltet oder die Seite existierte nie.",
+    action: "Zur Startseite",
+  },
+  es: {
+    title: "Página no encontrada",
+    heading: "404 — página no encontrada",
+    description:
+      "Es posible que el enlace esté desactualizado o que la página no exista.",
+    action: "Ir al inicio",
+  },
+  fr: {
+    title: "Page introuvable",
+    heading: "404 — page introuvable",
+    description:
+      "Le lien est peut-être obsolète ou cette page n'a jamais existé.",
+    action: "Retour à l’accueil",
+  },
+  it: {
+    title: "Pagina non trovata",
+    heading: "404 — pagina non trovata",
+    description:
+      "Il link potrebbe non essere aggiornato oppure la pagina non è mai esistita.",
+    action: "Torna alla home",
+  },
+  ja: {
+    title: "ページが見つかりません",
+    heading: "404 — ページが見つかりません",
+    description: "リンクが古いか、このページは存在しません。",
+    action: "ホームへ戻る",
+  },
+  "zh-CN": {
+    title: "找不到页面",
+    heading: "404 — 找不到页面",
+    description: "链接可能已失效，或该页面从未存在。",
+    action: "返回首页",
+  },
+};
+
+function notFound(locale: SupportedLocale = "uk"): Response {
+  const copy = notFoundCopy[locale];
+  const homePath = localePath(locale);
+  return new Response(
+    `<!doctype html><html lang="${locale}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${copy.title} | F1 Calendar</title><style>body{margin:0;background:#09090b;color:#fafafa;font-family:Arial,sans-serif}main{box-sizing:border-box;display:grid;min-height:100vh;place-content:center;padding:2rem;text-align:center}p{max-width:34rem;color:#a1a1aa;line-height:1.6}a{display:inline-block;margin-top:1rem;background:#e10600;color:#fff;padding:.8rem 1.1rem;font-weight:700;text-decoration:none}</style></head><body><main><h1>${copy.heading}</h1><p>${copy.description}</p><a href="${homePath}">${copy.action}</a></main></body></html>`,
+    {
+      status: 404,
+      headers: { "Content-Type": "text/html; charset=utf-8" },
+    },
+  );
 }
 
 function redirect(url: URL, pathname: string): Response {
@@ -353,7 +418,7 @@ export default {
     if (locale && url.pathname === localePath(locale))
       return env.ASSETS.fetch(request);
 
-    if (!url.pathname.includes(".")) return notFound();
+    if (!url.pathname.includes(".")) return notFound(locale || "uk");
     return env.ASSETS.fetch(request);
   },
 };

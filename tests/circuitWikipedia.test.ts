@@ -40,16 +40,14 @@ test("uses the neutral fallback without fetching when Jolpica has no valid Wikip
 });
 
 test("keeps the Jolpica Wikipedia page as the source link when the summary has a thumbnail", async () => {
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          thumbnail: { source: "https://upload.wikimedia.org/circuit.png" },
-        }),
-        { status: 200 },
-      ),
-    );
+  const fetchMock = vi.fn().mockResolvedValue(
+    new Response(
+      JSON.stringify({
+        thumbnail: { source: "https://upload.wikimedia.org/circuit.png" },
+      }),
+      { status: 200 },
+    ),
+  );
   vi.stubGlobal("fetch", fetchMock);
   await expect(
     loadCircuitMedia({

@@ -108,11 +108,7 @@ function subscription(value: unknown): PushSubscriptionData | null {
 
 function configured(env: PushEnv): Response | null {
   if (!env.PUSH_DB || !env.VAPID_PUBLIC_KEY || !env.VAPID_PRIVATE_KEY)
-    return failure(
-      "not_configured",
-      serverText("remindersNotConfigured"),
-      503,
-    );
+    return failure("not_configured", serverText("remindersNotConfigured"), 503);
   return null;
 }
 
@@ -128,11 +124,7 @@ export async function handlePushApi(
   if (request.method === "GET")
     return env.VAPID_PUBLIC_KEY
       ? response({ publicKey: env.VAPID_PUBLIC_KEY })
-      : failure(
-          "not_configured",
-          serverText("remindersNotConfigured"),
-          503,
-        );
+      : failure("not_configured", serverText("remindersNotConfigured"), 503);
   const missing = configured(env);
   if (missing) return missing;
   let body: Record<string, unknown>;
@@ -147,7 +139,11 @@ export async function handlePushApi(
   const prefs = preferences(body.preferences);
   const locale = requestLocale(request, body.locale);
   if (!sub)
-    return failure("invalid_subscription", serverText("invalidSubscription"), 400);
+    return failure(
+      "invalid_subscription",
+      serverText("invalidSubscription"),
+      400,
+    );
   const now = Date.now();
   if (request.method === "DELETE") {
     await env
@@ -187,9 +183,19 @@ export async function handlePushApi(
   }
   if (request.method === "PATCH") {
     if (!prefs) {
-      const result = await env.PUSH_DB!.prepare("UPDATE push_subscriptions SET locale=?, updated_at=? WHERE endpoint=?")
-        .bind(locale, now, sub.endpoint).run();
-      return result.meta?.changes ? response({ ok: true }) : failure("not_found", serverText("subscriptionNotFound", {}, locale), 404);
+      const result = await env
+        .PUSH_DB!.prepare(
+          "UPDATE push_subscriptions SET locale=?, updated_at=? WHERE endpoint=?",
+        )
+        .bind(locale, now, sub.endpoint)
+        .run();
+      return result.meta?.changes
+        ? response({ ok: true })
+        : failure(
+            "not_found",
+            serverText("subscriptionNotFound", {}, locale),
+            404,
+          );
     }
     const result = await env
       .PUSH_DB!.prepare(
@@ -269,12 +275,19 @@ async function deliver(
   const claim = await claimDelivery(env.PUSH_DB!, sub.id, raceKey, type, now);
   if (!claim) return;
   const timing =
-    type === "day" ? serverText("reminderDay", {}, sub.locale) : type === "hour" ? serverText("reminderHour", {}, sub.locale) : serverText("reminderNow", {}, sub.locale);
+    type === "day"
+      ? serverText("reminderDay", {}, sub.locale)
+      : type === "hour"
+        ? serverText("reminderHour", {}, sub.locale)
+        : serverText("reminderNow", {}, sub.locale);
   try {
     const sent = await sendPushNotification(
       { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
       {
-        title: type === "start" ? serverText("raceStarted", {}, sub.locale) : serverText("raceReminder", {}, sub.locale),
+        title:
+          type === "start"
+            ? serverText("raceStarted", {}, sub.locale)
+            : serverText("raceReminder", {}, sub.locale),
         body: `${race.raceName || serverText("f1Round", {}, sub.locale)} — ${type === "start" ? serverText("scheduledStartNow", {}, sub.locale) : serverText("scheduledStart", { timing }, sub.locale)}.`,
         url: "/",
         tag: `race-${raceKey}-${type}`,

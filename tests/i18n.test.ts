@@ -1,5 +1,12 @@
 import { beforeEach, expect, test } from "vitest";
-import { i18n, initialLocale, loadLocale, normalizeLocale, setLocale, supportedLocales } from "../src/shared/config/i18n";
+import {
+  i18n,
+  initialLocale,
+  loadLocale,
+  normalizeLocale,
+  setLocale,
+  supportedLocales,
+} from "../src/shared/config/i18n";
 
 beforeEach(() => localStorage.clear());
 

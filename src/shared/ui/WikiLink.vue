@@ -12,7 +12,12 @@ const { t } = useI18n();
 const safeUrl = computed(() => {
   try {
     const parsed = new URL(props.url);
-    return parsed.protocol === "https:" ? parsed.href : "";
+    if (!["http:", "https:"].includes(parsed.protocol)) return "";
+
+    // Jolpica still returns HTTP Wikipedia URLs for many established drivers.
+    // Wikipedia supports HTTPS, so upgrade them before rendering the external link.
+    parsed.protocol = "https:";
+    return parsed.href;
   } catch {
     return "";
   }

@@ -72,12 +72,20 @@ const raceStart = (race: CalendarRace) => {
         t("calendar.updated", { time: updatedAt })
       }}</span>
     </div>
-    <div class="flex border-t border-white/10 px-5 sm:px-7" role="tablist" :aria-label="t('calendar.tabs')">
+    <div
+      class="flex border-t border-white/10 px-5 sm:px-7"
+      role="tablist"
+      :aria-label="t('calendar.tabs')"
+    >
       <button
         v-for="tab in tabs"
         :key="tab"
         class="border-b-2 px-3 py-3 text-[11px] font-extrabold tracking-wide transition"
-        :class="activeTab === tab ? 'border-f1-red text-white' : 'border-transparent text-zinc-500 hover:text-zinc-200'"
+        :class="
+          activeTab === tab
+            ? 'border-f1-red text-white'
+            : 'border-transparent text-zinc-500 hover:text-zinc-200'
+        "
         role="tab"
         :aria-selected="activeTab === tab"
         @click="activeTab = tab"
@@ -90,7 +98,10 @@ const raceStart = (race: CalendarRace) => {
       :id="`race-${race.round}`"
       :key="race.round"
       class="grid min-h-18 grid-cols-[36px_35px_1fr_85px_12px] items-center gap-1 border-t border-white/10 px-4 py-2 sm:grid-cols-[47px_42px_1fr_132px] sm:gap-2 sm:px-6"
-      :class="{ 'bg-linear-to-r from-red-950/35 to-transparent': activeTab === 'upcoming' && index === 0 }"
+      :class="{
+        'bg-linear-to-r from-red-950/35 to-transparent':
+          activeTab === 'upcoming' && index === 0,
+      }"
     >
       <div class="text-center font-display text-2xl font-extrabold">
         {{ race.round
@@ -106,7 +117,9 @@ const raceStart = (race: CalendarRace) => {
       </div>
       <div class="text-right text-[12px] font-bold sm:text-[11px]">
         {{ raceDate(race) }}
-        <small class="block pt-1 text-[10px] font-bold tracking-wide text-zinc-400">
+        <small
+          class="block pt-1 text-[10px] font-bold tracking-wide text-zinc-400"
+        >
           {{ t("calendar.start") }} · {{ raceStart(race) }}
         </small>
         <small
@@ -115,11 +128,19 @@ const raceStart = (race: CalendarRace) => {
         >{{ t("calendar.nextRace") }}</small>
       </div>
       <div class="col-span-full">
-        <NextRaceCircuit :race="race" :force-open="race.round === openRaceRound" />
+        <NextRaceCircuit
+          :race="race"
+          :force-open="race.round === openRaceRound"
+        />
       </div>
     </article>
-    <p v-if="!displayedRaces.length" class="p-6 text-center text-xs text-zinc-400">
-      {{ activeTab === "upcoming" ? t("calendar.empty") : t("calendar.pastEmpty") }}
+    <p
+      v-if="!displayedRaces.length"
+      class="p-6 text-center text-xs text-zinc-400"
+    >
+      {{
+        activeTab === "upcoming" ? t("calendar.empty") : t("calendar.pastEmpty")
+      }}
     </p>
   </section>
 </template>

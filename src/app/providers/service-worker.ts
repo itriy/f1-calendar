@@ -16,7 +16,10 @@ export function registerServiceWorker() {
         });
 
         const offerUpdate = () => {
-          if (registration.waiting && window.confirm(i18n.global.t("serviceWorker.update")))
+          if (
+            registration.waiting &&
+            window.confirm(i18n.global.t("serviceWorker.update"))
+          )
             registration.waiting.postMessage({ type: "SKIP_WAITING" });
         };
 

@@ -45,12 +45,10 @@ vi.mock("../src/entities/race/model/useF1Data", async () => {
 });
 
 vi.mock("@/entities/race/api/circuitWikipedia", () => ({
-  loadCircuitMedia: vi
-    .fn()
-    .mockResolvedValue({
-      imageUrl: "https://example.test/circuit.png",
-      sourceUrl: "https://en.wikipedia.org/wiki/Circuit_de_Monaco",
-    }),
+  loadCircuitMedia: vi.fn().mockResolvedValue({
+    imageUrl: "https://example.test/circuit.png",
+    sourceUrl: "https://en.wikipedia.org/wiki/Circuit_de_Monaco",
+  }),
 }));
 
 import App from "../src/app/App.vue";

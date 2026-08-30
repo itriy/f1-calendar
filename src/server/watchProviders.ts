@@ -1,4 +1,7 @@
-import type { WatchProvider, WatchProvidersResponse } from "@/entities/watch-provider/model/types";
+import type {
+  WatchProvider,
+  WatchProvidersResponse,
+} from "@/entities/watch-provider/model/types";
 import { requestLocale } from "@/shared/config/i18n/server";
 
 const BROADCAST_INFO_URL =
