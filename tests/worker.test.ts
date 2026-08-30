@@ -352,6 +352,15 @@ test("redirects the root and workers.dev pages to canonical localized URLs", asy
   );
 });
 
+test("keeps the local development origin when redirecting to the default locale", async () => {
+  const response = await worker.fetch(new Request("http://localhost:8787/"), {
+    ASSETS: assets,
+  });
+
+  expect(response.status).toBe(302);
+  expect(response.headers.get("location")).toBe("http://localhost:8787/uk/");
+});
+
 test("does not return the SPA shell for unknown document routes", async () => {
   const response = await worker.fetch(
     new Request("https://f1-calendar.date/not-a-page"),

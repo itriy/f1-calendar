@@ -154,11 +154,16 @@ function notFound(locale: SupportedLocale = "uk"): Response {
 
 function redirect(url: URL, pathname: string): Response {
   const destination = new URL(url);
-  destination.protocol = "https:";
-  destination.hostname = "f1-calendar.date";
-  destination.port = "";
+  const useCanonicalOrigin =
+    url.hostname === WORKERS_DEV_HOST ||
+    url.hostname === new URL(SITE_ORIGIN).hostname;
+  if (useCanonicalOrigin) {
+    destination.protocol = "https:";
+    destination.hostname = new URL(SITE_ORIGIN).hostname;
+    destination.port = "";
+  }
   destination.pathname = pathname;
-  return Response.redirect(destination.toString(), 301);
+  return Response.redirect(destination.toString(), useCanonicalOrigin ? 301 : 302);
 }
 
 function json(body: unknown, status = 200): Response {
