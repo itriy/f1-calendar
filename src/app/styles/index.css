@@ -1,10 +1,53 @@
 @import "tailwindcss";
 
+/* Keep fallback line boxes close to the bundled fonts while they load. */
+@font-face {
+  font-family: "Barlow Condensed Fallback";
+  font-style: normal;
+  font-weight: 500;
+  src: local("Arial Narrow");
+  size-adjust: 94%;
+  ascent-override: 106.38%;
+  descent-override: 21.28%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Barlow Condensed Fallback";
+  font-style: normal;
+  font-weight: 600 800;
+  src: local("Arial Narrow Bold");
+  size-adjust: 94%;
+  ascent-override: 106.38%;
+  descent-override: 21.28%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Manrope Fallback";
+  font-style: normal;
+  font-weight: 400 500;
+  src: local("Arial");
+  ascent-override: 106.6%;
+  descent-override: 30%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Manrope Fallback";
+  font-style: normal;
+  font-weight: 600 800;
+  src: local("Arial Bold");
+  ascent-override: 106.6%;
+  descent-override: 30%;
+  line-gap-override: 0%;
+}
+
 @font-face {
   font-family: "Barlow Condensed";
   font-style: normal;
   font-weight: 500;
-  font-display: swap;
+  font-display: optional;
   src: url("/fonts/barlow-condensed-500-latin-ext.woff2") format("woff2");
   unicode-range:
     U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
@@ -16,7 +59,7 @@
   font-family: "Barlow Condensed";
   font-style: normal;
   font-weight: 500;
-  font-display: swap;
+  font-display: optional;
   src: url("/fonts/barlow-condensed-500-latin.woff2") format("woff2");
   unicode-range:
     U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
@@ -28,7 +71,7 @@
   font-family: "Barlow Condensed";
   font-style: normal;
   font-weight: 600;
-  font-display: swap;
+  font-display: optional;
   src: url("/fonts/barlow-condensed-600-latin-ext.woff2") format("woff2");
   unicode-range:
     U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
@@ -40,7 +83,7 @@
   font-family: "Barlow Condensed";
   font-style: normal;
   font-weight: 600;
-  font-display: swap;
+  font-display: optional;
   src: url("/fonts/barlow-condensed-600-latin.woff2") format("woff2");
   unicode-range:
     U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
@@ -52,7 +95,7 @@
   font-family: "Barlow Condensed";
   font-style: normal;
   font-weight: 700;
-  font-display: swap;
+  font-display: optional;
   src: url("/fonts/barlow-condensed-700-latin-ext.woff2") format("woff2");
   unicode-range:
     U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
@@ -64,7 +107,7 @@
   font-family: "Barlow Condensed";
   font-style: normal;
   font-weight: 700;
-  font-display: swap;
+  font-display: optional;
   src: url("/fonts/barlow-condensed-700-latin.woff2") format("woff2");
   unicode-range:
     U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
@@ -76,7 +119,7 @@
   font-family: "Barlow Condensed";
   font-style: normal;
   font-weight: 800;
-  font-display: swap;
+  font-display: optional;
   src: url("/fonts/barlow-condensed-800-latin-ext.woff2") format("woff2");
   unicode-range:
     U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
@@ -88,7 +131,7 @@
   font-family: "Barlow Condensed";
   font-style: normal;
   font-weight: 800;
-  font-display: swap;
+  font-display: optional;
   src: url("/fonts/barlow-condensed-800-latin.woff2") format("woff2");
   unicode-range:
     U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
@@ -100,7 +143,7 @@
   font-family: "Manrope";
   font-style: normal;
   font-weight: 400 800;
-  font-display: swap;
+  font-display: optional;
   src: url("/fonts/manrope-cyrillic-ext.woff2") format("woff2");
   unicode-range:
     U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
@@ -110,7 +153,7 @@
   font-family: "Manrope";
   font-style: normal;
   font-weight: 400 800;
-  font-display: swap;
+  font-display: optional;
   src: url("/fonts/manrope-cyrillic.woff2") format("woff2");
   unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
 }
@@ -119,7 +162,7 @@
   font-family: "Manrope";
   font-style: normal;
   font-weight: 400 800;
-  font-display: swap;
+  font-display: optional;
   src: url("/fonts/manrope-latin-ext.woff2") format("woff2");
   unicode-range:
     U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
@@ -131,7 +174,7 @@
   font-family: "Manrope";
   font-style: normal;
   font-weight: 400 800;
-  font-display: swap;
+  font-display: optional;
   src: url("/fonts/manrope-latin.woff2") format("woff2");
   unicode-range:
     U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
@@ -140,8 +183,10 @@
 }
 
 @theme {
-  --font-display: "Barlow Condensed", sans-serif;
-  --font-sans: "Manrope", Arial, sans-serif;
+  --font-display:
+    "Barlow Condensed", "Barlow Condensed Fallback", "Arial Narrow", Arial,
+    sans-serif;
+  --font-sans: "Manrope", "Manrope Fallback", Arial, sans-serif;
   --color-f1-red: #e10600;
   --color-f1-bg: #0b0d12;
   --color-f1-panel: #101218;

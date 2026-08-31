@@ -4,6 +4,7 @@ import { localeFromPathname } from "@/shared/config/seo";
 
 export const supportedLocales = [
   "uk",
+  "ru",
   "en",
   "de",
   "fr",
@@ -15,6 +16,7 @@ export const supportedLocales = [
 export type SupportedLocale = (typeof supportedLocales)[number];
 export const localeLabels: Record<SupportedLocale, string> = {
   uk: "Українська",
+  ru: "Русский",
   en: "English",
   de: "Deutsch",
   fr: "Français",
@@ -25,6 +27,7 @@ export const localeLabels: Record<SupportedLocale, string> = {
 };
 export const localeShortLabels: Record<SupportedLocale, string> = {
   uk: "UA",
+  ru: "RU",
   en: "EN",
   de: "DE",
   fr: "FR",
@@ -57,6 +60,7 @@ const localeLoaders: Record<
   () => Promise<{ default: Record<string, unknown> }>
 > = {
   uk: () => import("./locales/uk.json"),
+  ru: () => import("./locales/ru.json"),
   en: () => import("./locales/en.json"),
   de: () => import("./locales/de.json"),
   fr: () => import("./locales/fr.json"),

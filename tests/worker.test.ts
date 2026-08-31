@@ -331,8 +331,9 @@ test("serves crawl directives and the localized sitemap", async () => {
   const xml = await sitemap.text();
   expect(sitemap.headers.get("content-type")).toContain("application/xml");
   expect(xml).toContain("https://f1-calendar.date/uk/");
+  expect(xml).toContain("https://f1-calendar.date/ru/");
   expect(xml).toContain("https://f1-calendar.date/zh-CN/");
-  expect(xml.match(/<loc>/g) || []).toHaveLength(8);
+  expect(xml.match(/<loc>/g) || []).toHaveLength(9);
 });
 
 test("redirects the root and workers.dev pages to canonical localized URLs", async () => {
@@ -349,6 +350,15 @@ test("redirects the root and workers.dev pages to canonical localized URLs", asy
   expect(legacy.status).toBe(301);
   expect(legacy.headers.get("location")).toBe(
     "https://f1-calendar.date/en/?source=test",
+  );
+
+  const russian = await worker.fetch(
+    new Request("https://f1-calendar.date/ru"),
+    { ASSETS: assets },
+  );
+  expect(russian.status).toBe(301);
+  expect(russian.headers.get("location")).toBe(
+    "https://f1-calendar.date/ru/",
   );
 });
 
@@ -368,5 +378,18 @@ test("does not return the SPA shell for unknown document routes", async () => {
   );
   expect(response.status).toBe(404);
   expect(response.headers.get("content-type")).toContain("text/html");
-  expect(await response.text()).toContain("404 — сторінку не знайдено");
+  expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+  const html = await response.text();
+  expect(html).toContain('<meta name="robots" content="noindex, nofollow">');
+  expect(html).toContain("404 — сторінку не знайдено");
+});
+
+test("returns a localized noindex page for unknown Russian routes", async () => {
+  const response = await worker.fetch(
+    new Request("https://f1-calendar.date/ru/not-a-page"),
+    { ASSETS: assets },
+  );
+  expect(response.status).toBe(404);
+  expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+  expect(await response.text()).toContain("404 — страница не найдена");
 });

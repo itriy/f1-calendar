@@ -45,6 +45,44 @@ const serverTranslations: Partial<
     Partial<Record<keyof typeof uk, string>>
   >
 > = {
+  ru: {
+    methodNotAllowed: "Метод не поддерживается.",
+    videoRateLimited: "Слишком много запросов к видео. Попробуйте позже.",
+    videoNotConfigured: "Видео Formula 1 ещё не настроены владельцем сайта.",
+    videoUnavailable: "Видео Formula 1 временно недоступны. Попробуйте позже.",
+    invalidRaceData: "Некорректные данные этапа.",
+    rateLimited: "Слишком много запросов. Попробуйте снова через несколько минут.",
+    payloadTooLarge: "Запрос слишком большой.",
+    invalidRequest: "Некорректный запрос.",
+    invalidQuery: "Запрос должен содержать от 3 до {max} символов.",
+    searchNotConfigured: "AI-поиск ещё не настроен.",
+    aiPrompt:
+      "Ты — поиск для F1 Calendar. Отвечай по-русски, кратко и только на темы Формулы-1, F2, F3, WEC, команд, пилотов, трасс, гонок и автоспорта. Если запрос не об автоспорте, объясни, что поиск поддерживает только F1 и смежный автоспорт. Не выдумывай факты; опирайся на результаты веб-поиска. Запрос пользователя: {query}",
+    providerRateLimited: "Лимит AI-поиска исчерпан. Попробуйте позже.",
+    providerAuthFailed:
+      "Настройки AI-поиска отклонены. Обратитесь к владельцу сайта.",
+    providerModelUnavailable:
+      "Настроенная AI-модель недоступна. Обратитесь к владельцу сайта.",
+    providerUnavailable: "AI-поиск временно недоступен. Попробуйте позже.",
+    emptySearchResponse:
+      "AI-поиск не вернул ответ. Попробуйте изменить запрос.",
+    providerError: "Произошла ошибка AI-поиска. Попробуйте ещё раз.",
+    apiNotFound: "Маршрут API не найден.",
+    remindersNotConfigured: "Напоминания ещё не настроены владельцем сайта.",
+    invalidSubscription: "Некорректная push-подписка.",
+    invalidPreferences: "Выберите хотя бы один вариант напоминания.",
+    subscriptionNotFound: "Подписка не найдена.",
+    reminderDay: "за 1 день",
+    reminderHour: "за 1 час",
+    reminderNow: "сейчас",
+    raceStarted: "Гонка стартует",
+    raceReminder: "Напоминание о гонке",
+    f1Round: "Этап Формулы-1",
+    scheduledStartNow: "запланированный старт сейчас",
+    scheduledStart: "запланированный старт {timing}",
+    newsSummaryPrompt:
+      "Кратко, одним предложением на русском языке перескажи заголовок новости Формулы-1. Не добавляй фактов: {title}",
+  },
   en: {
     methodNotAllowed: "Method is not allowed.",
     rateLimited: "Too many requests. Please try again in a few minutes.",
@@ -164,6 +202,7 @@ export function serverText(
               es: "Spanish",
               it: "Italian",
               ja: "Japanese",
+              ru: "Russian",
             } as Record<string, string>
           )[locale] || "English";
     return `You are the search assistant for F1 Calendar. Answer briefly in ${language} and only about Formula 1, F2, F3, WEC, teams, drivers, circuits, races, and motorsport. Do not invent facts; rely on web search results. User query: ${values.query ?? ""}`;

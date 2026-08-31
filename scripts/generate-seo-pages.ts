@@ -1,4 +1,4 @@
-import { cp, mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import {
   canonicalUrl,
@@ -46,6 +46,29 @@ function pageHead(locale: (typeof seoLocales)[number]): string {
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"F1 Calendar","url":"${canonical}","inLanguage":"${locale}"}</script>`;
 }
 
+function criticalFontPreloads(
+  locale: (typeof seoLocales)[number],
+): string {
+  const fonts = [
+    "/fonts/barlow-condensed-800-latin.woff2",
+    "/fonts/manrope-latin.woff2",
+  ];
+  if (["de", "fr", "es", "it"].includes(locale)) {
+    fonts.push(
+      "/fonts/barlow-condensed-800-latin-ext.woff2",
+      "/fonts/manrope-latin-ext.woff2",
+    );
+  }
+  if (["uk", "ru"].includes(locale))
+    fonts.push("/fonts/manrope-cyrillic.woff2");
+  return fonts
+    .map(
+      (font) =>
+        `<link rel="preload" href="${font}" as="font" type="font/woff2" crossorigin />`,
+    )
+    .join("\n    ");
+}
+
 function fallbackContent(locale: (typeof seoLocales)[number]): string {
   const page = seoPages[locale];
   return `<main data-seo-fallback="true"><h1>${escapeHtml(page.heading)}</h1><p>${escapeHtml(page.intro)}</p><p>F1 Calendar</p></main>`;
@@ -57,7 +80,7 @@ for (const locale of seoLocales) {
     .replace('<html lang="uk">', `<html lang="${locale}">`)
     .replace(
       /<title>[\s\S]*?<\/title>/,
-      `<title>${escapeHtml(page.title)}</title>`,
+      `<title>${escapeHtml(page.title)}</title>\n    ${criticalFontPreloads(locale)}`,
     )
     .replace("</head>", `    ${pageHead(locale)}\n  </head>`)
     .replace(
@@ -73,7 +96,10 @@ for (const locale of seoLocales) {
   await writeFile(destination, html);
 }
 
-await cp(
-  resolve(outputDirectory, "index.html"),
+await writeFile(
   resolve(outputDirectory, "404.html"),
+  template.replace(
+    "</head>",
+    '    <meta name="robots" content="noindex, nofollow" />\n  </head>',
+  ),
 );

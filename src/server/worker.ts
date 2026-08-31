@@ -92,6 +92,12 @@ const notFoundCopy: Record<
       "Можливо, посилання застаріло або сторінки ніколи не існувало.",
     action: "На головну",
   },
+  ru: {
+    title: "Страница не найдена",
+    heading: "404 — страница не найдена",
+    description: "Возможно, ссылка устарела или такой страницы не существует.",
+    action: "На главную",
+  },
   en: {
     title: "Page not found",
     heading: "404 — page not found",
@@ -144,10 +150,13 @@ function notFound(locale: SupportedLocale = "uk"): Response {
   const copy = notFoundCopy[locale];
   const homePath = localePath(locale);
   return new Response(
-    `<!doctype html><html lang="${locale}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${copy.title} | F1 Calendar</title><style>body{margin:0;background:#09090b;color:#fafafa;font-family:Arial,sans-serif}main{box-sizing:border-box;display:grid;min-height:100vh;place-content:center;padding:2rem;text-align:center}p{max-width:34rem;color:#a1a1aa;line-height:1.6}a{display:inline-block;margin-top:1rem;background:#e10600;color:#fff;padding:.8rem 1.1rem;font-weight:700;text-decoration:none}</style></head><body><main><h1>${copy.heading}</h1><p>${copy.description}</p><a href="${homePath}">${copy.action}</a></main></body></html>`,
+    `<!doctype html><html lang="${locale}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow"><title>${copy.title} | F1 Calendar</title><style>body{margin:0;background:#09090b;color:#fafafa;font-family:Arial,sans-serif}main{box-sizing:border-box;display:grid;min-height:100vh;place-content:center;padding:2rem;text-align:center}p{max-width:34rem;color:#a1a1aa;line-height:1.6}a{display:inline-block;margin-top:1rem;background:#e10600;color:#fff;padding:.8rem 1.1rem;font-weight:700;text-decoration:none}</style></head><body><main><h1>${copy.heading}</h1><p>${copy.description}</p><a href="${homePath}">${copy.action}</a></main></body></html>`,
     {
       status: 404,
-      headers: { "Content-Type": "text/html; charset=utf-8" },
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        "X-Robots-Tag": "noindex, nofollow",
+      },
     },
   );
 }
