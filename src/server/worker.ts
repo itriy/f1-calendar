@@ -53,6 +53,7 @@ const OFFICIAL_FORMULA1_CHANNEL_ID = "UCB_qr75-ydFVKSF9Dmo6izg";
 const YOUTUBE_ID = /^[A-Za-z0-9_-]{11}$/;
 const MAX_YOUTUBE_PLAYLIST_PAGES = 3;
 const WORKERS_DEV_HOST = "f1-calendar.itriy1.workers.dev";
+const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
 
 function robotsTxt(): Response {
   return new Response(
@@ -172,7 +173,10 @@ function redirect(url: URL, pathname: string): Response {
     destination.port = "";
   }
   destination.pathname = pathname;
-  return Response.redirect(destination.toString(), useCanonicalOrigin ? 301 : 302);
+  return Response.redirect(
+    destination.toString(),
+    useCanonicalOrigin ? 301 : 302,
+  );
 }
 
 function json(body: unknown, status = 200): Response {
@@ -424,6 +428,8 @@ export default {
       return error("not_found", serverText("apiNotFound"), 404);
     if (url.pathname === "/robots.txt") return robotsTxt();
     if (url.pathname === "/sitemap.xml") return sitemapXml();
+    if (url.pathname === "/" && LOCAL_HOSTS.has(url.hostname))
+      return env.ASSETS.fetch(request);
     if (url.pathname === "/") return redirect(url, localePath("uk"));
 
     const locale = localeFromPathname(url.pathname);

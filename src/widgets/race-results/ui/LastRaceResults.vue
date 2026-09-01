@@ -58,41 +58,14 @@ const formatDate = (date?: string) =>
         <b class="block text-sm">{{ race.name }}</b><span class="mt-1 block text-[12px] text-zinc-400">{{ race.place }} · {{ formatDate(race.date) }}</span>
       </div>
       <div
-        v-if="race.results[0]"
-        class="border-t border-yellow-300/30 bg-yellow-300/8 px-5 py-3 sm:px-7"
-      >
-        <p
-          class="mb-1 text-[12px] font-extrabold tracking-[.14em] text-yellow-300"
-        >
-          {{ t("common.winner") }}
-        </p>
-        <div class="flex items-end justify-between gap-3">
-          <div class="flex items-center gap-2">
-            <TeamBadge :team="race.results[0].team" />
-            <div>
-              <WikiLink
-                :url="race.results[0].url"
-                :label="race.results[0].name"
-                class-name="block text-sm hover:underline"
-              /><WikiLink
-                :url="race.results[0].teamUrl"
-                :label="race.results[0].team"
-                class-name="block text-[12px] text-zinc-400 hover:text-white hover:underline"
-              /><small class="mt-1 block text-[12px] text-yellow-100/75">{{
-                t("lastRace.time", { time: race.results[0].raceTime })
-              }}</small>
-            </div>
-          </div>
-          <strong class="font-display text-2xl text-yellow-300">{{ race.results[0].points }}
-            <small class="font-sans text-[12px] text-zinc-400">{{
-              t("common.points")
-            }}</small></strong>
-        </div>
-      </div>
-      <div
         v-for="result in race.results"
         :key="`${result.position}-${result.name}`"
-        class="grid grid-cols-[28px_minmax(0,1fr)_auto] items-center gap-3 border-t border-white/8 px-5 py-2.5 sm:px-7"
+        class="grid grid-cols-[28px_minmax(0,1fr)_auto] items-center gap-3 border-t px-5 sm:px-7"
+        :class="
+          result.position === '1'
+            ? 'border-yellow-300/30 bg-yellow-300/8 py-3.5'
+            : 'border-white/8 py-2.5'
+        "
       >
         <b
           class="font-display text-xl"
@@ -106,26 +79,41 @@ const formatDate = (date?: string) =>
         <div class="flex min-w-0 items-center gap-2">
           <TeamBadge :team="result.team" />
           <div class="min-w-0">
+            <span
+              v-if="result.position === '1'"
+              class="mb-0.5 block text-[10px] font-extrabold tracking-[.14em] text-yellow-300"
+            >{{ t("common.winner") }}</span>
             <WikiLink
               :url="result.url"
               :label="result.name"
-              class-name="block truncate text-xs hover:text-f1-red hover:underline"
+              :class-name="`block truncate hover:text-f1-red hover:underline ${result.position === '1' ? 'text-sm font-bold' : 'text-xs'}`"
             /><WikiLink
               :url="result.teamUrl"
               :label="result.team"
               class-name="block truncate text-[12px] text-zinc-500 hover:text-white hover:underline"
             />
+            <small
+              v-if="result.position === '1'"
+              class="mt-1 block text-[12px] text-yellow-100/75"
+            >{{ t("lastRace.time", { time: result.raceTime }) }}</small>
           </div>
         </div>
         <div class="border-l border-white/10 pl-3 text-right">
-          <strong class="block whitespace-nowrap font-display text-lg">{{ result.points }}
+          <strong
+            class="block whitespace-nowrap font-display"
+            :class="
+              result.position === '1' ? 'text-2xl text-yellow-300' : 'text-lg'
+            "
+          >{{ result.points }}
             <small class="font-sans text-[12px] text-zinc-500">{{
               t("common.points")
             }}</small></strong><span
+            v-if="result.position !== '1'"
             class="mt-0.5 block text-[10px] font-extrabold tracking-[.1em] text-zinc-500"
-          >{{ t("lastRace.gap") }}</span><small class="block whitespace-nowrap text-[12px] text-zinc-300">{{
-            result.gap || "—"
-          }}</small>
+          >{{ t("lastRace.gap") }}</span><small
+            v-if="result.position !== '1'"
+            class="block whitespace-nowrap text-[12px] text-zinc-300"
+          >{{ result.gap || "—" }}</small>
         </div>
       </div>
       <p

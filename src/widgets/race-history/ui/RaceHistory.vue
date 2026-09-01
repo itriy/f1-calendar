@@ -16,11 +16,20 @@ type HistoryRace = {
 };
 type RaceDetail = {
   round: string;
-  results: Array<ResultLink & { position: string; gap: string }>;
+  results: Array<
+    ResultLink & { position: string; points: string; gap: string }
+  >;
 };
 type SeasonSummary = {
   driver: ResultLink & { points: string };
   constructor: { name: string; url: string; points: string };
+  drivers: Array<ResultLink & { position: string; points: string }>;
+  constructors: Array<{
+    position: string;
+    name: string;
+    url: string;
+    points: string;
+  }>;
 };
 const props = defineProps<{
   races: HistoryRace[];
@@ -47,6 +56,8 @@ const { t, locale } = useI18n();
 
 const initialCount = 5;
 const expanded = ref(false);
+const driversExpanded = ref(false);
+const constructorsExpanded = ref(false);
 const visibleRaces = computed(() =>
   expanded.value ? props.races : props.races.slice(0, initialCount),
 );
@@ -64,6 +75,8 @@ const isCurrentSeason = computed(
 );
 function selectSeason(event: Event) {
   expanded.value = false;
+  driversExpanded.value = false;
+  constructorsExpanded.value = false;
   emit("select-season", (event.target as HTMLSelectElement).value);
 }
 function isSelected(race: HistoryRace) {
@@ -144,23 +157,81 @@ function toggleRace(race: HistoryRace) {
         </p>
         <div v-else-if="summary?.driver" class="flex items-center gap-3">
           <TeamBadge :team="summary.driver.team" />
-          <div class="min-w-0">
-            <WikiLink
-              :url="summary.driver.url"
-              :label="summary.driver.name"
-              class-name="block truncate text-sm font-bold hover:text-f1-red"
-            /><WikiLink
-              :url="summary.driver.teamUrl"
-              :label="summary.driver.team"
-              class-name="block truncate text-[12px] text-zinc-500 hover:text-white"
-            /><strong class="mt-1 block font-display text-xl">{{ summary.driver.points }}
+          <div
+            class="min-w-0 flex-1 lg:flex lg:items-baseline lg:justify-between lg:gap-3"
+          >
+            <div class="min-w-0 lg:flex lg:items-baseline lg:gap-2">
+              <WikiLink
+                :url="summary.driver.url"
+                :label="summary.driver.name"
+                class-name="block truncate text-sm font-bold hover:text-f1-red lg:min-w-0 lg:flex-1"
+              /><WikiLink
+                :url="summary.driver.teamUrl"
+                :label="summary.driver.team"
+                class-name="block truncate text-[12px] text-zinc-500 hover:text-white lg:shrink-0"
+              />
+            </div>
+            <strong
+              class="mt-1 block font-display text-xl lg:mt-0 lg:shrink-0 lg:whitespace-nowrap"
+            >{{ summary.driver.points }}
               <small class="font-sans text-[12px] text-zinc-500">{{
                 t("common.points")
               }}</small></strong>
           </div>
         </div>
+        <template v-if="summary?.drivers.length">
+          <button
+            class="mt-4 flex w-full cursor-pointer items-center justify-between border-t border-white/10 pt-3 text-left text-[11px] font-extrabold tracking-[.1em] text-f1-red hover:text-white"
+            type="button"
+            :aria-expanded="driversExpanded"
+            aria-controls="history-driver-standings"
+            @click="driversExpanded = !driversExpanded"
+          >
+            {{
+              driversExpanded
+                ? t("history.collapseStandings")
+                : t("history.showDriverStandings")
+            }}
+            <span class="font-display text-lg" aria-hidden="true">{{
+              driversExpanded ? "−" : "+"
+            }}</span>
+          </button>
+          <div
+            v-if="driversExpanded"
+            id="history-driver-standings"
+            class="mt-3 overflow-hidden border border-white/8"
+          >
+            <div
+              v-for="driver in summary.drivers"
+              :key="`${driver.position}-${driver.name}`"
+              class="grid grid-cols-[24px_minmax(0,1fr)_auto] items-center gap-2 border-t border-white/8 px-3 py-2 first:border-t-0"
+            >
+              <b class="font-display text-lg text-zinc-300">{{
+                driver.position
+              }}</b>
+              <div class="flex min-w-0 items-center gap-2">
+                <TeamBadge :team="driver.team" />
+                <div class="min-w-0">
+                  <WikiLink
+                    :url="driver.url"
+                    :label="driver.name"
+                    class-name="block truncate text-xs font-bold hover:text-f1-red"
+                  /><WikiLink
+                    :url="driver.teamUrl"
+                    :label="driver.team"
+                    class-name="block truncate text-[11px] text-zinc-500 hover:text-white"
+                  />
+                </div>
+              </div>
+              <strong class="whitespace-nowrap font-display text-base">{{ driver.points }}
+                <small class="font-sans text-[9px] text-zinc-500">{{
+                  t("common.points")
+                }}</small></strong>
+            </div>
+          </div>
+        </template>
         <div
-          v-else
+          v-if="!summaryLoading && !summary?.driver"
           class="flex items-center justify-between gap-3 text-xs text-red-100"
         >
           <span>{{ summaryError || t("history.summaryUnavailable") }}</span><button
@@ -188,19 +259,68 @@ function toggleRace(race: HistoryRace) {
         </p>
         <div v-else-if="summary?.constructor" class="flex items-center gap-3">
           <TeamBadge :team="summary.constructor.name" />
-          <div class="min-w-0">
+          <div
+            class="min-w-0 flex-1 lg:flex lg:items-baseline lg:justify-between lg:gap-3"
+          >
             <WikiLink
               :url="summary.constructor.url"
               :label="summary.constructor.name"
-              class-name="block truncate text-sm font-bold hover:text-f1-red"
-            /><strong class="mt-1 block font-display text-xl">{{ summary.constructor.points }}
+              class-name="block truncate text-sm font-bold hover:text-f1-red lg:min-w-0 lg:flex-1"
+            /><strong
+              class="mt-1 block font-display text-xl lg:mt-0 lg:shrink-0 lg:whitespace-nowrap"
+            >{{ summary.constructor.points }}
               <small class="font-sans text-[10px] text-zinc-500">{{
                 t("common.points")
               }}</small></strong>
           </div>
         </div>
+        <template v-if="summary?.constructors.length">
+          <button
+            class="mt-4 flex w-full cursor-pointer items-center justify-between border-t border-white/10 pt-3 text-left text-[11px] font-extrabold tracking-[.1em] text-f1-red hover:text-white"
+            type="button"
+            :aria-expanded="constructorsExpanded"
+            aria-controls="history-constructor-standings"
+            @click="constructorsExpanded = !constructorsExpanded"
+          >
+            {{
+              constructorsExpanded
+                ? t("history.collapseStandings")
+                : t("history.showConstructorStandings")
+            }}
+            <span class="font-display text-lg" aria-hidden="true">{{
+              constructorsExpanded ? "−" : "+"
+            }}</span>
+          </button>
+          <div
+            v-if="constructorsExpanded"
+            id="history-constructor-standings"
+            class="mt-3 overflow-hidden border border-white/8"
+          >
+            <div
+              v-for="constructor in summary.constructors"
+              :key="`${constructor.position}-${constructor.name}`"
+              class="grid grid-cols-[24px_minmax(0,1fr)_auto] items-center gap-2 border-t border-white/8 px-3 py-2 first:border-t-0"
+            >
+              <b class="font-display text-lg text-zinc-300">{{
+                constructor.position
+              }}</b>
+              <div class="flex min-w-0 items-center gap-2">
+                <TeamBadge :team="constructor.name" />
+                <WikiLink
+                  :url="constructor.url"
+                  :label="constructor.name"
+                  class-name="block truncate text-xs font-bold hover:text-f1-red"
+                />
+              </div>
+              <strong class="whitespace-nowrap font-display text-base">{{ constructor.points }}
+                <small class="font-sans text-[9px] text-zinc-500">{{
+                  t("common.points")
+                }}</small></strong>
+            </div>
+          </div>
+        </template>
         <div
-          v-else
+          v-if="!summaryLoading && !summary?.constructor"
           class="flex items-center justify-between gap-3 text-xs text-red-100"
         >
           <span>{{ summaryError || t("history.summaryUnavailable") }}</span><button
@@ -293,7 +413,7 @@ function toggleRace(race: HistoryRace) {
           <p
             class="mb-3 text-[12px] font-extrabold tracking-[.12em] text-zinc-500"
           >
-            {{ t("history.podium") }}
+            {{ t("history.classification") }}
           </p>
           <p v-if="detailsLoading" class="text-xs text-zinc-400">
             {{ t("history.detailsLoading") }}
@@ -312,36 +432,44 @@ function toggleRace(race: HistoryRace) {
           </div>
           <div
             v-else-if="selectedRace?.results?.length"
-            class="grid gap-2 sm:grid-cols-3"
+            class="overflow-hidden border border-white/8"
           >
             <div
               v-for="result in selectedRace.results"
               :key="`${result.position}-${result.name}`"
-              class="flex items-center gap-3 border border-white/8 bg-white/3 p-3"
+              class="grid grid-cols-[28px_minmax(0,1fr)_auto] items-center gap-3 border-t border-white/8 bg-white/3 px-3 py-2.5 first:border-t-0 sm:grid-cols-[36px_minmax(0,1fr)_minmax(130px,0.55fr)_auto] sm:px-4"
             >
               <b
-                class="font-display text-xl"
+                class="font-display text-xl text-stone-100"
                 :class="{
                   'text-yellow-300': result.position === '1',
                   'text-zinc-300': result.position === '2',
                   'text-amber-700': result.position === '3',
                 }"
-              >{{ result.position }}</b><TeamBadge :team="result.team" />
-              <div class="min-w-0 flex-1">
-                <WikiLink
-                  :url="result.url"
-                  :label="result.name"
-                  class-name="block truncate text-xs font-bold hover:text-f1-red"
-                /><WikiLink
-                  :url="result.teamUrl"
-                  :label="result.team"
-                  class-name="block truncate text-[12px] text-zinc-500 hover:text-white"
-                /><span
-                  class="mt-1 block text-[12px] font-extrabold tracking-[.1em] text-zinc-500"
-                >{{ t("common.gap") }}</span><small class="block text-[12px] text-zinc-300">{{
-                  result.gap
-                }}</small>
+              >{{ result.position }}</b>
+              <div class="flex min-w-0 items-center gap-2">
+                <TeamBadge :team="result.team" />
+                <div class="min-w-0">
+                  <WikiLink
+                    :url="result.url"
+                    :label="result.name"
+                    class-name="block truncate text-xs font-bold hover:text-f1-red"
+                  /><WikiLink
+                    :url="result.teamUrl"
+                    :label="result.team"
+                    class-name="block truncate text-[12px] text-zinc-500 hover:text-white"
+                  /><span
+                    class="mt-1 block truncate text-[11px] text-zinc-300 sm:hidden"
+                  >{{ result.gap }}</span>
+                </div>
               </div>
+              <span
+                class="hidden truncate text-[12px] text-zinc-300 sm:block"
+              >{{ result.gap }}</span>
+              <strong class="whitespace-nowrap text-right font-display text-lg">{{ result.points }}
+                <small class="font-sans text-[10px] text-zinc-500">{{
+                  t("common.points")
+                }}</small></strong>
             </div>
           </div>
           <p v-else class="text-xs text-zinc-400">

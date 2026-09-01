@@ -96,6 +96,17 @@ type RaceDetails = {
 type SeasonSummary = {
   driver: Pick<StandingDriver, "name" | "url" | "points" | "team" | "teamUrl">;
   constructor: { name: string; url: string; points: string };
+  drivers: Array<
+    Pick<StandingDriver, "name" | "url" | "points" | "team" | "teamUrl"> & {
+      position: string;
+    }
+  >;
+  constructors: Array<{
+    position: string;
+    name: string;
+    url: string;
+    points: string;
+  }>;
 };
 
 export function getRaceStart(
@@ -271,7 +282,6 @@ export function useF1Data() {
       name: race.raceName,
       results: (race.Results || [])
         .filter((result) => result.position)
-        .slice(0, 3)
         .map((result) => ({
           position: result.position,
           name: `${result.Driver.givenName} ${result.Driver.familyName}`,
@@ -286,12 +296,14 @@ export function useF1Data() {
   function normalizeSeasonSummary(
     data: Awaited<ReturnType<typeof getSeasonChampionshipLeaders>>,
   ): SeasonSummary {
-    const driverStanding =
+    const driverStandings =
       data.drivers.MRData?.StandingsTable?.StandingsLists?.[0]
-        ?.DriverStandings?.[0];
-    const constructorStanding =
+        ?.DriverStandings || [];
+    const constructorStandings =
       data.constructors.MRData?.StandingsTable?.StandingsLists?.[0]
-        ?.ConstructorStandings?.[0];
+        ?.ConstructorStandings || [];
+    const driverStanding = driverStandings[0];
+    const constructorStanding = constructorStandings[0];
     if (!driverStanding || !constructorStanding)
       throw new Error(t("data.seasonSummaryMissing"));
     const driverTeam = driverStanding.Constructors?.[0];
@@ -308,6 +320,23 @@ export function useF1Data() {
         url: constructorStanding.Constructor.url || "",
         points: constructorStanding.points,
       },
+      drivers: driverStandings.map((standing) => {
+        const team = standing.Constructors?.[0];
+        return {
+          position: standing.position,
+          name: `${standing.Driver.givenName} ${standing.Driver.familyName}`,
+          url: standing.Driver.url || "",
+          points: standing.points,
+          team: team?.name || "—",
+          teamUrl: team?.url || "",
+        };
+      }),
+      constructors: constructorStandings.map((standing) => ({
+        position: standing.position,
+        name: standing.Constructor.name,
+        url: standing.Constructor.url || "",
+        points: standing.points,
+      })),
     };
   }
   async function loadLastResults() {

@@ -75,12 +75,11 @@ test("keeps the Russian translation structure and placeholders aligned with Ukra
 });
 
 test("provides Russian server copy for notifications and generated summaries", () => {
-  expect(serverText("raceReminder", {}, "ru")).toBe(
-    "Напоминание о гонке",
-  );
+  expect(serverText("raceReminder", {}, "ru")).toBe("Напоминание о гонке");
   expect(serverText("scheduledStart", { timing: "за 1 час" }, "ru")).toBe(
     "запланированный старт за 1 час",
   );
-  expect(serverText("newsSummaryPrompt", { title: "Новость" }, "ru"))
-    .toContain("на русском языке");
+  expect(serverText("newsSummaryPrompt", { title: "Новость" }, "ru")).toContain(
+    "на русском языке",
+  );
 });

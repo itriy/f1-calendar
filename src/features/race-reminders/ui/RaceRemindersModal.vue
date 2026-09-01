@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { defineAsyncComponent } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRemindersModal } from "@/features/race-reminders/model/useRemindersModal";
-import RaceReminders from "./RaceReminders.vue";
+
+const RaceReminders = defineAsyncComponent(() => import("./RaceReminders.vue"));
 
 const { t } = useI18n();
 const { isOpen, dialog, close } = useRemindersModal();

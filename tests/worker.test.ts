@@ -357,18 +357,17 @@ test("redirects the root and workers.dev pages to canonical localized URLs", asy
     { ASSETS: assets },
   );
   expect(russian.status).toBe(301);
-  expect(russian.headers.get("location")).toBe(
-    "https://f1-calendar.date/ru/",
-  );
+  expect(russian.headers.get("location")).toBe("https://f1-calendar.date/ru/");
 });
 
-test("keeps the local development origin when redirecting to the default locale", async () => {
+test("serves the app directly at the local development root", async () => {
   const response = await worker.fetch(new Request("http://localhost:8787/"), {
     ASSETS: assets,
   });
 
-  expect(response.status).toBe(302);
-  expect(response.headers.get("location")).toBe("http://localhost:8787/uk/");
+  expect(response.status).toBe(200);
+  expect(response.headers.get("location")).toBeNull();
+  expect(await response.text()).toBe("asset");
 });
 
 test("does not return the SPA shell for unknown document routes", async () => {

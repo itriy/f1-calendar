@@ -3,6 +3,17 @@ import { i18n } from "@/shared/config/i18n";
 export function registerServiceWorker() {
   if (!("serviceWorker" in navigator) || !window.isSecureContext) return;
 
+  if (["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname)) {
+    void navigator.serviceWorker
+      .getRegistrations()
+      .then((registrations) =>
+        Promise.all(
+          registrations.map((registration) => registration.unregister()),
+        ),
+      );
+    return;
+  }
+
   window.addEventListener("load", () => {
     void navigator.serviceWorker
       .register("/service-worker.js")

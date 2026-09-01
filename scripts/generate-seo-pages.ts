@@ -8,7 +8,28 @@ import {
 } from "../src/shared/config/seo";
 
 const outputDirectory = resolve("dist");
-const template = await readFile(resolve(outputDirectory, "index.html"), "utf8");
+const builtTemplate = await readFile(
+  resolve(outputDirectory, "index.html"),
+  "utf8",
+);
+
+async function inlineStylesheets(html: string): Promise<string> {
+  const stylesheetPattern =
+    /<link\b(?=[^>]*\brel=["']stylesheet["'])(?=[^>]*\bhref=["']([^"']+)["'])[^>]*>/g;
+  let result = html;
+  for (const match of html.matchAll(stylesheetPattern)) {
+    const href = match[1];
+    if (!href.startsWith("/assets/") || !href.endsWith(".css")) continue;
+    const css = await readFile(
+      resolve(outputDirectory, href.replace(/^\/+/, "")),
+      "utf8",
+    );
+    result = result.replace(match[0], `<style>${css}</style>`);
+  }
+  return result;
+}
+
+const template = await inlineStylesheets(builtTemplate);
 
 function escapeHtml(value: string): string {
   return value.replace(/[&<>"']/g, (character) => {
@@ -46,9 +67,7 @@ function pageHead(locale: (typeof seoLocales)[number]): string {
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"F1 Calendar","url":"${canonical}","inLanguage":"${locale}"}</script>`;
 }
 
-function criticalFontPreloads(
-  locale: (typeof seoLocales)[number],
-): string {
+function criticalFontPreloads(locale: (typeof seoLocales)[number]): string {
   const fonts = [
     "/fonts/barlow-condensed-800-latin.woff2",
     "/fonts/manrope-latin.woff2",
@@ -95,6 +114,8 @@ for (const locale of seoLocales) {
   await mkdir(dirname(destination), { recursive: true });
   await writeFile(destination, html);
 }
+
+await writeFile(resolve(outputDirectory, "index.html"), template);
 
 await writeFile(
   resolve(outputDirectory, "404.html"),

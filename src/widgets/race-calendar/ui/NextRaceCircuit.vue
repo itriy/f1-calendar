@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
 import {
-  autoUpdate,
-  computePosition,
-  flip,
-  offset,
-  shift,
-} from "@floating-ui/dom";
+  computed,
+  defineAsyncComponent,
+  nextTick,
+  onBeforeUnmount,
+  ref,
+  watch,
+} from "vue";
 import type { JolpicaRace } from "@/entities/race/model/types";
-import {
-  loadCircuitMedia,
-  type CircuitMedia,
-} from "@/entities/race/api/circuitWikipedia";
+import type { CircuitMedia } from "@/entities/race/api/circuitWikipedia";
 import { useI18n } from "vue-i18n";
-import WeekendDetails from "./WeekendDetails.vue";
+
+const WeekendDetails = defineAsyncComponent(
+  () => import("./WeekendDetails.vue"),
+);
 
 const props = defineProps<{ race: JolpicaRace; forceOpen?: boolean }>();
 const { t } = useI18n();
@@ -41,6 +41,10 @@ function closePreviewOnBlur(event: FocusEvent) {
 async function startPositioning() {
   await nextTick();
   if (!previewTrigger.value || !previewPopover.value) return;
+  const { autoUpdate, computePosition, flip, offset, shift } =
+    await import("@floating-ui/dom");
+  if (!previewTrigger.value || !previewPopover.value || !previewOpen.value)
+    return;
   const update = async () => {
     if (!previewTrigger.value || !previewPopover.value) return;
     const { x, y, strategy } = await computePosition(
@@ -77,6 +81,8 @@ async function toggle() {
     return;
   mediaLoading.value = true;
   try {
+    const { loadCircuitMedia } =
+      await import("@/entities/race/api/circuitWikipedia");
     media.value = await loadCircuitMedia(circuit.value);
     mediaUnavailable.value = !media.value;
   } catch {

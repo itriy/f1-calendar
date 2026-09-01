@@ -51,7 +51,8 @@ const serverTranslations: Partial<
     videoNotConfigured: "Видео Formula 1 ещё не настроены владельцем сайта.",
     videoUnavailable: "Видео Formula 1 временно недоступны. Попробуйте позже.",
     invalidRaceData: "Некорректные данные этапа.",
-    rateLimited: "Слишком много запросов. Попробуйте снова через несколько минут.",
+    rateLimited:
+      "Слишком много запросов. Попробуйте снова через несколько минут.",
     payloadTooLarge: "Запрос слишком большой.",
     invalidRequest: "Некорректный запрос.",
     invalidQuery: "Запрос должен содержать от 3 до {max} символов.",

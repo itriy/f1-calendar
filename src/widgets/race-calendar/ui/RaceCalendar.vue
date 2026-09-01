@@ -84,7 +84,7 @@ const raceStart = (race: CalendarRace) => {
         :class="
           activeTab === tab
             ? 'border-f1-red text-white'
-            : 'border-transparent text-zinc-500 hover:text-zinc-200'
+            : 'border-transparent text-zinc-400 hover:text-white'
         "
         role="tab"
         :aria-selected="activeTab === tab"
@@ -106,13 +106,13 @@ const raceStart = (race: CalendarRace) => {
       <div class="text-center font-display text-2xl font-extrabold">
         {{ race.round
         }}<small
-          class="block font-sans text-[12px] font-semibold tracking-wide text-zinc-500"
+          class="block font-sans text-[12px] font-semibold tracking-wide text-zinc-400"
         >{{ t("calendar.round") }}</small>
       </div>
       <div class="text-xl">{{ race.flag }}</div>
       <div>
         <b class="block text-[12px] sm:text-xs">{{ race.raceName }}</b><span
-          class="block text-[12px] font-semibold tracking-wide text-zinc-500"
+          class="block text-[12px] font-semibold tracking-wide text-zinc-400"
         >{{ race.Circuit.Location.locality }}</span>
       </div>
       <div class="text-right text-[12px] font-bold sm:text-[11px]">

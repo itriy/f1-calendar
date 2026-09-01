@@ -12,7 +12,6 @@ import PwaInstall from "@/features/pwa-install/ui/PwaInstall.vue";
 import NewsFeed from "@/widgets/news-feed/ui/NewsFeed.vue";
 import WatchProviders from "@/widgets/watch-providers/ui/WatchProviders.vue";
 import LanguageSelector from "@/shared/ui/LanguageSelector.vue";
-import { updatePushLocale } from "@/features/race-reminders/api/pushReminders";
 import { useF1Feed } from "@/entities/feed/api/f1Feed";
 import {
   formatRaceStartLocal,
@@ -59,6 +58,11 @@ const {
   closeHistoryRaceDetails,
 } = useF1Data();
 const { t } = useI18n();
+const updatePushLocale = async () => {
+  const pushReminders =
+    await import("@/features/race-reminders/api/pushReminders");
+  await pushReminders.updatePushLocale();
+};
 const weekendDetailsRound = ref("");
 const showWeekendDetails = async (round: string) => {
   weekendDetailsRound.value = round;
@@ -218,13 +222,11 @@ const countdown = (
     <template v-else>
       <section
         v-if="nextRace"
-        class="mx-auto grid w-[min(90rem,calc(100%-1.75rem))] grid-cols-[42px_1fr] gap-x-3 bg-f1-red p-5 shadow-2xl sm:flex sm:w-[min(90rem,calc(100%-3rem))] sm:items-center sm:gap-5 sm:px-8"
+        class="mx-auto grid w-[min(90rem,calc(100%-1.75rem))] grid-cols-[42px_1fr] gap-x-3 bg-f1-red p-5 text-white shadow-2xl sm:flex sm:w-[min(90rem,calc(100%-3rem))] sm:items-center sm:gap-5 sm:px-8"
       >
         <div class="text-3xl sm:text-4xl">{{ nextRace.flag }}</div>
         <div class="mr-auto">
-          <p
-            class="mb-1 text-[12px] font-extrabold tracking-[.14em] opacity-75"
-          >
+          <p class="mb-1 text-[12px] font-extrabold tracking-[.14em]">
             {{ t("app.nextRace") }}
           </p>
           <h2
