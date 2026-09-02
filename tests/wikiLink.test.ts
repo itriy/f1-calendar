@@ -15,6 +15,9 @@ test("upgrades Jolpica HTTP Wikipedia URLs to HTTPS", () => {
   expect(wrapper.get("a").attributes("href")).toBe(
     "https://en.wikipedia.org/wiki/Lando_Norris",
   );
+  expect(wrapper.get("a").attributes("rel")).toBe(
+    "nofollow noindex noopener noreferrer",
+  );
 });
 
 test("does not render a link for non-web URL protocols", () => {

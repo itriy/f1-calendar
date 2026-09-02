@@ -288,7 +288,7 @@ async function deliver(
           type === "start"
             ? serverText("raceStarted", {}, sub.locale)
             : serverText("raceReminder", {}, sub.locale),
-        body: `${race.raceName || serverText("f1Round", {}, sub.locale)} — ${type === "start" ? serverText("scheduledStartNow", {}, sub.locale) : serverText("scheduledStart", { timing }, sub.locale)}.`,
+        body: `${race.raceName || serverText("f1Round", {}, sub.locale)} - ${type === "start" ? serverText("scheduledStartNow", {}, sub.locale) : serverText("scheduledStart", { timing }, sub.locale)}.`,
         url: "/",
         tag: `race-${raceKey}-${type}`,
       },

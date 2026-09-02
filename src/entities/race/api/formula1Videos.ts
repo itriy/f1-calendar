@@ -14,21 +14,21 @@ export type Formula1Video = {
 };
 
 const fallbackVideosByRace: Record<string, Formula1Video[]> = {
-  // Race Highlights | 2025 Australian Grand Prix — FORMULA 1
+  // Race Highlights | 2025 Australian Grand Prix - FORMULA 1
   "2025-1": [
     {
       id: "md9-jG4RzXs",
       title: "Race Highlights | 2025 Australian Grand Prix",
       kind: "race-highlights",
     },
-    // Qualifying Highlights | 2025 Australian Grand Prix — FORMULA 1
+    // Qualifying Highlights | 2025 Australian Grand Prix - FORMULA 1
     {
       id: "Mr7T8TC-cZg",
       title: "Qualifying Highlights | 2025 Australian Grand Prix",
       kind: "qualifying-highlights",
     },
   ],
-  // Race Highlights | 2025 Monaco Grand Prix — FORMULA 1
+  // Race Highlights | 2025 Monaco Grand Prix - FORMULA 1
   "2025-8": [
     {
       id: "ajzQj7bjSWE",

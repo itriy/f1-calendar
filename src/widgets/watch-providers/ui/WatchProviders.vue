@@ -48,7 +48,7 @@ watch(locale, load);
         class="shrink-0 border border-white/25 px-4 py-3 text-[11px] font-extrabold tracking-[.1em] hover:border-f1-red hover:text-f1-red"
         href="https://www.formula1.com/"
         target="_blank"
-        rel="noopener noreferrer"
+        rel="nofollow noindex noopener noreferrer"
       >{{ t("watch.officialSite") }} ↗</a>
     </div>
     <div class="mt-3 grid gap-3 sm:grid-cols-2">
@@ -56,7 +56,7 @@ watch(locale, load);
         class="flex items-center justify-between gap-3 border border-white/10 bg-white/3 p-4 transition-colors hover:border-f1-red"
         href="https://f1tv.formula1.com/"
         target="_blank"
-        rel="noopener noreferrer"
+        rel="nofollow noindex noopener noreferrer"
       >
         <span><b class="block text-sm">F1 TV</b><small class="mt-1 block text-xs leading-5 text-zinc-400">{{
           t("watch.f1tvDescription")
@@ -80,7 +80,7 @@ watch(locale, load);
             class="mt-3 flex items-start justify-between gap-3 text-sm font-bold hover:text-f1-red"
             :href="provider.url"
             target="_blank"
-            rel="noopener noreferrer"
+            rel="nofollow noindex noopener noreferrer"
           >
             <span><span>
               {{ provider.name }}
@@ -103,7 +103,7 @@ watch(locale, load);
           class="mt-4 inline-block text-[11px] font-bold text-f1-red hover:underline"
           href="https://www.formula1.com/en/information/f1-broadcast-information.45y3LNsT1D6VoK0ZmX8ciJ"
           target="_blank"
-          rel="noopener noreferrer"
+          rel="nofollow noindex noopener noreferrer"
         >{{ t("watch.fullList") }} ↗</a>
       </div>
     </div>

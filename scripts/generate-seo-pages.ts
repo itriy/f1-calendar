@@ -72,14 +72,17 @@ function criticalFontPreloads(locale: (typeof seoLocales)[number]): string {
     "/fonts/barlow-condensed-800-latin.woff2",
     "/fonts/manrope-latin.woff2",
   ];
-  if (["de", "fr", "es", "it"].includes(locale)) {
+  if (["de", "fr", "es", "it", "nl-NL", "sq-AL"].includes(locale)) {
     fonts.push(
       "/fonts/barlow-condensed-800-latin-ext.woff2",
       "/fonts/manrope-latin-ext.woff2",
     );
   }
   if (["uk", "ru"].includes(locale))
-    fonts.push("/fonts/manrope-cyrillic.woff2");
+    fonts.push(
+      "/fonts/manrope-cyrillic.woff2",
+      "/fonts/roboto-condensed-cyrillic.woff2",
+    );
   return fonts
     .map(
       (font) =>

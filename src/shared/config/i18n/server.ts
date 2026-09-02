@@ -12,7 +12,7 @@ const uk = {
   invalidQuery: "Запит має містити від 3 до {max} символів.",
   searchNotConfigured: "AI-пошук ще не налаштований.",
   aiPrompt:
-    "Ти — пошук для F1 Calendar. Відповідай українською, стисло й лише на теми Формули 1, F2, F3, WEC, команд, пілотів, трас, перегонів та автоспорту. Якщо запит не про автоспорт, поясни, що пошук підтримує лише F1 та суміжний автоспорт. Не вигадуй фактів; спирайся на результати веб-пошуку. Запит користувача: {query}",
+    "Ти - пошук для F1 Calendar. Відповідай українською, стисло й лише на теми Формули 1, F2, F3, WEC, команд, пілотів, трас, перегонів та автоспорту. Якщо запит не про автоспорт, поясни, що пошук підтримує лише F1 та суміжний автоспорт. Не вигадуй фактів; спирайся на результати веб-пошуку. Запит користувача: {query}",
   providerRateLimited: "Вичерпано ліміт AI-пошуку. Спробуйте пізніше.",
   providerAuthFailed:
     "Налаштування AI-пошуку відхилено. Зверніться до власника сайту.",
@@ -58,7 +58,7 @@ const serverTranslations: Partial<
     invalidQuery: "Запрос должен содержать от 3 до {max} символов.",
     searchNotConfigured: "AI-поиск ещё не настроен.",
     aiPrompt:
-      "Ты — поиск для F1 Calendar. Отвечай по-русски, кратко и только на темы Формулы-1, F2, F3, WEC, команд, пилотов, трасс, гонок и автоспорта. Если запрос не об автоспорте, объясни, что поиск поддерживает только F1 и смежный автоспорт. Не выдумывай факты; опирайся на результаты веб-поиска. Запрос пользователя: {query}",
+      "Ты - поиск для F1 Calendar. Отвечай по-русски, кратко и только на темы Формулы-1, F2, F3, WEC, команд, пилотов, трасс, гонок и автоспорта. Если запрос не об автоспорте, объясни, что поиск поддерживает только F1 и смежный автоспорт. Не выдумывай факты; опирайся на результаты веб-поиска. Запрос пользователя: {query}",
     providerRateLimited: "Лимит AI-поиска исчерпан. Попробуйте позже.",
     providerAuthFailed:
       "Настройки AI-поиска отклонены. Обратитесь к владельцу сайта.",
@@ -170,6 +170,94 @@ const serverTranslations: Partial<
     newsSummaryPrompt:
       "请将这条F1新闻标题用简体中文概括为一句话，不要添加事实：{title}",
   },
+  "nl-NL": {
+    methodNotAllowed: "Deze methode is niet toegestaan.",
+    videoRateLimited: "Te veel videoverzoeken. Probeer het later opnieuw.",
+    videoNotConfigured:
+      "Formule 1-video's zijn nog niet ingesteld door de sitebeheerder.",
+    videoUnavailable:
+      "Formule 1-video's zijn tijdelijk niet beschikbaar. Probeer het later opnieuw.",
+    invalidRaceData: "Ongeldige racegegevens.",
+    rateLimited:
+      "Te veel verzoeken. Probeer het over een paar minuten opnieuw.",
+    payloadTooLarge: "Het verzoek is te groot.",
+    invalidRequest: "Ongeldig verzoek.",
+    invalidQuery: "De zoekopdracht moet 3 tot {max} tekens bevatten.",
+    searchNotConfigured: "AI-zoeken is nog niet ingesteld.",
+    aiPrompt:
+      "Je bent de zoekassistent van F1 Calendar. Antwoord kort in het Nederlands en uitsluitend over Formule 1, F2, F3, WEC, teams, coureurs, circuits, races en autosport. Leg bij andere onderwerpen uit dat de zoekfunctie alleen F1 en aanverwante autosport ondersteunt. Verzin geen feiten; baseer je op de resultaten van de webzoekopdracht. Zoekopdracht van de gebruiker: {query}",
+    providerRateLimited:
+      "De limiet voor AI-zoeken is bereikt. Probeer het later opnieuw.",
+    providerAuthFailed:
+      "De instellingen voor AI-zoeken zijn geweigerd. Neem contact op met de sitebeheerder.",
+    providerModelUnavailable:
+      "Het ingestelde AI-model is niet beschikbaar. Neem contact op met de sitebeheerder.",
+    providerUnavailable:
+      "AI-zoeken is tijdelijk niet beschikbaar. Probeer het later opnieuw.",
+    emptySearchResponse:
+      "AI-zoeken heeft geen antwoord opgeleverd. Probeer een andere zoekopdracht.",
+    providerError:
+      "Er is een fout opgetreden tijdens AI-zoeken. Probeer het opnieuw.",
+    apiNotFound: "API-route niet gevonden.",
+    remindersNotConfigured:
+      "Herinneringen zijn nog niet ingesteld door de sitebeheerder.",
+    invalidSubscription: "Ongeldig pushabonnement.",
+    invalidPreferences: "Kies ten minste één herinneringsmoment.",
+    subscriptionNotFound: "Abonnement niet gevonden.",
+    reminderDay: "over 1 dag",
+    reminderHour: "over 1 uur",
+    reminderNow: "nu",
+    raceStarted: "Race begint",
+    raceReminder: "Raceherinnering",
+    f1Round: "Formule 1-ronde",
+    scheduledStartNow: "geplande start nu",
+    scheduledStart: "geplande start {timing}",
+    newsSummaryPrompt:
+      "Vat deze Formule 1-nieuwskop samen in één korte Nederlandse zin. Voeg geen feiten toe: {title}",
+  },
+  "sq-AL": {
+    methodNotAllowed: "Kjo metodë nuk lejohet.",
+    videoRateLimited: "Shumë kërkesa për video. Provo përsëri më vonë.",
+    videoNotConfigured:
+      "Videot e Formula 1 nuk janë konfiguruar ende nga administratori i faqes.",
+    videoUnavailable:
+      "Videot e Formula 1 nuk janë përkohësisht të disponueshme. Provo përsëri më vonë.",
+    invalidRaceData: "Të dhënat e garës janë të pavlefshme.",
+    rateLimited: "Shumë kërkesa. Provo përsëri pas disa minutash.",
+    payloadTooLarge: "Kërkesa është shumë e madhe.",
+    invalidRequest: "Kërkesë e pavlefshme.",
+    invalidQuery: "Kërkimi duhet të përmbajë nga 3 deri në {max} shenja.",
+    searchNotConfigured: "Kërkimi me AI nuk është konfiguruar ende.",
+    aiPrompt:
+      "Je asistenti i kërkimit për F1 Calendar. Përgjigju shkurt në shqip dhe vetëm për Formula 1, F2, F3, WEC, ekipet, pilotët, pistat, garat dhe sportin motorik. Nëse pyetja nuk lidhet me sportin motorik, shpjego se kërkimi mbështet vetëm F1 dhe sportet motorike të ngjashme. Mos shpik fakte; mbështetu te rezultatet e kërkimit në internet. Pyetja e përdoruesit: {query}",
+    providerRateLimited:
+      "Kufiri i kërkimit me AI është arritur. Provo përsëri më vonë.",
+    providerAuthFailed:
+      "Konfigurimi i kërkimit me AI u refuzua. Kontakto administratorin e faqes.",
+    providerModelUnavailable:
+      "Modeli i konfiguruar i AI nuk është i disponueshëm. Kontakto administratorin e faqes.",
+    providerUnavailable:
+      "Kërkimi me AI nuk është përkohësisht i disponueshëm. Provo përsëri më vonë.",
+    emptySearchResponse:
+      "Kërkimi me AI nuk dha përgjigje. Provo një kërkim tjetër.",
+    providerError: "Ndodhi një gabim gjatë kërkimit me AI. Provo përsëri.",
+    apiNotFound: "Rruga e API-së nuk u gjet.",
+    remindersNotConfigured:
+      "Kujtesat nuk janë konfiguruar ende nga administratori i faqes.",
+    invalidSubscription: "Abonim push i pavlefshëm.",
+    invalidPreferences: "Zgjidh të paktën një kohë kujtese.",
+    subscriptionNotFound: "Abonimi nuk u gjet.",
+    reminderDay: "pas 1 dite",
+    reminderHour: "pas 1 ore",
+    reminderNow: "tani",
+    raceStarted: "Gara nis",
+    raceReminder: "Kujtesë për garën",
+    f1Round: "Raundi i Formula 1",
+    scheduledStartNow: "nisja e planifikuar tani",
+    scheduledStart: "nisja e planifikuar {timing}",
+    newsSummaryPrompt:
+      "Përmblidhe këtë titull lajmi të Formula 1 në një fjali të shkurtër në shqip. Mos shto fakte: {title}",
+  },
 };
 
 export function requestLocale(
@@ -203,6 +291,8 @@ export function serverText(
               es: "Spanish",
               it: "Italian",
               ja: "Japanese",
+              "nl-NL": "Dutch",
+              "sq-AL": "Albanian",
               ru: "Russian",
             } as Record<string, string>
           )[locale] || "English";

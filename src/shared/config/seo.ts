@@ -12,7 +12,7 @@ export type SeoPage = {
 export const seoPages: Record<SupportedLocale, SeoPage> = {
   uk: {
     title:
-      "Календар Формули 1 2026 — розклад гонок, результати й таблиці | F1 Calendar",
+      "Календар Формули 1 2026 - розклад гонок, результати й таблиці | F1 Calendar",
     description:
       "Актуальний календар Формули 1 2026: розклад гонок, результати, турнірні таблиці, новини та нагадування українською.",
     heading: "Календар Формули 1 2026",
@@ -21,7 +21,7 @@ export const seoPages: Record<SupportedLocale, SeoPage> = {
   },
   ru: {
     title:
-      "Календарь Формулы-1 2026 — расписание гонок, результаты и таблицы | F1 Calendar",
+      "Календарь Формулы-1 2026 - расписание гонок, результаты и таблицы | F1 Calendar",
     description:
       "Актуальный календарь Формулы-1 2026: расписание гонок, результаты, турнирные таблицы, новости и напоминания на русском языке.",
     heading: "Календарь Формулы-1 2026",
@@ -30,7 +30,7 @@ export const seoPages: Record<SupportedLocale, SeoPage> = {
   },
   en: {
     title:
-      "Formula 1 Calendar 2026 — race schedule, results and standings | F1 Calendar",
+      "Formula 1 Calendar 2026 - race schedule, results and standings | F1 Calendar",
     description:
       "The up-to-date 2026 Formula 1 calendar: race schedule, results, standings, news and reminders.",
     heading: "Formula 1 Calendar 2026",
@@ -39,7 +39,7 @@ export const seoPages: Record<SupportedLocale, SeoPage> = {
   },
   de: {
     title:
-      "Formel-1-Kalender 2026 — Rennkalender, Ergebnisse und Tabellen | F1 Calendar",
+      "Formel-1-Kalender 2026 - Rennkalender, Ergebnisse und Tabellen | F1 Calendar",
     description:
       "Der aktuelle Formel-1-Kalender 2026: Renntermine, Ergebnisse, Tabellen, Nachrichten und Erinnerungen.",
     heading: "Formel-1-Kalender 2026",
@@ -47,7 +47,7 @@ export const seoPages: Record<SupportedLocale, SeoPage> = {
   },
   fr: {
     title:
-      "Calendrier Formule 1 2026 — courses, résultats et classements | F1 Calendar",
+      "Calendrier Formule 1 2026 - courses, résultats et classements | F1 Calendar",
     description:
       "Le calendrier Formule 1 2026 à jour : horaires des courses, résultats, classements, actualités et rappels.",
     heading: "Calendrier Formule 1 2026",
@@ -56,7 +56,7 @@ export const seoPages: Record<SupportedLocale, SeoPage> = {
   },
   es: {
     title:
-      "Calendario Fórmula 1 2026 — carreras, resultados y clasificaciones | F1 Calendar",
+      "Calendario Fórmula 1 2026 - carreras, resultados y clasificaciones | F1 Calendar",
     description:
       "El calendario actualizado de Fórmula 1 2026: horarios, resultados, clasificaciones, noticias y recordatorios.",
     heading: "Calendario Fórmula 1 2026",
@@ -65,7 +65,7 @@ export const seoPages: Record<SupportedLocale, SeoPage> = {
   },
   it: {
     title:
-      "Calendario Formula 1 2026 — gare, risultati e classifiche | F1 Calendar",
+      "Calendario Formula 1 2026 - gare, risultati e classifiche | F1 Calendar",
     description:
       "Il calendario aggiornato della Formula 1 2026: orari delle gare, risultati, classifiche, notizie e promemoria.",
     heading: "Calendario Formula 1 2026",
@@ -73,7 +73,7 @@ export const seoPages: Record<SupportedLocale, SeoPage> = {
       "Gare, risultati e leader del campionato di Formula 1 in un unico posto.",
   },
   ja: {
-    title: "F1カレンダー2026 — レース日程・結果・ランキング | F1 Calendar",
+    title: "F1カレンダー2026 - レース日程・結果・ランキング | F1 Calendar",
     description:
       "2026年F1の最新カレンダー。レース日程、結果、ランキング、ニュース、リマインダーを掲載。",
     heading: "F1カレンダー2026",
@@ -81,10 +81,27 @@ export const seoPages: Record<SupportedLocale, SeoPage> = {
       "F1のレース日程、結果、チャンピオンシップ順位を一か所で確認できます。",
   },
   "zh-CN": {
-    title: "2026 年 F1 赛历 — 比赛日程、成绩和积分榜 | F1 Calendar",
+    title: "2026 年 F1 赛历 - 比赛日程、成绩和积分榜 | F1 Calendar",
     description: "最新 2026 年 F1 赛历：比赛时间、成绩、积分榜、新闻和提醒。",
     heading: "2026 年 F1 赛历",
     intro: "在一个地方查看 F1 比赛日程、成绩和锦标赛排名。",
+  },
+  "nl-NL": {
+    title:
+      "Formule 1-kalender 2026 - races, uitslagen en standen | F1 Calendar",
+    description:
+      "De actuele Formule 1-kalender van 2026 met racetijden, uitslagen, standen, nieuws en herinneringen.",
+    heading: "Formule 1-kalender 2026",
+    intro: "Formule 1-races, uitslagen en kampioenschapsstanden op één plek.",
+  },
+  "sq-AL": {
+    title:
+      "Kalendari i Formula 1 2026 - garat, rezultatet dhe renditja | F1 Calendar",
+    description:
+      "Kalendari i përditësuar i Formula 1 për vitin 2026 me oraret e garave, rezultatet, renditjen, lajmet dhe kujtesat.",
+    heading: "Kalendari i Formula 1 2026",
+    intro:
+      "Garat, rezultatet dhe renditja e kampionatit të Formula 1 në një vend.",
   },
 };
 

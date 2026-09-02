@@ -15,6 +15,10 @@ test("normalizes supported browser locales and falls back to English", () => {
   expect(normalizeLocale("de-AT")).toBe("de");
   expect(normalizeLocale("ru-RU")).toBe("ru");
   expect(normalizeLocale("zh-TW")).toBe("zh-CN");
+  expect(normalizeLocale("nl-NL")).toBe("nl-NL");
+  expect(normalizeLocale("nl-BE")).toBe("nl-NL");
+  expect(normalizeLocale("sq-AL")).toBe("sq-AL");
+  expect(normalizeLocale("sq-XK")).toBe("sq-AL");
   expect(normalizeLocale("pl-PL")).toBe("en");
 });
 
@@ -81,5 +85,25 @@ test("provides Russian server copy for notifications and generated summaries", (
   );
   expect(serverText("newsSummaryPrompt", { title: "Новость" }, "ru")).toContain(
     "на русском языке",
+  );
+});
+
+test("provides Dutch server copy for notifications and generated summaries", () => {
+  expect(serverText("raceReminder", {}, "nl-NL")).toBe("Raceherinnering");
+  expect(serverText("scheduledStart", { timing: "over 1 uur" }, "nl-NL")).toBe(
+    "geplande start over 1 uur",
+  );
+  expect(
+    serverText("newsSummaryPrompt", { title: "Nieuws" }, "nl-NL"),
+  ).toContain("Nederlandse zin");
+});
+
+test("provides Albanian server copy for notifications and generated summaries", () => {
+  expect(serverText("raceReminder", {}, "sq-AL")).toBe("Kujtesë për garën");
+  expect(serverText("scheduledStart", { timing: "pas 1 ore" }, "sq-AL")).toBe(
+    "nisja e planifikuar pas 1 ore",
+  );
+  expect(serverText("newsSummaryPrompt", { title: "Lajm" }, "sq-AL")).toContain(
+    "shqip",
   );
 });

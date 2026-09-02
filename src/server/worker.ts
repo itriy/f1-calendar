@@ -88,62 +88,76 @@ const notFoundCopy: Record<
 > = {
   uk: {
     title: "Сторінку не знайдено",
-    heading: "404 — сторінку не знайдено",
+    heading: "404 - сторінку не знайдено",
     description:
       "Можливо, посилання застаріло або сторінки ніколи не існувало.",
     action: "На головну",
   },
   ru: {
     title: "Страница не найдена",
-    heading: "404 — страница не найдена",
+    heading: "404 - страница не найдена",
     description: "Возможно, ссылка устарела или такой страницы не существует.",
     action: "На главную",
   },
   en: {
     title: "Page not found",
-    heading: "404 — page not found",
+    heading: "404 - page not found",
     description: "The link may be outdated, or this page never existed.",
     action: "Go to home page",
   },
   de: {
     title: "Seite nicht gefunden",
-    heading: "404 — Seite nicht gefunden",
+    heading: "404 - Seite nicht gefunden",
     description:
       "Der Link ist möglicherweise veraltet oder die Seite existierte nie.",
     action: "Zur Startseite",
   },
   es: {
     title: "Página no encontrada",
-    heading: "404 — página no encontrada",
+    heading: "404 - página no encontrada",
     description:
       "Es posible que el enlace esté desactualizado o que la página no exista.",
     action: "Ir al inicio",
   },
   fr: {
     title: "Page introuvable",
-    heading: "404 — page introuvable",
+    heading: "404 - page introuvable",
     description:
       "Le lien est peut-être obsolète ou cette page n'a jamais existé.",
     action: "Retour à l’accueil",
   },
   it: {
     title: "Pagina non trovata",
-    heading: "404 — pagina non trovata",
+    heading: "404 - pagina non trovata",
     description:
       "Il link potrebbe non essere aggiornato oppure la pagina non è mai esistita.",
     action: "Torna alla home",
   },
   ja: {
     title: "ページが見つかりません",
-    heading: "404 — ページが見つかりません",
+    heading: "404 - ページが見つかりません",
     description: "リンクが古いか、このページは存在しません。",
     action: "ホームへ戻る",
   },
   "zh-CN": {
     title: "找不到页面",
-    heading: "404 — 找不到页面",
+    heading: "404 - 找不到页面",
     description: "链接可能已失效，或该页面从未存在。",
     action: "返回首页",
+  },
+  "nl-NL": {
+    title: "Pagina niet gevonden",
+    heading: "404 - pagina niet gevonden",
+    description:
+      "De link is mogelijk verouderd of deze pagina heeft nooit bestaan.",
+    action: "Naar de startpagina",
+  },
+  "sq-AL": {
+    title: "Faqja nuk u gjet",
+    heading: "404 - faqja nuk u gjet",
+    description:
+      "Lidhja mund të jetë e vjetruar ose kjo faqe mund të mos ketë ekzistuar kurrë.",
+    action: "Shko te faqja kryesore",
   },
 };
 

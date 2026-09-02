@@ -96,7 +96,7 @@ function normalizeResult(item: AlphaResult): SessionResult {
   return {
     position: item.position || 0,
     driver: `${item.driver.given_name} ${item.driver.family_name}`,
-    team: item.team?.name || "—",
+    team: item.team?.name || "-",
     grid: item.components?.GRID?.position ?? null,
     fastestLap: item.components?.FLAP?.time ?? null,
     points: item.points || 0,
@@ -115,7 +115,7 @@ async function pitStops(season: string, round: string) {
     );
     const counts = new Map<string, number>();
     for (const stop of body.MRData?.RaceTable?.Races?.[0]?.PitStops || []) {
-      const driver = stop.driverId || "—";
+      const driver = stop.driverId || "-";
       counts.set(driver, (counts.get(driver) || 0) + 1);
     }
     return [...counts]
@@ -189,8 +189,8 @@ export function loadSessionLaps(url: string): Promise<Lap[]> {
           .map((lap) => ({
             number: lap.number,
             position: lap.position ?? null,
-            driver: drivers[lap.driver_id]?.abbreviation || "—",
-            time: lap.time_display || "—",
+            driver: drivers[lap.driver_id]?.abbreviation || "-",
+            time: lap.time_display || "-",
             fastest: Boolean(lap.is_entry_fastest_lap),
           }))
           .sort(

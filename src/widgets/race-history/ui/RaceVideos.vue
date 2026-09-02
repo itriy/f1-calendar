@@ -73,7 +73,7 @@ onBeforeUnmount(() => controller?.abort());
         class="text-[11px] font-bold text-f1-red hover:underline"
         href="https://www.youtube.com/@Formula1"
         target="_blank"
-        rel="noopener noreferrer"
+        rel="nofollow noindex noopener noreferrer"
       >{{ t("history.youtubeChannel") }}</a>
     </div>
     <div v-if="videos.length" class="grid gap-4 lg:grid-cols-2">
@@ -86,7 +86,7 @@ onBeforeUnmount(() => controller?.abort());
           class="group relative block aspect-video bg-black"
           :href="video.watchUrl"
           target="_blank"
-          rel="noopener noreferrer"
+          rel="nofollow noindex noopener noreferrer"
           :aria-label="`${t('history.watchOnYoutube')}: ${video.title}`"
         >
           <img

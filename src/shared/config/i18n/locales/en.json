@@ -22,7 +22,7 @@
     "headlineMiddle": "the",
     "headlineEmphasis": "pulse",
     "headlineEnd": "of racing",
-    "intro": "The latest Formula 1 schedule and championship leaders — in one place.",
+    "intro": "The latest Formula 1 schedule and championship leaders - in one place.",
     "nextRound": "NEXT ROUND",
     "nextRace": "NEXT RACE",
     "loading": "Downloading current Jolpica-F1 data...",
@@ -77,7 +77,7 @@
     "fullList": "COMPLETE LIST OF F1 SPEAKERS",
     "providers": {
       "sweet": "Setanta Sports and Setanta Sports+ with Formula 1 broadcasts.",
-      "megogo": "Formula 1 on Setanta Sports; sports subscription — from UAH 279/month. after the start period.",
+      "megogo": "Formula 1 on Setanta Sports; sports subscription - from UAH 279/month. after the start period.",
       "kyivstar": "Setanta Sports, Setanta Sports+ and the exclusive Setanta Sports Premium.",
       "vodafone": "Setanta Sports and Setanta Sports+ are available in the sports package.",
       "lanet": "Setanta Sports HD and Setanta Sports+ HD; online TV is available to Lanet Internet subscribers."
@@ -155,7 +155,7 @@
     "title": "Title chances",
     "description": "A deterministic estimate based on the current gap, {rounds} {roundLabel}, and a maximum of {points} points per race. It is not an official prediction or betting odds.",
     "gap": "−{points} pts",
-    "finished": "The season is complete — title chances are no longer calculated.",
+    "finished": "The season is complete - title chances are no longer calculated.",
     "empty": "Not enough data to calculate the model.",
     "round": "round",
     "rounds": "rounds"

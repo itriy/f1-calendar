@@ -12,6 +12,8 @@ export const supportedLocales = [
   "it",
   "ja",
   "zh-CN",
+  "nl-NL",
+  "sq-AL",
 ] as const;
 export type SupportedLocale = (typeof supportedLocales)[number];
 export const localeLabels: Record<SupportedLocale, string> = {
@@ -24,6 +26,8 @@ export const localeLabels: Record<SupportedLocale, string> = {
   it: "Italiano",
   ja: "日本語",
   "zh-CN": "简体中文",
+  "nl-NL": "Nederlands",
+  "sq-AL": "Shqip",
 };
 export const localeShortLabels: Record<SupportedLocale, string> = {
   uk: "UA",
@@ -35,12 +39,16 @@ export const localeShortLabels: Record<SupportedLocale, string> = {
   it: "IT",
   ja: "JA",
   "zh-CN": "中文",
+  "nl-NL": "NL",
+  "sq-AL": "SQ",
 };
 const LOCALE_STORAGE_KEY = "f1-calendar-locale";
 export function normalizeLocale(value?: string | null): SupportedLocale {
   const candidate = value?.replace("_", "-");
   if (candidate === "zh-CN" || candidate?.toLowerCase().startsWith("zh"))
     return "zh-CN";
+  if (candidate?.toLowerCase().startsWith("nl")) return "nl-NL";
+  if (candidate?.toLowerCase().startsWith("sq")) return "sq-AL";
   const language = candidate?.split("-")[0]?.toLowerCase();
   return supportedLocales.includes(language as SupportedLocale)
     ? (language as SupportedLocale)
@@ -68,6 +76,8 @@ const localeLoaders: Record<
   it: () => import("./locales/it.json"),
   ja: () => import("./locales/ja.json"),
   "zh-CN": () => import("./locales/zh-CN.json"),
+  "nl-NL": () => import("./locales/nl-NL.json"),
+  "sq-AL": () => import("./locales/sq-AL.json"),
 };
 const loadedLocales = new Set<SupportedLocale>();
 

@@ -3,6 +3,7 @@ import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import type { JolpicaRace } from "@/entities/race/model/types";
 import NextRaceCircuit from "./NextRaceCircuit.vue";
+import { formatDateTime } from "@/shared/lib/dateTime";
 
 type CalendarRace = JolpicaRace & {
   flag: string;
@@ -31,27 +32,27 @@ watch(
 );
 const format = (date?: string) =>
   date
-    ? new Intl.DateTimeFormat(locale.value, {
+    ? formatDateTime(new Date(`${date}T12:00:00Z`), locale.value, {
         day: "numeric",
         month: "long",
-      }).format(new Date(`${date}T12:00:00Z`))
+      })
     : t("common.unknownDate");
 const raceDate = (race: CalendarRace) => {
   const end = race.FirstPractice?.date || race.date;
   return format(race.date) === format(end)
     ? format(race.date)
-    : `${format(race.date)} — ${format(end)}`;
+    : `${format(race.date)} - ${format(end)}`;
 };
 const raceStart = (race: CalendarRace) => {
   if (!race.date || !race.time) return t("calendar.timeUnknown");
   const time = race.time.endsWith("Z") ? race.time : `${race.time}Z`;
   const start = new Date(`${race.date}T${time}`);
   if (Number.isNaN(start.getTime())) return t("calendar.timeUnknown");
-  return new Intl.DateTimeFormat(locale.value, {
+  return formatDateTime(start, locale.value, {
     hour: "2-digit",
     minute: "2-digit",
     timeZoneName: "short",
-  }).format(start);
+  });
 };
 </script>
 

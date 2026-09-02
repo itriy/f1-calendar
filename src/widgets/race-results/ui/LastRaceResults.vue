@@ -8,16 +8,17 @@ defineProps({
 defineEmits(["retry"]);
 import TeamBadge from "@/entities/team/ui/TeamBadge.vue";
 import WikiLink from "@/shared/ui/WikiLink.vue";
+import { formatDateTime } from "@/shared/lib/dateTime";
 
 const { t, locale } = useI18n();
 const formatDate = (date?: string) =>
   date
-    ? new Intl.DateTimeFormat(locale.value, {
+    ? formatDateTime(new Date(`${date}T12:00:00Z`), locale.value, {
         day: "numeric",
         month: "long",
         year: "numeric",
         timeZone: "UTC",
-      }).format(new Date(`${date}T12:00:00Z`))
+      })
     : t("common.unknownDate");
 </script>
 
@@ -113,7 +114,7 @@ const formatDate = (date?: string) =>
           >{{ t("lastRace.gap") }}</span><small
             v-if="result.position !== '1'"
             class="block whitespace-nowrap text-[12px] text-zinc-300"
-          >{{ result.gap || "—" }}</small>
+          >{{ result.gap || "-" }}</small>
         </div>
       </div>
       <p

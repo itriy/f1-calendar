@@ -29,7 +29,7 @@ const safeUrl = computed(() => {
     v-if="safeUrl"
     :href="safeUrl"
     target="_blank"
-    rel="noopener noreferrer"
+    rel="nofollow noindex noopener noreferrer"
     :class="[
       'cursor-pointer decoration-f1-red/70 underline-offset-2 transition-colors hover:underline focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-f1-red',
       className,

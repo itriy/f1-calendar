@@ -8,6 +8,7 @@ import {
   getSeasonRaceWinners,
 } from "@/entities/race/api/jolpica";
 import { i18n } from "@/shared/config/i18n";
+import { formatDateTime } from "@/shared/lib/dateTime";
 import type {
   JolpicaConstructorStanding,
   JolpicaDriverStanding,
@@ -124,19 +125,23 @@ export function formatRaceStartLocal(
   const start = getRaceStart(race);
   if (!start)
     return race?.date
-      ? new Intl.DateTimeFormat(i18n.global.locale.value, {
-          day: "numeric",
-          month: "long",
-        }).format(new Date(`${race.date}T12:00:00Z`))
+      ? formatDateTime(
+          new Date(`${race.date}T12:00:00Z`),
+          i18n.global.locale.value,
+          {
+            day: "numeric",
+            month: "long",
+          },
+        )
       : i18n.global.t("common.dateUnknown");
-  return new Intl.DateTimeFormat(i18n.global.locale.value, {
+  return formatDateTime(start, i18n.global.locale.value, {
     weekday: "long",
     day: "numeric",
     month: "long",
     hour: "2-digit",
     minute: "2-digit",
     timeZoneName: "short",
-  }).format(start);
+  });
 }
 
 export function getUpcomingRaces<T extends Pick<JolpicaRace, "date" | "time">>(
@@ -192,7 +197,7 @@ export function useF1Data() {
       pos: item.position,
       name: `${item.Driver.givenName} ${item.Driver.familyName}`,
       url: item.Driver.url || "",
-      team: constructor?.name || "—",
+      team: constructor?.name || "-",
       teamUrl: constructor?.url || "",
       points: item.points,
       code: item.Driver.driverId,
@@ -204,7 +209,7 @@ export function useF1Data() {
       pos: item.position,
       name: item.Constructor.name,
       url: item.Constructor.url || "",
-      team: item.Constructor.nationality || "—",
+      team: item.Constructor.nationality || "-",
       teamUrl: "",
       points: item.points,
       code: item.Constructor.constructorId,
@@ -215,7 +220,7 @@ export function useF1Data() {
     return {
       name: race.raceName,
       date: race.date || "",
-      place: race.Circuit?.Location?.locality || "—",
+      place: race.Circuit?.Location?.locality || "-",
       flag: flags[race.Circuit?.Location?.country || ""] || "🏁",
       results: (race.Results || [])
         .filter((result) => Number(result.points) > 0)
@@ -237,7 +242,7 @@ export function useF1Data() {
             position: result.position,
             name: `${result.Driver.givenName} ${result.Driver.familyName}`,
             url: result.Driver.url || "",
-            team: result.Constructor?.name || "—",
+            team: result.Constructor?.name || "-",
             teamUrl: result.Constructor?.url || "",
             points: result.points,
             status: result.status || "",
@@ -254,13 +259,13 @@ export function useF1Data() {
       name: race.raceName,
       date: race.date || "",
       circuit: race.Circuit?.circuitName || t("data.circuitUnknown"),
-      place: race.Circuit?.Location?.locality || "—",
+      place: race.Circuit?.Location?.locality || "-",
       flag: flags[race.Circuit?.Location?.country || ""] || "🏁",
       winner: winner
         ? {
             name: `${winner.Driver.givenName} ${winner.Driver.familyName}`,
             url: winner.Driver.url || "",
-            team: winner.Constructor?.name || "—",
+            team: winner.Constructor?.name || "-",
             teamUrl: winner.Constructor?.url || "",
           }
         : null,
@@ -286,7 +291,7 @@ export function useF1Data() {
           position: result.position,
           name: `${result.Driver.givenName} ${result.Driver.familyName}`,
           url: result.Driver.url || "",
-          team: result.Constructor?.name || "—",
+          team: result.Constructor?.name || "-",
           teamUrl: result.Constructor?.url || "",
           points: result.points,
           gap: formatResultGap(result),
@@ -312,7 +317,7 @@ export function useF1Data() {
         name: `${driverStanding.Driver.givenName} ${driverStanding.Driver.familyName}`,
         url: driverStanding.Driver.url || "",
         points: driverStanding.points,
-        team: driverTeam?.name || "—",
+        team: driverTeam?.name || "-",
         teamUrl: driverTeam?.url || "",
       },
       constructor: {
@@ -327,7 +332,7 @@ export function useF1Data() {
           name: `${standing.Driver.givenName} ${standing.Driver.familyName}`,
           url: standing.Driver.url || "",
           points: standing.points,
-          team: team?.name || "—",
+          team: team?.name || "-",
           teamUrl: team?.url || "",
         };
       }),
@@ -451,10 +456,10 @@ export function useF1Data() {
       driverStandings.value = driverList.map(driver);
       drivers.value = driverStandings.value.slice(0, 5);
       constructors.value = constructorList.slice(0, 5).map(constructor);
-      updatedAt.value = new Intl.DateTimeFormat(i18n.global.locale.value, {
+      updatedAt.value = formatDateTime(new Date(), i18n.global.locale.value, {
         hour: "2-digit",
         minute: "2-digit",
-      }).format(new Date());
+      });
     } catch (cause) {
       console.error(t("data.seasonLog"), cause);
       error.value = t("data.seasonLoadError");

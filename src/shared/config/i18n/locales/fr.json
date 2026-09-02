@@ -77,7 +77,7 @@
     "fullList": "LISTE COMPLÈTE DES INTERVENANTS F1",
     "providers": {
       "sweet": "Setanta Sports et Setanta Sports+ avec les diffusions de Formule 1.",
-      "megogo": "Formule 1 sur Setanta Sports ; abonnement sportif — à partir de 279 UAH/mois. après la période de début.",
+      "megogo": "Formule 1 sur Setanta Sports ; abonnement sportif - à partir de 279 UAH/mois. après la période de début.",
       "kyivstar": "Setanta Sports, Setanta Sports+ et l'exclusivité Setanta Sports Premium.",
       "vodafone": "Setanta Sports et Setanta Sports+ sont disponibles dans le forfait sport.",
       "lanet": "Setanta Sports HD et Setanta Sports+ HD ; La télévision en ligne est accessible aux abonnés Internet de Lanet."
@@ -155,7 +155,7 @@
     "title": "Chances de titre",
     "description": "Estimation déterministe fondée sur l'écart actuel, {rounds} {roundLabel} et un maximum de {points} points par course. Ce n'est ni une prévision officielle ni une cote.",
     "gap": "−{points} pts",
-    "finished": "La saison est terminée — les chances de titre ne sont plus calculées.",
+    "finished": "La saison est terminée - les chances de titre ne sont plus calculées.",
     "empty": "Données insuffisantes pour calculer le modèle.",
     "round": "manche",
     "rounds": "manches"

@@ -155,7 +155,7 @@
     "title": "Titelchancen",
     "description": "Deterministische Einschätzung anhand des aktuellen Rückstands, {rounds} {roundLabel} und maximal {points} Punkten pro Rennen. Keine offizielle Prognose oder Wettquote.",
     "gap": "−{points} Pkt.",
-    "finished": "Die Saison ist beendet — Titelchancen werden nicht mehr berechnet.",
+    "finished": "Die Saison ist beendet - Titelchancen werden nicht mehr berechnet.",
     "empty": "Nicht genügend Daten für die Berechnung.",
     "round": "Runde",
     "rounds": "Runden"

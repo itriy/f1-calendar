@@ -4,6 +4,7 @@ import { useI18n } from "vue-i18n";
 import TeamBadge from "@/entities/team/ui/TeamBadge.vue";
 import WikiLink from "@/shared/ui/WikiLink.vue";
 import RaceVideos from "./RaceVideos.vue";
+import { formatDateTime } from "@/shared/lib/dateTime";
 
 type ResultLink = { name: string; url: string; team: string; teamUrl: string };
 type HistoryRace = {
@@ -63,12 +64,12 @@ const visibleRaces = computed(() =>
 );
 const formatDate = (date?: string) =>
   date
-    ? new Intl.DateTimeFormat(locale.value, {
+    ? formatDateTime(new Date(`${date}T12:00:00Z`), locale.value, {
         day: "numeric",
         month: "long",
         year: "numeric",
         timeZone: "UTC",
-      }).format(new Date(`${date}T12:00:00Z`))
+      })
     : t("common.unknownDate");
 const isCurrentSeason = computed(
   () => String(props.season) === String(props.currentSeason),

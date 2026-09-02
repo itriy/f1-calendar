@@ -8,6 +8,7 @@ import {
   type Lap,
   type WeekendDetails,
 } from "@/entities/race/api/weekendDetails";
+import { formatDateTime } from "@/shared/lib/dateTime";
 
 const props = defineProps<{ race: JolpicaRace }>();
 const { t, locale } = useI18n();
@@ -54,14 +55,14 @@ const lapUrl = computed(
 );
 
 const formatSession = (value: string) =>
-  new Intl.DateTimeFormat(locale.value, {
+  formatDateTime(new Date(value), locale.value, {
     weekday: "short",
     day: "numeric",
     month: "short",
     hour: "2-digit",
     minute: "2-digit",
     timeZoneName: "short",
-  }).format(new Date(value));
+  });
 async function load() {
   loading.value = true;
   error.value = false;
@@ -169,17 +170,17 @@ watch(
           <p class="border border-white/10 p-2">
             <b class="block text-[10px] text-white/55">{{
               t("weekend.winner")
-            }}</b>{{ raceResults[0]?.driver || "—" }}
+            }}</b>{{ raceResults[0]?.driver || "-" }}
           </p>
           <p class="border border-white/10 p-2">
             <b class="block text-[10px] text-white/55">{{
               t("weekend.fastestLap")
-            }}</b>{{ fastest ? `${fastest.driver} · ${fastest.fastestLap}` : "—" }}
+            }}</b>{{ fastest ? `${fastest.driver} · ${fastest.fastestLap}` : "-" }}
           </p>
           <p class="border border-white/10 p-2">
             <b class="block text-[10px] text-white/55">{{
               t("weekend.biggestGain")
-            }}</b>{{ biggestGain ? biggestGain.driver : "—" }}
+            }}</b>{{ biggestGain ? biggestGain.driver : "-" }}
           </p>
         </div>
         <p v-if="details.pitStops.length" class="text-xs text-white/70">
@@ -218,7 +219,7 @@ watch(
                 <td>{{ lap.number }}</td>
                 <td>{{ lap.driver }}</td>
                 <td>{{ lap.time }}</td>
-                <td>{{ lap.position || "—" }}</td>
+                <td>{{ lap.position || "-" }}</td>
               </tr>
             </tbody>
           </table>

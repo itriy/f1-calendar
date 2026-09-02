@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import type { FeedItem } from "@/entities/feed/model/types";
+import { formatDateTime } from "@/shared/lib/dateTime";
 
 const props = defineProps<{
   items: FeedItem[];
@@ -17,12 +18,12 @@ const visibleItems = computed(() =>
     : props.items.filter((item) => item.type === filter.value),
 );
 const formatTime = (value: string) =>
-  new Intl.DateTimeFormat(locale.value, {
+  formatDateTime(new Date(value), locale.value, {
     day: "numeric",
     month: "short",
     hour: "2-digit",
     minute: "2-digit",
-  }).format(new Date(value));
+  });
 </script>
 
 <template>
@@ -100,7 +101,7 @@ const formatTime = (value: string) =>
             class="block aspect-[16/8] overflow-hidden bg-black"
             :href="item.sourceUrl"
             target="_blank"
-            rel="noopener noreferrer"
+            rel="nofollow noindex noopener noreferrer"
             tabindex="-1"
             aria-hidden="true"
           >
@@ -132,7 +133,7 @@ const formatTime = (value: string) =>
               class="mt-3 inline-block text-[11px] font-bold text-f1-red hover:underline"
               :href="item.sourceUrl"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="nofollow noindex noopener noreferrer"
             >{{ t("feed.readSource") }} ↗</a>
           </div>
         </template>

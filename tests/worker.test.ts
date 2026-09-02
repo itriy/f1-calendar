@@ -333,7 +333,9 @@ test("serves crawl directives and the localized sitemap", async () => {
   expect(xml).toContain("https://f1-calendar.date/uk/");
   expect(xml).toContain("https://f1-calendar.date/ru/");
   expect(xml).toContain("https://f1-calendar.date/zh-CN/");
-  expect(xml.match(/<loc>/g) || []).toHaveLength(9);
+  expect(xml).toContain("https://f1-calendar.date/nl-NL/");
+  expect(xml).toContain("https://f1-calendar.date/sq-AL/");
+  expect(xml.match(/<loc>/g) || []).toHaveLength(11);
 });
 
 test("redirects the root and workers.dev pages to canonical localized URLs", async () => {
@@ -358,6 +360,22 @@ test("redirects the root and workers.dev pages to canonical localized URLs", asy
   );
   expect(russian.status).toBe(301);
   expect(russian.headers.get("location")).toBe("https://f1-calendar.date/ru/");
+
+  const dutch = await worker.fetch(
+    new Request("https://f1-calendar.date/nl-NL"),
+    { ASSETS: assets },
+  );
+  expect(dutch.status).toBe(301);
+  expect(dutch.headers.get("location")).toBe("https://f1-calendar.date/nl-NL/");
+
+  const albanian = await worker.fetch(
+    new Request("https://f1-calendar.date/sq-AL"),
+    { ASSETS: assets },
+  );
+  expect(albanian.status).toBe(301);
+  expect(albanian.headers.get("location")).toBe(
+    "https://f1-calendar.date/sq-AL/",
+  );
 });
 
 test("serves the app directly at the local development root", async () => {
@@ -380,7 +398,7 @@ test("does not return the SPA shell for unknown document routes", async () => {
   expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
   const html = await response.text();
   expect(html).toContain('<meta name="robots" content="noindex, nofollow">');
-  expect(html).toContain("404 — сторінку не знайдено");
+  expect(html).toContain("404 - сторінку не знайдено");
 });
 
 test("returns a localized noindex page for unknown Russian routes", async () => {
@@ -390,5 +408,5 @@ test("returns a localized noindex page for unknown Russian routes", async () => 
   );
   expect(response.status).toBe(404);
   expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
-  expect(await response.text()).toContain("404 — страница не найдена");
+  expect(await response.text()).toContain("404 - страница не найдена");
 });

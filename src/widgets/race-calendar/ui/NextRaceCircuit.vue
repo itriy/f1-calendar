@@ -223,13 +223,13 @@ watch(
             class="mt-2 inline-block text-[12px] underline underline-offset-2 hover:text-white"
             :href="media.sourceUrl"
             target="_blank"
-            rel="noopener noreferrer"
+            rel="nofollow noindex noopener noreferrer"
           >{{ t("circuit.sourceMedia") }} <span aria-hidden="true">↗</span></a><a
             v-else-if="circuit?.url"
             class="mt-2 inline-block text-[12px] underline underline-offset-2 hover:text-white"
             :href="circuit.url"
             target="_blank"
-            rel="noopener noreferrer"
+            rel="nofollow noindex noopener noreferrer"
           >{{ t("circuit.sourceWikipedia") }}
             <span aria-hidden="true">↗</span></a>
         </div>
