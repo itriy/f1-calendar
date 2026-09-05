@@ -153,6 +153,8 @@
   "chances": {
     "eyebrow": "MODEL · JOLPICA-F1",
     "title": "Title chances",
+    "drivers": "Drivers",
+    "constructors": "Constructors' championship",
     "description": "A deterministic estimate based on the current gap, {rounds} {roundLabel}, and a maximum of {points} points per race. It is not an official prediction or betting odds.",
     "gap": "−{points} pts",
     "finished": "The season is complete - title chances are no longer calculated.",

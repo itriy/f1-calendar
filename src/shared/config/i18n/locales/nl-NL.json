@@ -153,6 +153,8 @@
   "chances": {
     "eyebrow": "MODEL · JOLPICA-F1",
     "title": "Kampioenschapskansen",
+    "drivers": "Coureurs",
+    "constructors": "Constructeurskampioenschap",
     "description": "Een deterministische schatting op basis van de huidige achterstand, {rounds} {roundLabel} en maximaal {points} punten per race. Dit is geen officiële voorspelling of wedquotering.",
     "gap": "−{points} ptn",
     "finished": "Het seizoen is afgelopen - kampioenschapskansen worden niet meer berekend.",

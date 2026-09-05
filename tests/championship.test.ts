@@ -1,5 +1,8 @@
 import { expect, test } from "vitest";
-import { estimateChampionshipChances } from "../src/features/championship/model/championship";
+import {
+  estimateChampionshipChances,
+  MAX_CONSTRUCTOR_POINTS_PER_RACE,
+} from "../src/features/championship/model/championship";
 
 const standings = [
   {
@@ -42,4 +45,20 @@ test("keeps only mathematical contenders and distributes a deterministic model i
 
 test("returns no title model once the season is complete", () => {
   expect(estimateChampionshipChances(standings, 0)).toEqual([]);
+});
+
+test("uses the two-car maximum for constructor championship contenders", () => {
+  const result = estimateChampionshipChances(
+    standings.map((item) =>
+      item.code === "out" ? { ...item, points: "20" } : item,
+    ),
+    2,
+    MAX_CONSTRUCTOR_POINTS_PER_RACE,
+  );
+  expect(result.map((item) => item.name)).toEqual([
+    "Leader",
+    "Contender",
+    "Out",
+  ]);
+  expect(result[0].maximumAvailable).toBe(86);
 });

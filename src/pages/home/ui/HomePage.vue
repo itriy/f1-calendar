@@ -20,6 +20,7 @@ import {
 } from "@/entities/race/model/useF1Data";
 import {
   estimateChampionshipChances,
+  MAX_CONSTRUCTOR_POINTS_PER_RACE,
   MAX_POINTS_PER_RACE,
 } from "@/features/championship/model/championship";
 
@@ -79,6 +80,13 @@ const {
 } = useF1Feed(computed(() => schedule.value));
 const contenders = computed(() =>
   estimateChampionshipChances(driverStandings.value, remainingRounds.value),
+);
+const constructorContenders = computed(() =>
+  estimateChampionshipChances(
+    constructors.value,
+    remainingRounds.value,
+    MAX_CONSTRUCTOR_POINTS_PER_RACE,
+  ),
 );
 const pastRaces = computed(() =>
   schedule.value
@@ -272,9 +280,11 @@ const countdown = (
         />
         <div class="space-y-4">
           <ChampionshipChances
-            :contenders="contenders"
+            :driver-contenders="contenders"
+            :constructor-contenders="constructorContenders"
             :remaining-rounds="remainingRounds"
-            :max-points-per-race="MAX_POINTS_PER_RACE"
+            :driver-max-points-per-race="MAX_POINTS_PER_RACE"
+            :constructor-max-points-per-race="MAX_CONSTRUCTOR_POINTS_PER_RACE"
           /><LastRaceResults
             :race="lastRace"
             :loading="resultsLoading"

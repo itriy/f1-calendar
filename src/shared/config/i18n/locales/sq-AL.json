@@ -153,6 +153,8 @@
   "chances": {
     "eyebrow": "MODELI · JOLPICA-F1",
     "title": "Shanset për titullin",
+    "drivers": "Pilotët",
+    "constructors": "Kampionati i konstruktorëve",
     "description": "Një vlerësim determinist bazuar në diferencën aktuale, {rounds} {roundLabel} dhe një maksimum prej {points} pikësh për garë. Nuk është parashikim zyrtar apo kuotë bastesh.",
     "gap": "−{points} pikë",
     "finished": "Sezoni ka përfunduar - shanset për titullin nuk llogariten më.",

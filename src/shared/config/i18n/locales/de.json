@@ -153,6 +153,8 @@
   "chances": {
     "eyebrow": "MODELL · JOLPICA-F1",
     "title": "Titelchancen",
+    "drivers": "Fahrer",
+    "constructors": "Konstrukteurswertung",
     "description": "Deterministische Einschätzung anhand des aktuellen Rückstands, {rounds} {roundLabel} und maximal {points} Punkten pro Rennen. Keine offizielle Prognose oder Wettquote.",
     "gap": "−{points} Pkt.",
     "finished": "Die Saison ist beendet - Titelchancen werden nicht mehr berechnet.",

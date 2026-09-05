@@ -1,6 +1,8 @@
 import type { StandingDriver } from "@/entities/race/model/types";
 
 export const MAX_POINTS_PER_RACE = 25;
+// A team can finish first and second (25 + 18).
+export const MAX_CONSTRUCTOR_POINTS_PER_RACE = 43;
 
 export interface TitleContender extends StandingDriver {
   gap: number;

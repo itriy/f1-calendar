@@ -153,6 +153,8 @@
   "chances": {
     "eyebrow": "モデル · JOLPICA-F1",
     "title": "タイトル獲得の可能性",
+    "drivers": "ドライバー",
+    "constructors": "コンストラクターズ選手権",
     "description": "現在の差、残り{rounds}{roundLabel}、1レース最大{points}ポイントに基づく決定論的な評価です。公式予想やオッズではありません。",
     "gap": "−{points}ポイント",
     "finished": "シーズンは終了し、タイトル獲得の可能性は計算されません。",

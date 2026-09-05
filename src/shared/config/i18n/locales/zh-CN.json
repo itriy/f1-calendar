@@ -153,6 +153,8 @@
   "chances": {
     "eyebrow": "模型 · JOLPICA-F1",
     "title": "冠军机会",
+    "drivers": "车手",
+    "constructors": "车队冠军",
     "description": "基于当前积分差、剩余{rounds}{roundLabel}和每场最多{points}分的确定性评估。这不是官方预测或博彩赔率。",
     "gap": "−{points}分",
     "finished": "赛季已经结束，不再计算冠军机会。",

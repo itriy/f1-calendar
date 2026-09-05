@@ -153,6 +153,8 @@
   "chances": {
     "eyebrow": "MODÈLE · JOLPICA-F1",
     "title": "Chances de titre",
+    "drivers": "Pilotes",
+    "constructors": "Championnat des constructeurs",
     "description": "Estimation déterministe fondée sur l'écart actuel, {rounds} {roundLabel} et un maximum de {points} points par course. Ce n'est ni une prévision officielle ni une cote.",
     "gap": "−{points} pts",
     "finished": "La saison est terminée - les chances de titre ne sont plus calculées.",
