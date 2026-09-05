@@ -232,9 +232,12 @@ export async function refreshNewsFeed(
       .run();
 }
 
-export async function refreshNewsFeedSafely(env: NewsEnv): Promise<void> {
+export async function refreshNewsFeedSafely(
+  env: NewsEnv,
+  force = false,
+): Promise<void> {
   try {
-    await refreshNewsFeed(env);
+    await refreshNewsFeed(env, force);
   } catch (cause) {
     console.warn("News feed refresh failed", cause);
   }
@@ -277,7 +280,15 @@ export async function handleNewsFeed(
         image_url: string | null;
         published_at: string;
       }>();
-  const result = await query();
+  let result = await query();
+  if (!result.results.length) {
+    // The scheduled Worker normally keeps the feed warm. Recover inline when
+    // its first run is delayed or unavailable, rather than caching an empty
+    // feed for visitors.
+    await refreshNewsFeedSafely(env, true);
+    result = await query();
+  }
+  const isEmpty = !result.results.length;
   return Response.json(
     {
       news: result.results.map((item) => ({
@@ -295,7 +306,9 @@ export async function handleNewsFeed(
     },
     {
       headers: {
-        "Cache-Control": "public, max-age=300, s-maxage=900",
+        "Cache-Control": isEmpty
+          ? "public, max-age=60, s-maxage=60"
+          : "public, max-age=300, s-maxage=900",
         "Content-Type": "application/json; charset=utf-8",
       },
     },

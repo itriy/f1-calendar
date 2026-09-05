@@ -54,6 +54,60 @@ test("serves stored news without refreshing it in the API Worker", async () => {
   });
 });
 
+test("rebuilds an empty news feed when the scheduled refresh is unavailable", async () => {
+  const publishedAt = new Date().toUTCString();
+  let stored = false;
+  const db: D1Database = {
+    prepare: (sql) => {
+      const statement: D1Statement = {
+        bind: () => statement,
+        first: async <T>() => null as T | null,
+        all: async <T>() =>
+          ({
+            results: stored
+              ? [
+                  {
+                    id: "news-recovered",
+                    source: "Formula 1",
+                    source_url: "https://example.test/recovered",
+                    title: "Recovered F1 news",
+                    summary: null,
+                    description: null,
+                    language: "en",
+                    image_url: null,
+                    published_at: new Date().toISOString(),
+                  },
+                ]
+              : [],
+          }) as { results: T[] },
+        run: async () => {
+          if (sql.startsWith("INSERT INTO news_items")) stored = true;
+          return { success: true };
+        },
+      };
+      return statement;
+    },
+  };
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue(
+      new Response(
+        `<rss><channel><item><title>Recovered F1 news</title><link>https://example.test/recovered</link><pubDate>${publishedAt}</pubDate></item></channel></rss>`,
+      ),
+    ),
+  );
+
+  const response = await handleNewsFeed(
+    new Request("https://example.test/api/f1-feed"),
+    { PUSH_DB: db },
+  );
+
+  expect(await response.json()).toEqual({
+    news: [expect.objectContaining({ id: "news-recovered" })],
+  });
+  expect(response.headers.get("Cache-Control")).toContain("s-maxage=900");
+});
+
 test("returns several matching videos only when YouTube identifies the Formula 1 channel", async () => {
   vi.stubGlobal(
     "fetch",
