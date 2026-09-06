@@ -37,10 +37,17 @@ const { t } = useI18n();
       </h2>
     </div>
     <template v-if="remainingRounds > 0 && contenders.length">
-      <div class="flex gap-5 border-t border-white/10 px-5 pt-4 sm:px-7" role="tablist">
+      <div
+        class="flex gap-5 border-t border-white/10 px-5 pt-4 sm:px-7"
+        role="tablist"
+      >
         <button
           class="border-b-2 pb-3 text-[11px] font-bold"
-          :class="activeTab === 'drivers' ? 'border-f1-red text-white' : 'border-transparent text-zinc-500'"
+          :class="
+            activeTab === 'drivers'
+              ? 'border-f1-red text-white'
+              : 'border-transparent text-zinc-500'
+          "
           role="tab"
           :aria-selected="activeTab === 'drivers'"
           @click="activeTab = 'drivers'"
@@ -49,7 +56,11 @@ const { t } = useI18n();
         </button>
         <button
           class="border-b-2 pb-3 text-[11px] font-bold"
-          :class="activeTab === 'constructors' ? 'border-f1-red text-white' : 'border-transparent text-zinc-500'"
+          :class="
+            activeTab === 'constructors'
+              ? 'border-f1-red text-white'
+              : 'border-transparent text-zinc-500'
+          "
           role="tab"
           :aria-selected="activeTab === 'constructors'"
           @click="activeTab = 'constructors'"
@@ -77,13 +88,17 @@ const { t } = useI18n();
         <div>
           <div class="mb-1 flex justify-between gap-3 text-xs">
             <div class="flex min-w-0 items-center gap-2">
-              <TeamBadge v-if="activeTab === 'constructors'" :team="item.name" />
+              <TeamBadge
+                v-if="activeTab === 'constructors'"
+                :team="item.name"
+              />
               <WikiLink
                 :url="item.url"
                 :label="item.name"
                 class-name="truncate font-bold hover:text-f1-red hover:underline"
               />
-            </div><span class="shrink-0 text-zinc-500">{{
+            </div>
+            <span class="shrink-0 text-zinc-500">{{
               t("chances.gap", { points: item.gap })
             }}</span>
           </div>

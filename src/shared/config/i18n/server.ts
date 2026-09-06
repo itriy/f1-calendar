@@ -293,6 +293,9 @@ export function serverText(
               ja: "Japanese",
               "nl-NL": "Dutch",
               "sq-AL": "Albanian",
+              pl: "Polish",
+              cs: "Czech",
+              az: "Azerbaijani",
               ru: "Russian",
             } as Record<string, string>
           )[locale] || "English";

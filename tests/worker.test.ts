@@ -90,11 +90,13 @@ test("rebuilds an empty news feed when the scheduled refresh is unavailable", as
   };
   vi.stubGlobal(
     "fetch",
-    vi.fn().mockResolvedValue(
-      new Response(
-        `<rss><channel><item><title>Recovered F1 news</title><link>https://example.test/recovered</link><pubDate>${publishedAt}</pubDate></item></channel></rss>`,
+    vi
+      .fn()
+      .mockResolvedValue(
+        new Response(
+          `<rss><channel><item><title>Recovered F1 news</title><link>https://example.test/recovered</link><pubDate>${publishedAt}</pubDate></item></channel></rss>`,
+        ),
       ),
-    ),
   );
 
   const response = await handleNewsFeed(
@@ -389,7 +391,10 @@ test("serves crawl directives and the localized sitemap", async () => {
   expect(xml).toContain("https://f1-calendar.date/zh-CN/");
   expect(xml).toContain("https://f1-calendar.date/nl-NL/");
   expect(xml).toContain("https://f1-calendar.date/sq-AL/");
-  expect(xml.match(/<loc>/g) || []).toHaveLength(11);
+  expect(xml).toContain("https://f1-calendar.date/pl/");
+  expect(xml).toContain("https://f1-calendar.date/cs/");
+  expect(xml).toContain("https://f1-calendar.date/az/");
+  expect(xml.match(/<loc>/g) || []).toHaveLength(14);
 });
 
 test("redirects the root and workers.dev pages to canonical localized URLs", async () => {

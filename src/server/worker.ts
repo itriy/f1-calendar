@@ -159,6 +159,24 @@ const notFoundCopy: Record<
       "Lidhja mund të jetë e vjetruar ose kjo faqe mund të mos ketë ekzistuar kurrë.",
     action: "Shko te faqja kryesore",
   },
+  pl: {
+    title: "Nie znaleziono strony",
+    heading: "404 – nie znaleziono strony",
+    description: "Link może być nieaktualny lub strona nigdy nie istniała.",
+    action: "Strona główna",
+  },
+  cs: {
+    title: "Stránka nenalezena",
+    heading: "404 – stránka nenalezena",
+    description: "Odkaz může být zastaralý nebo stránka nikdy neexistovala.",
+    action: "Na hlavní stránku",
+  },
+  az: {
+    title: "Səhifə tapılmadı",
+    heading: "404 – səhifə tapılmadı",
+    description: "Keçid köhnəlmiş ola bilər və ya səhifə heç mövcud olmayıb.",
+    action: "Ana səhifəyə",
+  },
 };
 
 function notFound(locale: SupportedLocale = "uk"): Response {

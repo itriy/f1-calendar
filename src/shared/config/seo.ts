@@ -103,6 +103,30 @@ export const seoPages: Record<SupportedLocale, SeoPage> = {
     intro:
       "Garat, rezultatet dhe renditja e kampionatit të Formula 1 në një vend.",
   },
+  pl: {
+    title:
+      "Kalendarz Formuły 1 2026 – terminarz wyścigów, wyniki i klasyfikacje | F1 Calendar",
+    description:
+      "Aktualny kalendarz Formuły 1 2026: harmonogram wyścigów, wyniki, klasyfikacje, wiadomości i przypomnienia.",
+    heading: "Kalendarz Formuły 1 2026",
+    intro: "Wyścigi Formuły 1, wyniki i liderzy mistrzostw w jednym miejscu.",
+  },
+  cs: {
+    title:
+      "Kalendář Formule 1 2026 – rozpis závodů, výsledky a pořadí | F1 Calendar",
+    description:
+      "Aktuální kalendář Formule 1 2026: harmonogram závodů, výsledky, pořadí, novinky a připomínky.",
+    heading: "Kalendář Formule 1 2026",
+    intro: "Závody Formule 1, výsledky a lídři šampionátu na jednom místě.",
+  },
+  az: {
+    title:
+      "Formula 1 Təqvimi 2026 – yarış cədvəli, nəticələr və sıralama | F1 Calendar",
+    description:
+      "2026 Formula 1 təqvimi: yarış cədvəli, nəticələr, sıralama, xəbərlər və xatırlatmalar.",
+    heading: "Formula 1 Təqvimi 2026",
+    intro: "Formula 1 yarışları, nəticələri və çempionat liderləri bir yerdə.",
+  },
 };
 
 export const seoLocales = Object.keys(seoPages) as SupportedLocale[];

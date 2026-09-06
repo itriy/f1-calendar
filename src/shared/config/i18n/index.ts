@@ -14,6 +14,9 @@ export const supportedLocales = [
   "zh-CN",
   "nl-NL",
   "sq-AL",
+  "pl",
+  "cs",
+  "az",
 ] as const;
 export type SupportedLocale = (typeof supportedLocales)[number];
 export const localeLabels: Record<SupportedLocale, string> = {
@@ -28,6 +31,9 @@ export const localeLabels: Record<SupportedLocale, string> = {
   "zh-CN": "简体中文",
   "nl-NL": "Nederlands",
   "sq-AL": "Shqip",
+  pl: "Polski",
+  cs: "Čeština",
+  az: "Azərbaycan dili",
 };
 export const localeShortLabels: Record<SupportedLocale, string> = {
   uk: "UA",
@@ -41,6 +47,9 @@ export const localeShortLabels: Record<SupportedLocale, string> = {
   "zh-CN": "中文",
   "nl-NL": "NL",
   "sq-AL": "SQ",
+  pl: "PL",
+  cs: "CS",
+  az: "AZ",
 };
 const LOCALE_STORAGE_KEY = "f1-calendar-locale";
 export function normalizeLocale(value?: string | null): SupportedLocale {
@@ -78,6 +87,9 @@ const localeLoaders: Record<
   "zh-CN": () => import("./locales/zh-CN.json"),
   "nl-NL": () => import("./locales/nl-NL.json"),
   "sq-AL": () => import("./locales/sq-AL.json"),
+  pl: () => import("./locales/pl"),
+  cs: () => import("./locales/cs"),
+  az: () => import("./locales/az"),
 };
 const loadedLocales = new Set<SupportedLocale>();
 

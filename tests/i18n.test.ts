@@ -19,7 +19,9 @@ test("normalizes supported browser locales and falls back to English", () => {
   expect(normalizeLocale("nl-BE")).toBe("nl-NL");
   expect(normalizeLocale("sq-AL")).toBe("sq-AL");
   expect(normalizeLocale("sq-XK")).toBe("sq-AL");
-  expect(normalizeLocale("pl-PL")).toBe("en");
+  expect(normalizeLocale("pl-PL")).toBe("pl");
+  expect(normalizeLocale("cs-CZ")).toBe("cs");
+  expect(normalizeLocale("az-AZ")).toBe("az");
 });
 
 test("persists a manually selected locale", async () => {

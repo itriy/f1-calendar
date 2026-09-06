@@ -72,7 +72,11 @@ function criticalFontPreloads(locale: (typeof seoLocales)[number]): string {
     "/fonts/barlow-condensed-800-latin.woff2",
     "/fonts/manrope-latin.woff2",
   ];
-  if (["de", "fr", "es", "it", "nl-NL", "sq-AL"].includes(locale)) {
+  if (
+    ["de", "fr", "es", "it", "nl-NL", "sq-AL", "pl", "cs", "az"].includes(
+      locale,
+    )
+  ) {
     fonts.push(
       "/fonts/barlow-condensed-800-latin-ext.woff2",
       "/fonts/manrope-latin-ext.woff2",
