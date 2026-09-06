@@ -114,7 +114,9 @@ export function getRaceStart(
   race: Pick<JolpicaRace, "date" | "time"> | null | undefined,
 ): Date | null {
   if (!race?.date || !race.time) return null;
-  const time = race.time.endsWith("Z") ? race.time : `${race.time}Z`;
+  const time = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(race.time)
+    ? race.time
+    : `${race.time}Z`;
   const start = new Date(`${race.date}T${time}`);
   return Number.isNaN(start.getTime()) ? null : start;
 }
@@ -183,6 +185,9 @@ export function useF1Data() {
   const historyDetailsError = ref("");
   let historyRequestId = 0;
   let historyDetailsRequestId = 0;
+  const updateNow = () => {
+    now.value = Date.now();
+  };
   const futureRaces = computed(() =>
     getUpcomingRaces(schedule.value, now.value),
   );
@@ -484,12 +489,13 @@ export function useF1Data() {
   let clock: number | undefined;
   onMounted(() => {
     load();
-    clock = window.setInterval(() => {
-      now.value = Date.now();
-    }, 60_000);
+    updateNow();
+    clock = window.setInterval(updateNow, 1_000);
+    document.addEventListener("visibilitychange", updateNow);
   });
   onUnmounted(() => {
     if (clock) window.clearInterval(clock);
+    document.removeEventListener("visibilitychange", updateNow);
   });
   return {
     season,

@@ -205,7 +205,7 @@ const countdown = (
         <b class="block font-display text-sm tracking-wide">{{
           formatRaceStartLocal(nextRace)
         }}</b><a
-          class="mt-2 inline-block text-[12px] font-bold text-f1-red hover:underline focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-f1-red"
+          class="mt-3 inline-block text-sm font-extrabold tracking-wide text-f1-red hover:text-white hover:underline focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-f1-red"
           href="#calendar"
         >{{ roundsLabel(remainingRounds) }}</a>
       </div>

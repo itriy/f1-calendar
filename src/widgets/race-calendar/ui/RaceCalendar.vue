@@ -38,10 +38,10 @@ const format = (date?: string) =>
       })
     : t("common.unknownDate");
 const raceDate = (race: CalendarRace) => {
-  const end = race.FirstPractice?.date || race.date;
-  return format(race.date) === format(end)
+  const start = race.FirstPractice?.date || race.date;
+  return format(start) === format(race.date)
     ? format(race.date)
-    : `${format(race.date)} - ${format(end)}`;
+    : `${format(start)} - ${format(race.date)}`;
 };
 const raceStart = (race: CalendarRace) => {
   if (!race.date || !race.time) return t("calendar.timeUnknown");

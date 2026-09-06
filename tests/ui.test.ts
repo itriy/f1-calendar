@@ -107,6 +107,22 @@ test("calendar renders every supplied upcoming round, including the final one", 
   expect(wrapper.findAll("article")).toHaveLength(11);
 });
 
+test("calendar shows a race weekend from first practice through race day", () => {
+  const wrapper = mount(RaceCalendar, {
+    props: {
+      races: [
+        {
+          ...race,
+          date: "2026-09-06",
+          FirstPractice: { date: "2026-09-04" },
+        },
+      ],
+    },
+    global: { plugins: [i18n] },
+  });
+  expect(wrapper.text()).toContain("4 вересня - 6 вересня");
+});
+
 test("circuit accordion and media preview open and close with click and keyboard", async () => {
   const wrapper = mount(NextRaceCircuit, {
     props: { race },
