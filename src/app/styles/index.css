@@ -209,6 +209,20 @@ html:is([lang="uk"], [lang="ru"]) .font-display {
     "Barlow Condensed Fallback", "Arial Narrow", Arial, sans-serif;
 }
 
+.news-description table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.news-description th,
+.news-description td {
+  border: 1px solid rgb(255 255 255 / 0.15);
+  padding: 0.4rem;
+  text-align: left;
+}
+.news-description p {
+  margin: 0.4rem 0;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;

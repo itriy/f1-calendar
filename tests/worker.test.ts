@@ -54,6 +54,38 @@ test("serves stored news without refreshing it in the API Worker", async () => {
   });
 });
 
+test("decodes stored rich-news HTML before returning it to the browser", async () => {
+  const refreshedAt = new Date().toISOString();
+  const statement: D1Statement = {
+    bind: () => statement,
+    first: async <T>() => null as T | null,
+    all: async <T>() =>
+      ({
+        results: [
+          {
+            id: "news-rich",
+            source: "Formula 1",
+            source_url: "https://example.test/article",
+            title: "Schedule",
+            summary: "&lt;strong&gt;DATE&lt;/strong&gt;",
+            description: null,
+            language: "en",
+            image_url: null,
+            published_at: refreshedAt,
+          },
+        ],
+      }) as { results: T[] },
+    run: async () => ({ success: true }),
+  };
+  const response = await handleNewsFeed(
+    new Request("https://example.test/api/f1-feed"),
+    { PUSH_DB: { prepare: () => statement } },
+  );
+  expect(await response.json()).toEqual({
+    news: [expect.objectContaining({ summary: "<strong>DATE</strong>" })],
+  });
+});
+
 test("rebuilds an empty news feed when the scheduled refresh is unavailable", async () => {
   const publishedAt = new Date().toUTCString();
   let stored = false;

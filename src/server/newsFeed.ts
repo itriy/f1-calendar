@@ -63,6 +63,45 @@ function text(value: string | null | undefined): string {
     .replace(/&quot;/g, '"')
     .trim();
 }
+function decodeHtml(value: string): string {
+  return value.replace(
+    /&(?:#(\d+)|#x([\da-f]+)|lt|gt|quot|apos|amp);/gi,
+    (entity, decimal, hexadecimal) => {
+      if (decimal || hexadecimal) {
+        try {
+          return String.fromCodePoint(
+            Number.parseInt(decimal || hexadecimal, hexadecimal ? 16 : 10),
+          );
+        } catch {
+          return entity;
+        }
+      }
+      return (
+        {
+          "&lt;": "<",
+          "&gt;": ">",
+          "&quot;": '"',
+          "&apos;": "'",
+          "&amp;": "&",
+        }[entity.toLowerCase()] || entity
+      );
+    },
+  );
+}
+function safeDescription(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const html = decodeHtml(value.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1"))
+    .replace(/<!--([\s\S]*?)-->/g, "")
+    .replace(
+      /<(script|style|iframe|object|embed|svg|math)[\s\S]*?<\/\1\s*>/gi,
+      "",
+    )
+    .replace(/<\/?(?:script|style|iframe|object|embed|svg|math|link|meta|base)[^>]*>/gi, "")
+    .replace(/\s(?:on\w+|style)\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, "")
+    .replace(/\s(?:href|src)\s*=\s*(?:"\s*javascript:[^"]*"|'\s*javascript:[^']*'|javascript:[^\s>]*)/gi, "")
+    .trim();
+  return html || null;
+}
 function tag(entry: string, name: string): string | null {
   return (
     entry.match(
@@ -133,12 +172,12 @@ export function parseFeed(xml: string, source: Source): ParsedArticle[] {
         return [];
       if (source.f1Only && !/\b(formula\s*1|f1|grand prix)\b/i.test(title))
         return [];
-      const description = text(
+      const description = safeDescription(
         tag(block, "description") ||
           tag(block, "content:encoded") ||
           tag(block, "summary") ||
           tag(block, "content"),
-      ).slice(0, 700);
+      )?.slice(0, 4_000);
       const image = validUrl(
         block.match(
           /<(?:media:)?(?:thumbnail|content)[^>]+url=["']([^"']+)["']/i,
@@ -156,7 +195,7 @@ export function parseFeed(xml: string, source: Source): ParsedArticle[] {
           language: source.language,
           imageUrl: image,
           description:
-            description && description.toLowerCase() !== title.toLowerCase()
+            description && text(description).toLowerCase() !== title.toLowerCase()
               ? description
               : null,
         },
@@ -297,8 +336,8 @@ export async function handleNewsFeed(
         source: item.source,
         sourceUrl: item.source_url,
         title: item.title,
-        summary: item.summary,
-        description: item.description,
+        summary: safeDescription(item.summary),
+        description: safeDescription(item.description),
         language: item.language,
         imageUrl: item.image_url,
         publishedAt: item.published_at,

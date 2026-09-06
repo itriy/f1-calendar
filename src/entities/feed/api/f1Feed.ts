@@ -30,29 +30,49 @@ export function calendarEvents(
   races: JolpicaRace[],
   now = Date.now(),
 ): FeedEventItem[] {
-  return races.flatMap((race) =>
-    sessions.flatMap(([key, session]) => {
-      const startsAt = sessionDate(race[key], race);
-      const time = startsAt ? new Date(startsAt).getTime() : NaN;
-      if (
-        !startsAt ||
-        Number.isNaN(time) ||
-        time < now ||
-        time > now + EVENT_WINDOW_MS
-      )
-        return [];
-      return [
-        {
-          id: `event-${race.round}-${key}-${startsAt}`,
-          type: "event" as const,
-          startsAt,
-          session: i18n.global.t(session),
-          raceName: race.raceName,
-          round: race.round,
-        },
-      ];
-    }),
-  );
+  return races
+    .flatMap((race) =>
+      sessions.flatMap(([key, session]) => {
+        const startsAt = sessionDate(race[key], race);
+        const time = startsAt ? new Date(startsAt).getTime() : NaN;
+        if (
+          !startsAt ||
+          Number.isNaN(time) ||
+          time < now ||
+          time > now + EVENT_WINDOW_MS
+        )
+          return [];
+        return [
+          {
+            id: `event-${race.round}-${key}-${startsAt}`,
+            type: "event" as const,
+            startsAt,
+            session: i18n.global.t(session),
+            raceName: race.raceName,
+            round: race.round,
+          },
+        ];
+      }),
+    )
+    .sort(
+      (left, right) =>
+        new Date(left.startsAt).getTime() - new Date(right.startsAt).getTime(),
+    );
+}
+
+export function sortFeedItems(items: FeedItem[]): FeedItem[] {
+  return [...items].sort((left, right) => {
+    if (left.type === "event" && right.type === "event")
+      return (
+        new Date(left.startsAt).getTime() - new Date(right.startsAt).getTime()
+      );
+    if (left.type === "event") return -1;
+    if (right.type === "event") return 1;
+    return (
+      new Date(right.publishedAt).getTime() -
+      new Date(left.publishedAt).getTime()
+    );
+  });
 }
 
 export function useF1Feed(
@@ -63,15 +83,7 @@ export function useF1Feed(
   const error = ref("");
 
   const items = computed<FeedItem[]>(() =>
-    [...news.value, ...calendarEvents(schedule.value)].sort((a, b) => {
-      const left = new Date(
-        a.type === "news" ? a.publishedAt : a.startsAt,
-      ).getTime();
-      const right = new Date(
-        b.type === "news" ? b.publishedAt : b.startsAt,
-      ).getTime();
-      return right - left;
-    }),
+    sortFeedItems([...news.value, ...calendarEvents(schedule.value)]),
   );
 
   async function load() {

@@ -1,5 +1,8 @@
 import { expect, test } from "vitest";
-import { calendarEvents } from "../src/entities/feed/api/f1Feed";
+import {
+  calendarEvents,
+  sortFeedItems,
+} from "../src/entities/feed/api/f1Feed";
 import { parseFeed } from "../src/server/newsFeed";
 
 test("keeps only recent, valid RSS articles", () => {
@@ -37,6 +40,16 @@ test("uses fetch time only for sources that explicitly lack article dates", () =
   ).toHaveLength(0);
 });
 
+test("decodes safe HTML descriptions for rich RSS content", () => {
+  const recent = new Date().toUTCString();
+  const [article] = parseFeed(
+    `<rss><channel><item><title>Schedule</title><link>https://example.test/schedule</link><pubDate>${recent}</pubDate><description>&lt;table&gt;&lt;tr&gt;&lt;td&gt;DATE&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;script&gt;alert(1)&lt;/script&gt;</description></item></channel></rss>`,
+    { name: "Example", url: "https://example.test/feed", language: "en" },
+  );
+  expect(article.description).toContain("<table>");
+  expect(article.description).not.toContain("script");
+});
+
 test("creates future weekend sessions inside the 14-day feed window", () => {
   const now = Date.parse("2026-08-01T10:00:00Z");
   const events = calendarEvents(
@@ -57,6 +70,40 @@ test("creates future weekend sessions inside the 14-day feed window", () => {
     "Кваліфікація",
     "Гонка",
   ]);
+});
+
+test("puts the nearest upcoming event before later events and news", () => {
+  const items = sortFeedItems([
+    {
+      id: "news",
+      type: "news",
+      source: "Example",
+      sourceUrl: "https://example.test/news",
+      title: "News",
+      summary: null,
+      description: null,
+      language: "en",
+      imageUrl: null,
+      publishedAt: "2026-08-01T12:00:00Z",
+    },
+    {
+      id: "later",
+      type: "event",
+      startsAt: "2026-08-03T14:00:00Z",
+      session: "Race",
+      raceName: "Example Grand Prix",
+      round: "1",
+    },
+    {
+      id: "nearest",
+      type: "event",
+      startsAt: "2026-08-02T10:00:00Z",
+      session: "Practice",
+      raceName: "Example Grand Prix",
+      round: "1",
+    },
+  ]);
+  expect(items.map((item) => item.id)).toEqual(["nearest", "later", "news"]);
 });
 
 test("excludes sessions outside the two-week event window", () => {

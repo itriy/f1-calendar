@@ -123,12 +123,9 @@ const formatTime = (value: string) =>
             <h3 class="font-display text-2xl leading-none font-bold">
               {{ item.title }}
             </h3>
-            <p
-              v-if="item.summary || item.description"
-              class="mt-3 text-xs leading-5 text-zinc-400"
-            >
-              {{ item.summary || item.description }}
-            </p>
+            <!-- The Worker removes executable content and event attributes before storage. -->
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <div v-if="item.summary || item.description" class="news-description mt-3 text-xs leading-5 text-zinc-400" v-html="item.summary || item.description"></div>
             <a
               class="mt-3 inline-block text-[11px] font-bold text-f1-red hover:underline"
               :href="item.sourceUrl"
