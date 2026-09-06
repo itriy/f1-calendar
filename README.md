@@ -10,7 +10,7 @@ The Worker collects recent Formula 1 news from configured public RSS/Atom feeds,
 
 ## Scheduled refresh Worker
 
-`f1-calendar-refresh` runs every five minutes and owns RSS refreshes and push-reminder delivery. It shares the `f1-calendar-push` D1 database with the website/API Worker. Deploy it with `npx wrangler deploy --config wrangler.refresh.jsonc`; set its `VAPID_PRIVATE_KEY` secret before enabling push reminders. In GitHub Actions, add the same value as the `VAPID_PRIVATE_KEY` repository secret so both Workers are deployed together.
+`f1-calendar-refresh` runs every five minutes and owns RSS refreshes and push-reminder delivery. It shares the `f1-calendar-push` D1 database with the website/API Worker. Configure the VAPID variables and `VAPID_PRIVATE_KEY` secret in each production Worker. CI deploys with `--keep-vars`, so those Cloudflare-managed runtime bindings persist without being stored in GitHub.
 
 ## Local development
 
