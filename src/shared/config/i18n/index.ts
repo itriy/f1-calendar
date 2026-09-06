@@ -1,5 +1,6 @@
 import { createI18n } from "vue-i18n";
 import type ukMessages from "./locales/uk.json";
+import enMessages from "./locales/en.json";
 import { localeFromPathname } from "@/shared/config/seo";
 
 export const supportedLocales = [
@@ -87,9 +88,9 @@ const localeLoaders: Record<
   "zh-CN": () => import("./locales/zh-CN.json"),
   "nl-NL": () => import("./locales/nl-NL.json"),
   "sq-AL": () => import("./locales/sq-AL.json"),
-  pl: () => import("./locales/pl"),
-  cs: () => import("./locales/cs"),
-  az: () => import("./locales/az"),
+  pl: () => import("./locales/pl.json"),
+  cs: () => import("./locales/cs.json"),
+  az: () => import("./locales/az.json"),
 };
 const loadedLocales = new Set<SupportedLocale>();
 
@@ -103,8 +104,44 @@ export const i18n = createI18n<typeof ukMessages, SupportedLocale, false>({
 export async function loadLocale(locale: SupportedLocale) {
   if (loadedLocales.has(locale)) return;
   const messages = await localeLoaders[locale]();
-  i18n.global.setLocaleMessage(locale, messages.default);
+  const partialLocales = ["pl", "cs", "az"];
+  i18n.global.setLocaleMessage(
+    locale,
+    partialLocales.includes(locale)
+      ? mergeMessages(enMessages, messages.default)
+      : messages.default,
+  );
   loadedLocales.add(locale);
+}
+
+function mergeMessages(
+  base: Record<string, unknown>,
+  override: Record<string, unknown>,
+): Record<string, unknown> {
+  return Object.fromEntries(
+    Array.from(new Set([...Object.keys(base), ...Object.keys(override)])).map(
+      (key) => {
+        const baseValue = base[key];
+        const overrideValue = override[key];
+        if (
+          baseValue &&
+          overrideValue &&
+          typeof baseValue === "object" &&
+          typeof overrideValue === "object" &&
+          !Array.isArray(baseValue) &&
+          !Array.isArray(overrideValue)
+        )
+          return [
+            key,
+            mergeMessages(
+              baseValue as Record<string, unknown>,
+              overrideValue as Record<string, unknown>,
+            ),
+          ];
+        return [key, overrideValue ?? baseValue];
+      },
+    ),
+  );
 }
 
 export async function setLocale(locale: SupportedLocale) {

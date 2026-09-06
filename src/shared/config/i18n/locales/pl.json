@@ -1,0 +1,9 @@
+{
+  "common": { "language": "Język", "retry": "Spróbuj ponownie" },
+  "app": { "nextRace": "NASTĘPNY WYŚCIG", "nextRound": "NASTĘPNA RUNDA", "roundsRemaining": "Pozostało: {rounds} {label}", "round": "runda", "rounds": "rund", "seasonComplete": "Sezon zakończony", "reminders": "Przypomnienia" },
+  "calendar": { "title": "Kalendarz sezonu", "upcoming": "Nadchodzące", "past": "Zakończone", "start": "START", "nextRace": "NASTĘPNY WYŚCIG" },
+  "standings": { "title": "Klasyfikacja", "drivers": "Kierowcy", "constructors": "Konstruktorzy", "points": "PKT" },
+  "chances": { "title": "Szanse na tytuł", "drivers": "Kierowcy", "constructors": "Mistrzostwa konstruktorów", "round": "runda", "rounds": "rund" },
+  "lastRace": { "title": "Ostatnia runda" },
+  "reminders": { "title": "Przypomnienia o wyścigu", "enable": "Włącz przypomnienia", "save": "Zapisz wybór", "disable": "Wyłącz", "day": "1 dzień przed", "hour": "1 godzinę przed", "start": "W chwili startu", "enabled": "Przypomnienia włączone." }
+}

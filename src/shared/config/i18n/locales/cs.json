@@ -1,0 +1,9 @@
+{
+  "common": { "language": "Jazyk", "retry": "Zkusit znovu" },
+  "app": { "nextRace": "PŘÍŠTÍ ZÁVOD", "nextRound": "PŘÍŠTÍ KOLO", "roundsRemaining": "Zbývá: {rounds} {label}", "round": "kolo", "rounds": "kol", "seasonComplete": "Sezóna skončila", "reminders": "Připomínky" },
+  "calendar": { "title": "Kalendář sezóny", "upcoming": "Nadcházející", "past": "Dokončené", "start": "START", "nextRace": "PŘÍŠTÍ ZÁVOD" },
+  "standings": { "title": "Pořadí", "drivers": "Jezdci", "constructors": "Konstruktéři", "points": "BODY" },
+  "chances": { "title": "Šance na titul", "drivers": "Jezdci", "constructors": "Pohár konstruktérů", "round": "kolo", "rounds": "kol" },
+  "lastRace": { "title": "Poslední kolo" },
+  "reminders": { "title": "Připomínky závodu", "enable": "Zapnout připomínky", "save": "Uložit volbu", "disable": "Vypnout", "day": "1 den před", "hour": "1 hodinu před", "start": "V okamžiku startu", "enabled": "Připomínky jsou zapnuté." }
+}

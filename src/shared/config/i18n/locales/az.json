@@ -1,0 +1,9 @@
+{
+  "common": { "language": "Dil", "retry": "Yenidən cəhd edin" },
+  "app": { "nextRace": "NÖVBƏTİ YARIŞ", "nextRound": "NÖVBƏTİ TUR", "roundsRemaining": "Qalıb: {rounds} {label}", "round": "tur", "rounds": "tur", "seasonComplete": "Mövsüm başa çatdı", "reminders": "Xatırlatmalar" },
+  "calendar": { "title": "Mövsüm təqvimi", "upcoming": "Qarşıdakı", "past": "Başa çatan", "start": "BAŞLANĞIC", "nextRace": "NÖVBƏTİ YARIŞ" },
+  "standings": { "title": "Sıralama", "drivers": "Sürücülər", "constructors": "Konstruktorlar", "points": "XAL" },
+  "chances": { "title": "Çempionluq şansları", "drivers": "Sürücülər", "constructors": "Konstruktorlar kuboku", "round": "tur", "rounds": "tur" },
+  "lastRace": { "title": "Son tur" },
+  "reminders": { "title": "Yarış xatırlatmaları", "enable": "Xatırlatmaları aktiv edin", "save": "Seçimi yadda saxla", "disable": "Söndür", "day": "1 gün əvvəl", "hour": "1 saat əvvəl", "start": "Start anında", "enabled": "Xatırlatmalar aktivdir." }
+}
