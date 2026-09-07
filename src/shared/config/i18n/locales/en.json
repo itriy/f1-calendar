@@ -148,6 +148,8 @@
     "position": "POZ.",
     "participant": "MEMBER",
     "points": "POINTS",
+    "updated": "Updated {time}",
+    "liveUpdated": "Live data · updated {time}",
     "empty": "The table is not yet available."
   },
   "chances": {
@@ -164,6 +166,7 @@
   },
   "lastRace": {
     "eyebrow": "RESULTS · JOLPICA-F1",
+    "provisionalEyebrow": "PROVISIONAL · LIVE TIMING",
     "title": "The last stage",
     "loading": "Loading the results of the last race...",
     "time": "Time: {time}",

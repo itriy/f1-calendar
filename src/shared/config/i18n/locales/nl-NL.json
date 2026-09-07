@@ -148,6 +148,8 @@
     "position": "POS.",
     "participant": "DEELNEMER",
     "points": "PUNTEN",
+    "updated": "Bijgewerkt {time}",
+    "liveUpdated": "Livegegevens · bijgewerkt {time}",
     "empty": "De stand is nog niet beschikbaar."
   },
   "chances": {

@@ -69,6 +69,8 @@ export interface JolpicaResponse {
   MRData?: {
     RaceTable?: { season?: string; Races?: JolpicaRace[] };
     StandingsTable?: {
+      season?: string;
+      round?: string;
       StandingsLists?: Array<{
         DriverStandings?: JolpicaDriverStanding[];
         ConstructorStandings?: JolpicaConstructorStanding[];

@@ -3,6 +3,10 @@
   "name": "f1-calendar",
   "compatibility_date": "2026-08-23",
   "main": "src/server/worker.ts",
+  "durable_objects": {
+    "bindings": [{ "name": "F1_LIVE", "class_name": "F1LiveTimingHub" }],
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["F1LiveTimingHub"] }],
   "d1_databases": [
     {
       "binding": "PUSH_DB",

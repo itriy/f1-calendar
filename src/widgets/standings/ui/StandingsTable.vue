@@ -9,6 +9,8 @@ type ConstructorStanding = StandingDriver;
 const props = defineProps<{
   drivers: StandingDriver[];
   constructors: ConstructorStanding[];
+  source?: "jolpica" | "signalr" | "openf1";
+  updatedAt?: string;
 }>();
 const activeTable = ref("drivers");
 const standings = computed(() =>
@@ -26,6 +28,16 @@ const { t } = useI18n();
       <h2 class="font-display text-3xl leading-none font-extrabold uppercase">
         {{ t("standings.title") }}
       </h2>
+      <p
+        v-if="props.updatedAt"
+        class="mt-2 text-[10px] font-semibold tracking-wide text-zinc-500"
+      >
+        {{
+          props.source !== "jolpica"
+            ? t("standings.liveUpdated", { time: props.updatedAt })
+            : t("standings.updated", { time: props.updatedAt })
+        }}
+      </p>
     </div>
     <div class="mt-5 flex gap-5 border-b border-white/10 px-5 sm:px-7">
       <button

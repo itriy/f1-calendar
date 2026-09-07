@@ -7,6 +7,7 @@ import {
   getSeasonData,
   getSeasonRaceWinners,
 } from "@/entities/race/api/jolpica";
+import { getLiveStandings, getLiveTiming, type LiveStandings, type LiveTimingSnapshot } from "@/entities/race/api/openf1";
 import { i18n } from "@/shared/config/i18n";
 import { formatDateTime } from "@/shared/lib/dateTime";
 import type {
@@ -73,6 +74,7 @@ type LastRace = {
   date: string;
   place: string;
   flag: string;
+  provisional?: boolean;
   results: ResultView[];
 };
 type HistoryRace = {
@@ -109,6 +111,25 @@ type SeasonSummary = {
     points: string;
   }>;
 };
+
+const LIVE_STANDINGS_WINDOW_MS = 24 * 60 * 60_000;
+const LIVE_STANDINGS_REFRESH_MS = 10_000;
+const JOLPICA_RECHECK_MS = 5 * 60_000;
+
+export function isLiveStandingsWindow(
+  races: Pick<JolpicaRace, "date" | "time" | "Sprint">[],
+  currentTime = Date.now(),
+): boolean {
+  return races.some((race) =>
+    [race, race.Sprint]
+      .map(getRaceStart)
+      .some((start) =>
+        start !== null &&
+        currentTime >= start.getTime() &&
+        currentTime - start.getTime() < LIVE_STANDINGS_WINDOW_MS,
+      ),
+  );
+}
 
 export function getRaceStart(
   race: Pick<JolpicaRace, "date" | "time"> | null | undefined,
@@ -165,6 +186,8 @@ export function useF1Data() {
   const drivers = ref<StandingDriver[]>([]);
   const driverStandings = ref<StandingDriver[]>([]);
   const constructors = ref<ConstructorView[]>([]);
+  const standingsSource = ref<"jolpica" | "signalr" | "openf1">("jolpica");
+  const standingsUpdatedAt = ref("");
   const loading = ref(true);
   const error = ref("");
   const updatedAt = ref("");
@@ -185,6 +208,12 @@ export function useF1Data() {
   const historyDetailsError = ref("");
   let historyRequestId = 0;
   let historyDetailsRequestId = 0;
+  let standingsPoll: number | undefined;
+  let liveVisibilityHandler: (() => void) | undefined;
+  let lastJolpicaCheck = 0;
+  let lastOpenF1Check = 0;
+  let confirmedDrivers: StandingDriver[] = [];
+  let confirmedConstructors: ConstructorView[] = [];
   const updateNow = () => {
     now.value = Date.now();
   };
@@ -220,6 +249,164 @@ export function useF1Data() {
       code: item.Constructor.constructorId,
       color: teamColors[item.Constructor.constructorId] || "#9ba1aa",
     };
+  }
+  function applyJolpicaStandings(
+    driverList: JolpicaDriverStanding[],
+    constructorList: JolpicaConstructorStanding[],
+    replaceLive = true,
+  ) {
+    const nextDrivers = driverList.map(driver);
+    const nextConstructors = constructorList.slice(0, 5).map(constructor);
+    if (
+      !replaceLive &&
+      standingsSource.value !== "jolpica" &&
+      !sameStandings(nextDrivers, driverStandings.value)
+    )
+      return;
+    driverStandings.value = nextDrivers;
+    drivers.value = nextDrivers.slice(0, 5);
+    constructors.value = nextConstructors;
+    confirmedDrivers = nextDrivers;
+    confirmedConstructors = nextConstructors;
+    standingsSource.value = "jolpica";
+    standingsUpdatedAt.value = formatDataUpdatedAt();
+  }
+  function formatDataUpdatedAt() {
+    return formatDateTime(new Date(), i18n.global.locale.value, {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+  function sameStandings(
+    next: Array<Pick<StandingDriver, "pos" | "points">>,
+    current: Array<Pick<StandingDriver, "pos" | "points">>,
+  ) {
+    return (
+      next.length === current.length &&
+      next.every(
+        (standing, index) =>
+          standing.pos === current[index]?.pos &&
+          standing.points === current[index]?.points,
+      )
+    );
+  }
+  function normalizedName(value: string) {
+    return value.toLowerCase().replace(/[^a-zа-яіїєёáàâäçèéêëìíîïñòóôöùúûüýÿ]+/gi, "");
+  }
+  function pointsForPosition(position: number, sessionType: LiveTimingSnapshot["sessionType"]) {
+    const points = sessionType === "sprint"
+      ? [8, 7, 6, 5, 4, 3, 2, 1]
+      : [25, 18, 15, 12, 10, 8, 6, 4, 2, 1];
+    return points[position - 1] || 0;
+  }
+  function mergeLiveTiming(live: LiveTimingSnapshot) {
+    if (live.stale || live.sessionStatus !== "finished" || live.sessionType === "unknown") return;
+    const pointsByDriver = new Map(
+      live.results.map((result) => [normalizedName(result.name), pointsForPosition(Number(result.position), live.sessionType)]),
+    );
+    if (!pointsByDriver.size || !confirmedDrivers.length) return;
+    const liveDrivers = confirmedDrivers
+      .map((standing) => ({ ...standing, points: String(Number(standing.points) + (pointsByDriver.get(normalizedName(standing.name)) || 0)) }))
+      .sort((a, b) => Number(b.points) - Number(a.points))
+      .map((standing, index) => ({ ...standing, pos: String(index + 1) }));
+    const teamPoints = new Map<string, number>();
+    for (const result of live.results) {
+      const key = result.team.toLowerCase();
+      teamPoints.set(key, (teamPoints.get(key) || 0) + pointsForPosition(Number(result.position), live.sessionType));
+    }
+    const liveConstructors = confirmedConstructors
+      .map((standing) => ({ ...standing, points: String(Number(standing.points) + (teamPoints.get(standing.name.toLowerCase()) || 0)) }))
+      .sort((a, b) => Number(b.points) - Number(a.points))
+      .map((standing, index) => ({ ...standing, pos: String(index + 1) }));
+    if (!sameStandings(liveDrivers, driverStandings.value)) {
+      driverStandings.value = liveDrivers;
+      drivers.value = liveDrivers.slice(0, 5);
+      constructors.value = liveConstructors;
+      standingsSource.value = "signalr";
+      standingsUpdatedAt.value = formatDataUpdatedAt();
+    }
+    lastRace.value = {
+      name: live.sessionName || t("common.live"),
+      date: live.updatedAt.slice(0, 10),
+      place: "Live timing",
+      flag: "🏁",
+      provisional: true,
+      results: live.results
+        .filter((result) => pointsForPosition(Number(result.position), live.sessionType) > 0)
+        .map((result) => ({
+          position: result.position,
+          name: result.name,
+          url: "",
+          team: result.team,
+          teamUrl: "",
+          points: String(pointsForPosition(Number(result.position), live.sessionType)),
+          status: result.status,
+          raceTime: result.position === "1" ? result.gap || t("data.timeUnknown") : "",
+          gap: result.position === "1" ? t("data.winner") : result.gap || t("data.gapUnknown"),
+        })),
+    };
+  }
+  function mergeOpenF1Standings(live: LiveStandings) {
+    const driversByName = new Map(confirmedDrivers.map((standing) => [normalizedName(standing.name), standing]));
+    const constructorsByName = new Map(confirmedConstructors.map((standing) => [standing.name.toLowerCase(), standing]));
+    const liveDrivers = live.drivers.map((standing) => ({ ...driversByName.get(normalizedName(standing.name)), ...standing, url: driversByName.get(normalizedName(standing.name))?.url || "", teamUrl: driversByName.get(normalizedName(standing.name))?.teamUrl || "" }));
+    const liveConstructors = live.constructors.map((standing) => ({ ...constructorsByName.get(standing.name.toLowerCase()), ...standing, url: constructorsByName.get(standing.name.toLowerCase())?.url || "", team: constructorsByName.get(standing.name.toLowerCase())?.team || "-", teamUrl: "" }));
+    if (!liveDrivers.length || !liveConstructors.length || sameStandings(liveDrivers, driverStandings.value)) return;
+    driverStandings.value = liveDrivers;
+    drivers.value = liveDrivers.slice(0, 5);
+    constructors.value = liveConstructors.slice(0, 5);
+    standingsSource.value = "openf1";
+    standingsUpdatedAt.value = formatDataUpdatedAt();
+  }
+  async function refreshConfirmedStandings() {
+    const data = await getSeasonChampionshipLeaders(season.value);
+    const driverList =
+      data.drivers.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings;
+    const constructorList =
+      data.constructors.MRData?.StandingsTable?.StandingsLists?.[0]
+        ?.ConstructorStandings;
+    if (!driverList || !constructorList) return;
+    applyJolpicaStandings(driverList, constructorList, false);
+  }
+  async function refreshLiveStandings() {
+    const inLiveWindow = isLiveStandingsWindow(schedule.value);
+    if (inLiveWindow) {
+      try {
+        const live = await getLiveTiming();
+        if (live) mergeLiveTiming(live);
+      } catch (cause) {
+        console.warn("SignalR live timing unavailable", cause);
+      }
+    }
+    if (Date.now() - lastOpenF1Check >= JOLPICA_RECHECK_MS) {
+      lastOpenF1Check = Date.now();
+      try {
+        const fallback = await getLiveStandings(season.value);
+        if (fallback) mergeOpenF1Standings(fallback);
+      } catch (cause) {
+        console.warn("OpenF1 standings fallback unavailable", cause);
+      }
+    }
+    if (Date.now() - lastJolpicaCheck >= JOLPICA_RECHECK_MS) {
+      lastJolpicaCheck = Date.now();
+      try {
+        await refreshConfirmedStandings();
+      } catch (cause) {
+        console.warn("Jolpica standings refresh unavailable", cause);
+      }
+    }
+  }
+  function startStandingsPolling() {
+    if (standingsPoll) return;
+    liveVisibilityHandler = () => {
+      if (document.visibilityState === "visible") void refreshLiveStandings();
+    };
+    standingsPoll = window.setInterval(
+      liveVisibilityHandler,
+      LIVE_STANDINGS_REFRESH_MS,
+    );
+    document.addEventListener("visibilitychange", liveVisibilityHandler);
+    liveVisibilityHandler();
   }
   function normalizeLastRace(race: JolpicaRace): LastRace {
     return {
@@ -458,13 +645,8 @@ export function useF1Data() {
         ...race,
         flag: flags[race.Circuit?.Location?.country || ""] || "🏁",
       }));
-      driverStandings.value = driverList.map(driver);
-      drivers.value = driverStandings.value.slice(0, 5);
-      constructors.value = constructorList.slice(0, 5).map(constructor);
-      updatedAt.value = formatDateTime(new Date(), i18n.global.locale.value, {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+      applyJolpicaStandings(driverList, constructorList);
+      updatedAt.value = standingsUpdatedAt.value;
     } catch (cause) {
       console.error(t("data.seasonLog"), cause);
       error.value = t("data.seasonLoadError");
@@ -485,6 +667,7 @@ export function useF1Data() {
       .catch((cause) => console.error(t("data.seasonsLog"), cause));
     loadRaceHistory(season.value);
     loadSeasonSummary(season.value);
+    startStandingsPolling();
   }
   let clock: number | undefined;
   onMounted(() => {
@@ -495,7 +678,10 @@ export function useF1Data() {
   });
   onUnmounted(() => {
     if (clock) window.clearInterval(clock);
+    if (standingsPoll) window.clearInterval(standingsPoll);
     document.removeEventListener("visibilitychange", updateNow);
+    if (liveVisibilityHandler)
+      document.removeEventListener("visibilitychange", liveVisibilityHandler);
   });
   return {
     season,
@@ -503,6 +689,8 @@ export function useF1Data() {
     drivers,
     driverStandings,
     constructors,
+    standingsSource,
+    standingsUpdatedAt,
     loading,
     error,
     updatedAt,

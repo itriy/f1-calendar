@@ -148,6 +148,8 @@
     "position": "ПОЗ.",
     "participant": "УЧАСТНИК",
     "points": "ОЧКИ",
+    "updated": "Обновлено {time}",
+    "liveUpdated": "Оперативные данные · обновлено {time}",
     "empty": "Таблица пока недоступна."
   },
   "chances": {
@@ -164,6 +166,7 @@
   },
   "lastRace": {
     "eyebrow": "РЕЗУЛЬТАТЫ · JOLPICA-F1",
+    "provisionalEyebrow": "ПРЕДВАРИТЕЛЬНЫЕ · LIVE TIMING",
     "title": "Последний этап",
     "loading": "Загружаем результаты последней гонки…",
     "time": "Время: {time}",

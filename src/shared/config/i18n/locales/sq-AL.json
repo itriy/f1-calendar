@@ -148,6 +148,8 @@
     "position": "POZ.",
     "participant": "PJESËMARRËSI",
     "points": "PIKË",
+    "updated": "Përditësuar {time}",
+    "liveUpdated": "Të dhëna live · përditësuar {time}",
     "empty": "Renditja nuk është ende e disponueshme."
   },
   "chances": {

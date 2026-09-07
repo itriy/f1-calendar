@@ -30,6 +30,8 @@ const {
   drivers,
   driverStandings,
   constructors,
+  standingsSource,
+  standingsUpdatedAt,
   loading,
   error,
   updatedAt,
@@ -290,7 +292,12 @@ const countdown = (
             :loading="resultsLoading"
             :error="resultsError"
             @retry="loadLastResults"
-          /><StandingsTable :drivers="drivers" :constructors="constructors" />
+          /><StandingsTable
+            :drivers="drivers"
+            :constructors="constructors"
+            :source="standingsSource"
+            :updated-at="standingsUpdatedAt"
+          />
         </div>
       </section>
       <section

@@ -29,7 +29,7 @@ const formatDate = (date?: string) =>
         <p
           class="mb-2 text-[12px] font-extrabold tracking-[.16em] text-zinc-400"
         >
-          {{ t("lastRace.eyebrow") }}
+          {{ race?.provisional ? t("lastRace.provisionalEyebrow") : t("lastRace.eyebrow") }}
         </p>
         <h2 class="font-display text-3xl leading-none font-extrabold uppercase">
           {{ t("lastRace.title") }}

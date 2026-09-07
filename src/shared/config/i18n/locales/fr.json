@@ -148,6 +148,8 @@
     "position": "POZ.",
     "participant": "MEMBRE",
     "points": "POINTS",
+    "updated": "Mis à jour {time}",
+    "liveUpdated": "Données en direct · mises à jour {time}",
     "empty": "Le tableau n'est pas encore disponible."
   },
   "chances": {

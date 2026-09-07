@@ -148,6 +148,8 @@
     "position": "波兹。",
     "participant": "参与者",
     "points": "积分",
+    "updated": "更新于 {time}",
+    "liveUpdated": "实时数据 · 更新于 {time}",
     "empty": "该表尚未可用。"
   },
   "chances": {

@@ -148,6 +148,8 @@
     "position": "POZ.",
     "participant": "PARTICIPANTE",
     "points": "PUNTOS",
+    "updated": "Actualizado {time}",
+    "liveUpdated": "Datos en directo · actualizado {time}",
     "empty": "La mesa aún no está disponible."
   },
   "chances": {

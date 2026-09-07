@@ -1,6 +1,10 @@
 import { handlePushApi, type D1Database } from "./push";
 import { handleNewsFeed } from "./newsFeed";
 import { handleWatchProviders } from "./watchProviders";
+import { handleLiveStandings } from "./liveStandings";
+import { handleOpenF1Fallback } from "./openf1Fallback";
+export { F1LiveTimingHub } from "./f1LiveTimingHub";
+import type { F1LiveTimingHubNamespace } from "./liveStandings";
 import { serverText } from "@/shared/config/i18n/server";
 import {
   SITE_ORIGIN,
@@ -18,6 +22,7 @@ type Env = {
   VAPID_PRIVATE_KEY?: string;
   VAPID_SUBJECT?: string;
   YOUTUBE_API_KEY?: string;
+  F1_LIVE?: F1LiveTimingHubNamespace;
 };
 
 type Formula1Video = {
@@ -456,6 +461,10 @@ export default {
     if (url.pathname === "/api/f1-feed") return handleNewsFeed(request, env);
     if (url.pathname === "/api/watch-providers")
       return handleWatchProviders(request);
+    if (url.pathname === "/api/live-standings")
+      return handleOpenF1Fallback(request);
+    if (url.pathname === "/api/live-f1")
+      return handleLiveStandings(request, env.F1_LIVE);
     if (url.pathname.startsWith("/api/"))
       return error("not_found", serverText("apiNotFound"), 404);
     if (url.pathname === "/robots.txt") return robotsTxt();
@@ -475,4 +484,4 @@ export default {
   },
 };
 
-export { handleRaceVideos, handleNewsFeed, robotsTxt, sitemapXml };
+export { handleRaceVideos, handleNewsFeed, handleLiveStandings, robotsTxt, sitemapXml };
