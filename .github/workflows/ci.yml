@@ -49,6 +49,14 @@ jobs:
             echo "configured=false" >> "$GITHUB_OUTPUT"
             echo "Cloudflare deployment skipped: configure CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID repository secrets."
           fi
+      - name: Apply database migrations
+        if: steps.cloudflare-secrets.outputs.configured == 'true'
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4.125.0"
+          command: d1 migrations apply f1-calendar-push --remote
       - name: Deploy website and API Worker
         if: steps.cloudflare-secrets.outputs.configured == 'true'
         uses: cloudflare/wrangler-action@v4

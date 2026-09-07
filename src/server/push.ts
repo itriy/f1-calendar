@@ -42,6 +42,7 @@ type Delivery = {
 const MAX_BODY_BYTES = 4096;
 const JOLPICA_URL = "https://api.jolpi.ca/ergast/f1/current.json";
 const SCHEDULE_TTL_MS = 6 * 60 * 60_000;
+const DELIVERY_GRACE_MS = 12 * 60_000;
 const text = new TextEncoder();
 
 function response(body: unknown, status = 200) {
@@ -107,8 +108,13 @@ function subscription(value: unknown): PushSubscriptionData | null {
 }
 
 function configured(env: PushEnv): Response | null {
-  if (!env.PUSH_DB || !env.VAPID_PUBLIC_KEY || !env.VAPID_PRIVATE_KEY)
+  const missing = ["PUSH_DB", "VAPID_PUBLIC_KEY", "VAPID_PRIVATE_KEY"].filter(
+    (key) => !env[key as keyof PushEnv],
+  );
+  if (missing.length) {
+    console.error({ event: "push_not_configured", missing });
     return failure("not_configured", serverText("remindersNotConfigured"), 503);
+  }
   return null;
 }
 
@@ -121,12 +127,10 @@ export async function handlePushApi(
       status: 204,
       headers: { Allow: "GET, POST, PATCH, DELETE, OPTIONS" },
     });
-  if (request.method === "GET")
-    return env.VAPID_PUBLIC_KEY
-      ? response({ publicKey: env.VAPID_PUBLIC_KEY })
-      : failure("not_configured", serverText("remindersNotConfigured"), 503);
   const missing = configured(env);
   if (missing) return missing;
+  if (request.method === "GET")
+    return response({ publicKey: env.VAPID_PUBLIC_KEY });
   let body: Record<string, unknown>;
   try {
     body = (await parseBody(request)) as Record<string, unknown>;
@@ -231,7 +235,7 @@ function startAt(race: ScheduledRace) {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 function due(now: number, target: number) {
-  return now >= target - 2 * 60_000 && now <= target + 12 * 60_000;
+  return now >= target - 2 * 60_000 && now <= target + DELIVERY_GRACE_MS;
 }
 
 async function claimDelivery(
@@ -240,12 +244,13 @@ async function claimDelivery(
   raceKey: string,
   type: string,
   now: number,
+  expiresAt: number,
 ): Promise<Delivery | null> {
   await db
     .prepare(
-      "INSERT OR IGNORE INTO push_deliveries (subscription_id, race_key, reminder_type, next_attempt_at) VALUES (?, ?, ?, 0)",
+      "INSERT OR IGNORE INTO push_deliveries (subscription_id, race_key, reminder_type, next_attempt_at, expires_at) VALUES (?, ?, ?, 0, ?)",
     )
-    .bind(subscriptionId, raceKey, type)
+    .bind(subscriptionId, raceKey, type, expiresAt)
     .run();
   const row = await db
     .prepare(
@@ -271,8 +276,16 @@ async function deliver(
   type: "day" | "hour" | "start",
   race: ScheduledRace,
   now: number,
+  expiresAt: number,
 ) {
-  const claim = await claimDelivery(env.PUSH_DB!, sub.id, raceKey, type, now);
+  const claim = await claimDelivery(
+    env.PUSH_DB!,
+    sub.id,
+    raceKey,
+    type,
+    now,
+    expiresAt,
+  );
   if (!claim) return;
   const timing =
     type === "day"
@@ -312,12 +325,24 @@ async function deliver(
       )
       .bind(now, claim.id)
       .run();
+    console.info({ event: "push_sent", deliveryId: claim.id, raceKey, type });
   } catch (cause) {
     const retry =
       cause instanceof WebPushError && cause.retryAfterMs
         ? Math.min(cause.retryAfterMs, 60 * 60_000)
         : 5 * 60_000;
-    const status = claim.attempts >= 3 ? "failed" : "pending";
+    const status =
+      claim.attempts >= 3 || now + retry > expiresAt ? "failed" : "pending";
+    console.error({
+      event: "push_delivery_failed",
+      deliveryId: claim.id,
+      raceKey,
+      type,
+      attempt: claim.attempts,
+      status,
+      errorType: cause instanceof WebPushError ? "push_service" : "send_error",
+      statusCode: cause instanceof WebPushError ? cause.statusCode : undefined,
+    });
     await env
       .PUSH_DB!.prepare(
         "UPDATE push_deliveries SET status=?, next_attempt_at=? WHERE id=?",
@@ -328,7 +353,19 @@ async function deliver(
 }
 
 export async function sendDueRaceReminders(env: PushEnv, now = Date.now()) {
-  if (!env.PUSH_DB || !env.VAPID_PUBLIC_KEY || !env.VAPID_PRIVATE_KEY) return;
+  if (env.PUSH_DB) {
+    const expired = await env.PUSH_DB.prepare(
+      "UPDATE push_deliveries SET status='failed' WHERE status='pending' AND expires_at < ?",
+    )
+      .bind(now)
+      .run();
+    if (expired.meta?.changes)
+      console.info({
+        event: "push_deliveries_expired",
+        count: expired.meta.changes,
+      });
+  }
+  if (configured(env)) return;
   const cached = await env.PUSH_DB.prepare(
     "SELECT payload, updated_at FROM push_schedule_cache WHERE id=1",
   ).first<{ payload: string; updated_at: number }>();
@@ -346,6 +383,10 @@ export async function sendDueRaceReminders(env: PushEnv, now = Date.now()) {
         .bind(JSON.stringify(data), now)
         .run();
     } catch {
+      console.error({
+        event: "push_schedule_unavailable",
+        usingCache: Boolean(cached),
+      });
       if (!cached) return;
       data = JSON.parse(cached.payload);
     }
@@ -383,12 +424,34 @@ export async function sendDueRaceReminders(env: PushEnv, now = Date.now()) {
       },
       { type: "start", target: start.getTime(), enabled: "remind_start" },
     ];
-    for (const item of types)
-      if (due(now, item.target))
-        await Promise.allSettled(
+    for (const item of types) {
+      if (due(now, item.target)) {
+        const results = await Promise.allSettled(
           subs.results
             .filter((sub) => sub[item.enabled] === 1)
-            .map((sub) => deliver(env, sub, raceKey, item.type, race, now)),
+            .map((sub) =>
+              deliver(
+                env,
+                sub,
+                raceKey,
+                item.type,
+                race,
+                now,
+                item.target + DELIVERY_GRACE_MS,
+              ),
+            ),
         );
+        const rejected = results.filter(
+          (result) => result.status === "rejected",
+        ).length;
+        if (rejected)
+          console.error({
+            event: "push_delivery_storage_failed",
+            raceKey,
+            type: item.type,
+            count: rejected,
+          });
+      }
+    }
   }
 }
