@@ -306,5 +306,34 @@
   "wikiLink": {
     "ariaLabel": "{label}: open the Wikipedia page in a new tab",
     "title": "Open the Wikipedia page: {label}"
+  },
+  "raceEvents": {
+    "title": "KEY EVENTS",
+    "loading": "Loading race events…",
+    "error": "Could not load race events. Please try again.",
+    "note": "UTC time · Flags, race control, lead changes and pit lane visits. Lead changes may result from pit stops. Detailed notices are shown in English.",
+    "sector": "Sector {sector}",
+    "lap": "Lap {lap}",
+    "yellow": "Yellow flag",
+    "doubleYellow": "Double yellow flags",
+    "green": "Green flag",
+    "clear": "Track clear",
+    "red": "Red flag",
+    "finished": "Chequered flag",
+    "safetyCar": "Safety car deployed",
+    "safetyCarEnding": "Safety car in this lap",
+    "vsc": "Virtual safety car deployed",
+    "vscEnding": "Virtual safety car ending",
+    "more": "Show all events",
+    "less": "Show fewer events",
+    "empty": "No key events found for this race.",
+    "unsupported": "Event history is available from 2023.",
+    "pending": "Free event history becomes available 30 minutes after the session ends.",
+    "unavailable": "Event history is not yet available for this race.",
+    "leaderChange": "{driver} takes the lead. Previous leader: {previous}.",
+    "pit": "{driver} — pit lane visit",
+    "stopDuration": "Stationary stop: {seconds} s",
+    "laneDuration": "Time in pit lane: {seconds} s",
+    "partial": "Some additional events could not be loaded."
   }
 }

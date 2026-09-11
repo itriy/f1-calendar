@@ -305,5 +305,34 @@
   "wikiLink": {
     "ariaLabel": "{label}: abre la página de Wikipedia en una nueva pestaña",
     "title": "Abra la página de Wikipedia: {label}"
+  },
+  "raceEvents": {
+    "title": "EVENTOS CLAVE",
+    "loading": "Cargando eventos de la carrera…",
+    "error": "No se pudieron cargar los eventos de la carrera. Inténtalo de nuevo.",
+    "note": "Hora UTC · Banderas, dirección de carrera, cambios de líder y pasos por el pit lane. Los cambios de líder pueden deberse a paradas en boxes. Los avisos detallados se muestran en inglés.",
+    "sector": "Sector {sector}",
+    "lap": "Vuelta {lap}",
+    "yellow": "Bandera amarilla",
+    "doubleYellow": "Doble bandera amarilla",
+    "green": "Bandera verde",
+    "clear": "Pista despejada",
+    "red": "Bandera roja",
+    "finished": "Bandera a cuadros",
+    "safetyCar": "Coche de seguridad en pista",
+    "safetyCarEnding": "El coche de seguridad entra en esta vuelta",
+    "vsc": "Coche de seguridad virtual activado",
+    "vscEnding": "Finaliza el coche de seguridad virtual",
+    "more": "Mostrar todos los eventos",
+    "less": "Mostrar menos eventos",
+    "empty": "No se encontraron eventos clave para esta carrera.",
+    "unsupported": "El historial de eventos está disponible desde 2023.",
+    "pending": "El historial gratuito de eventos estará disponible 30 minutos después de que termine la sesión.",
+    "unavailable": "El historial de eventos aún no está disponible para esta carrera.",
+    "leaderChange": "{driver} toma el liderato. Líder anterior: {previous}.",
+    "pit": "{driver} — paso por el pit lane",
+    "stopDuration": "Tiempo detenido: {seconds} s",
+    "laneDuration": "Tiempo en el pit lane: {seconds} s",
+    "partial": "No se pudieron cargar algunos eventos adicionales."
   }
 }

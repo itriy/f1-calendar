@@ -305,5 +305,34 @@
   "wikiLink": {
     "ariaLabel": "{label}: Wikipedia-pagina openen in een nieuw tabblad",
     "title": "Wikipedia-pagina openen: {label}"
+  },
+  "raceEvents": {
+    "title": "BELANGRIJKE GEBEURTENISSEN",
+    "loading": "Racegebeurtenissen laden…",
+    "error": "De racegebeurtenissen konden niet worden geladen. Probeer het opnieuw.",
+    "note": "UTC-tijd · Vlaggen, wedstrijdleiding, leiderswissels en bezoeken aan de pitstraat. Leiderswissels kunnen het gevolg zijn van pitstops. Gedetailleerde meldingen worden in het Engels weergegeven.",
+    "sector": "Sector {sector}",
+    "lap": "Ronde {lap}",
+    "yellow": "Gele vlag",
+    "doubleYellow": "Dubbele gele vlaggen",
+    "green": "Groene vlag",
+    "clear": "Baan vrij",
+    "red": "Rode vlag",
+    "finished": "Finishvlag",
+    "safetyCar": "Safety car op de baan",
+    "safetyCarEnding": "Safety car komt deze ronde binnen",
+    "vsc": "Virtuele safety car actief",
+    "vscEnding": "Virtuele safety car wordt beëindigd",
+    "more": "Alle gebeurtenissen tonen",
+    "less": "Minder gebeurtenissen tonen",
+    "empty": "Geen belangrijke gebeurtenissen gevonden voor deze race.",
+    "unsupported": "De gebeurtenisgeschiedenis is beschikbaar vanaf 2023.",
+    "pending": "De gratis gebeurtenisgeschiedenis is 30 minuten na afloop van de sessie beschikbaar.",
+    "unavailable": "De gebeurtenisgeschiedenis is nog niet beschikbaar voor deze race.",
+    "leaderChange": "{driver} neemt de leiding. Vorige leider: {previous}.",
+    "pit": "{driver} — bezoek aan de pitstraat",
+    "stopDuration": "Stilstand: {seconds} s",
+    "laneDuration": "Tijd in de pitstraat: {seconds} s",
+    "partial": "Sommige aanvullende gebeurtenissen konden niet worden geladen."
   }
 }

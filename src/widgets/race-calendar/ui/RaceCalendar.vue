@@ -130,6 +130,7 @@ const raceStart = (race: CalendarRace) => {
       </div>
       <div class="col-span-full">
         <NextRaceCircuit
+          :show-events="activeTab === 'past'"
           :race="race"
           :force-open="race.round === openRaceRound"
         />

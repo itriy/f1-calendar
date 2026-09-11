@@ -305,5 +305,34 @@
   "wikiLink": {
     "ariaLabel": "{label}: Öffnen Sie die Wikipedia-Seite in einem neuen Tab",
     "title": "Öffnen Sie die Wikipedia-Seite: {label}"
+  },
+  "raceEvents": {
+    "title": "SCHLÜSSELEREIGNISSE",
+    "loading": "Rennereignisse werden geladen…",
+    "error": "Rennereignisse konnten nicht geladen werden. Bitte versuche es erneut.",
+    "note": "UTC-Zeit · Flaggen, Rennleitung, Führungswechsel und Besuche in der Boxengasse. Führungswechsel können durch Boxenstopps entstehen. Ausführliche Meldungen werden auf Englisch angezeigt.",
+    "sector": "Sektor {sector}",
+    "lap": "Runde {lap}",
+    "yellow": "Gelbe Flagge",
+    "doubleYellow": "Doppelte gelbe Flaggen",
+    "green": "Grüne Flagge",
+    "clear": "Strecke frei",
+    "red": "Rote Flagge",
+    "finished": "Karierte Flagge",
+    "safetyCar": "Safety-Car im Einsatz",
+    "safetyCarEnding": "Safety-Car kommt in dieser Runde herein",
+    "vsc": "Virtuelles Safety-Car im Einsatz",
+    "vscEnding": "Virtuelle Safety-Car-Phase endet",
+    "more": "Alle Ereignisse anzeigen",
+    "less": "Weniger Ereignisse anzeigen",
+    "empty": "Für dieses Rennen wurden keine Schlüsselereignisse gefunden.",
+    "unsupported": "Der Ereignisverlauf ist ab 2023 verfügbar.",
+    "pending": "Der kostenlose Ereignisverlauf ist 30 Minuten nach Sitzungsende verfügbar.",
+    "unavailable": "Der Ereignisverlauf ist für dieses Rennen noch nicht verfügbar.",
+    "leaderChange": "{driver} übernimmt die Führung. Zuvor führte {previous}.",
+    "pit": "{driver} — Besuch in der Boxengasse",
+    "stopDuration": "Standzeit: {seconds} s",
+    "laneDuration": "Zeit in der Boxengasse: {seconds} s",
+    "partial": "Einige zusätzliche Ereignisse konnten nicht geladen werden."
   }
 }

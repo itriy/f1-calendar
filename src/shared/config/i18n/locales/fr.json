@@ -305,5 +305,34 @@
   "wikiLink": {
     "ariaLabel": "{label} : ouvrir la page Wikipédia dans un nouvel onglet",
     "title": "Ouvrez la page Wikipédia : {label}"
+  },
+  "raceEvents": {
+    "title": "FAITS MARQUANTS",
+    "loading": "Chargement des événements de la course…",
+    "error": "Impossible de charger les événements de la course. Veuillez réessayer.",
+    "note": "Heure UTC · Drapeaux, direction de course, changements de leader et passages par la voie des stands. Les changements de leader peuvent résulter d’arrêts aux stands. Les messages détaillés sont affichés en anglais.",
+    "sector": "Secteur {sector}",
+    "lap": "Tour {lap}",
+    "yellow": "Drapeau jaune",
+    "doubleYellow": "Doubles drapeaux jaunes",
+    "green": "Drapeau vert",
+    "clear": "Piste dégagée",
+    "red": "Drapeau rouge",
+    "finished": "Drapeau à damier",
+    "safetyCar": "Voiture de sécurité en piste",
+    "safetyCarEnding": "La voiture de sécurité rentre à ce tour",
+    "vsc": "Voiture de sécurité virtuelle déployée",
+    "vscEnding": "Fin de la voiture de sécurité virtuelle",
+    "more": "Afficher tous les événements",
+    "less": "Afficher moins d’événements",
+    "empty": "Aucun fait marquant trouvé pour cette course.",
+    "unsupported": "L’historique des événements est disponible à partir de 2023.",
+    "pending": "L’historique gratuit des événements est disponible 30 minutes après la fin de la séance.",
+    "unavailable": "L’historique des événements n’est pas encore disponible pour cette course.",
+    "leaderChange": "{driver} prend la tête. Leader précédent : {previous}.",
+    "pit": "{driver} — passage par la voie des stands",
+    "stopDuration": "Temps d’arrêt : {seconds} s",
+    "laneDuration": "Temps dans la voie des stands : {seconds} s",
+    "partial": "Certains événements supplémentaires n’ont pas pu être chargés."
   }
 }

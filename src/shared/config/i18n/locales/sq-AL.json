@@ -305,5 +305,34 @@
   "wikiLink": {
     "ariaLabel": "{label}: hap faqen e Wikipedia-s në një skedë të re",
     "title": "Hap faqen e Wikipedia-s: {label}"
+  },
+  "raceEvents": {
+    "title": "NGJARJET KRYESORE",
+    "loading": "Po ngarkohen ngjarjet e garës…",
+    "error": "Ngjarjet e garës nuk mund të ngarkoheshin. Provo përsëri.",
+    "note": "Ora UTC · Flamujt, kontrolli i garës, ndryshimet e kryesuesit dhe kalimet në bokse. Ndryshimet e kryesuesit mund të vijnë nga ndalesat në bokse. Njoftimet e hollësishme shfaqen në anglisht.",
+    "sector": "Sektori {sector}",
+    "lap": "Xhiroja {lap}",
+    "yellow": "Flamur i verdhë",
+    "doubleYellow": "Flamuj të verdhë të dyfishtë",
+    "green": "Flamur i gjelbër",
+    "clear": "Pista është e lirë",
+    "red": "Flamur i kuq",
+    "finished": "Flamur me kuadrate",
+    "safetyCar": "Makina e sigurisë në pistë",
+    "safetyCarEnding": "Makina e sigurisë hyn në bokse këtë xhiro",
+    "vsc": "Makina virtuale e sigurisë është aktivizuar",
+    "vscEnding": "Makina virtuale e sigurisë po përfundon",
+    "more": "Shfaq të gjitha ngjarjet",
+    "less": "Shfaq më pak ngjarje",
+    "empty": "Nuk u gjetën ngjarje kryesore për këtë garë.",
+    "unsupported": "Historiku i ngjarjeve është i disponueshëm nga viti 2023.",
+    "pending": "Historiku falas i ngjarjeve bëhet i disponueshëm 30 minuta pas përfundimit të sesionit.",
+    "unavailable": "Historiku i ngjarjeve nuk është ende i disponueshëm për këtë garë.",
+    "leaderChange": "{driver} merr kryesimin. Kryesuesi i mëparshëm: {previous}.",
+    "pit": "{driver} — kalim nëpër bokse",
+    "stopDuration": "Koha e ndalesës: {seconds} s",
+    "laneDuration": "Koha në bokse: {seconds} s",
+    "partial": "Disa ngjarje shtesë nuk mund të ngarkoheshin."
   }
 }

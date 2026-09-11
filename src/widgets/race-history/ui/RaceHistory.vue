@@ -4,6 +4,7 @@ import { useI18n } from "vue-i18n";
 import TeamBadge from "@/entities/team/ui/TeamBadge.vue";
 import WikiLink from "@/shared/ui/WikiLink.vue";
 import RaceVideos from "./RaceVideos.vue";
+import RaceEvents from "@/entities/race/ui/RaceEvents.vue";
 import { formatDateTime } from "@/shared/lib/dateTime";
 
 type ResultLink = { name: string; url: string; team: string; teamUrl: string };
@@ -476,6 +477,7 @@ function toggleRace(race: HistoryRace) {
           <p v-else class="text-xs text-zinc-400">
             {{ t("history.detailsUnavailable") }}
           </p>
+          <RaceEvents :season="season" :date="race.date" />
           <RaceVideos
             :season="season"
             :round="race.round"

@@ -305,5 +305,34 @@
   "wikiLink": {
     "ariaLabel": "{label}：在新选项卡中打开维基百科页面",
     "title": "打开维基百科页面：{label}"
+  },
+  "raceEvents": {
+    "title": "关键事件",
+    "loading": "正在加载比赛事件…",
+    "error": "无法加载比赛事件，请重试。",
+    "note": "UTC 时间 · 旗帜、赛事控制、领先者变更和维修区通行。领先者变更可能由进站造成。详细通知以英文显示。",
+    "sector": "第 {sector} 赛段",
+    "lap": "第 {lap} 圈",
+    "yellow": "黄旗",
+    "doubleYellow": "双黄旗",
+    "green": "绿旗",
+    "clear": "赛道已清理",
+    "red": "红旗",
+    "finished": "方格旗",
+    "safetyCar": "安全车出动",
+    "safetyCarEnding": "安全车本圈结束后驶离",
+    "vsc": "虚拟安全车启用",
+    "vscEnding": "虚拟安全车即将结束",
+    "more": "显示所有事件",
+    "less": "收起事件",
+    "empty": "未找到本场比赛的关键事件。",
+    "unsupported": "事件历史记录自 2023 年起提供。",
+    "pending": "免费事件历史记录将在赛段结束 30 分钟后提供。",
+    "unavailable": "本场比赛的事件历史记录暂不可用。",
+    "leaderChange": "{driver}取得领先，上一位领先者：{previous}。",
+    "pit": "{driver} — 进入维修区",
+    "stopDuration": "静止时间：{seconds} 秒",
+    "laneDuration": "维修区用时：{seconds} 秒",
+    "partial": "部分附加事件无法加载。"
   }
 }

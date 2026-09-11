@@ -11,11 +11,13 @@ import type { JolpicaRace } from "@/entities/race/model/types";
 import type { CircuitMedia } from "@/entities/race/api/circuitWikipedia";
 import { useI18n } from "vue-i18n";
 
+const RaceEvents = defineAsyncComponent(() => import("@/entities/race/ui/RaceEvents.vue"));
+
 const WeekendDetails = defineAsyncComponent(
   () => import("./WeekendDetails.vue"),
 );
 
-const props = defineProps<{ race: JolpicaRace; forceOpen?: boolean }>();
+const props = defineProps<{ race: JolpicaRace; forceOpen?: boolean; showEvents?: boolean }>();
 const { t } = useI18n();
 const expanded = ref(false);
 const media = ref<CircuitMedia>(null);
@@ -235,6 +237,7 @@ watch(
         </div>
       </div>
       <WeekendDetails class="min-w-0" :race="race" />
+      <RaceEvents v-if="showEvents && race.date" :season="race.season || race.date.slice(0, 4)" :date="race.date" />
     </div>
   </div>
 </template>

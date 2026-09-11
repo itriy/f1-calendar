@@ -305,5 +305,34 @@
   "wikiLink": {
     "ariaLabel": "{label}: apre la pagina Wikipedia in una nuova scheda",
     "title": "Apri la pagina Wikipedia: {label}"
+  },
+  "raceEvents": {
+    "title": "EVENTI CHIAVE",
+    "loading": "Caricamento degli eventi della gara…",
+    "error": "Impossibile caricare gli eventi della gara. Riprova.",
+    "note": "Ora UTC · Bandiere, direzione gara, cambi di leader e passaggi in pit lane. I cambi di leader possono derivare dai pit stop. Le comunicazioni dettagliate sono mostrate in inglese.",
+    "sector": "Settore {sector}",
+    "lap": "Giro {lap}",
+    "yellow": "Bandiera gialla",
+    "doubleYellow": "Doppia bandiera gialla",
+    "green": "Bandiera verde",
+    "clear": "Pista libera",
+    "red": "Bandiera rossa",
+    "finished": "Bandiera a scacchi",
+    "safetyCar": "Safety car in pista",
+    "safetyCarEnding": "La safety car rientra in questo giro",
+    "vsc": "Virtual safety car attivata",
+    "vscEnding": "Fine della virtual safety car",
+    "more": "Mostra tutti gli eventi",
+    "less": "Mostra meno eventi",
+    "empty": "Nessun evento chiave trovato per questa gara.",
+    "unsupported": "La cronologia degli eventi è disponibile dal 2023.",
+    "pending": "La cronologia gratuita degli eventi sarà disponibile 30 minuti dopo la fine della sessione.",
+    "unavailable": "La cronologia degli eventi non è ancora disponibile per questa gara.",
+    "leaderChange": "{driver} passa al comando. Leader precedente: {previous}.",
+    "pit": "{driver} — passaggio in pit lane",
+    "stopDuration": "Tempo di sosta: {seconds} s",
+    "laneDuration": "Tempo in pit lane: {seconds} s",
+    "partial": "Non è stato possibile caricare alcuni eventi aggiuntivi."
   }
 }
